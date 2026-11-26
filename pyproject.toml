@@ -9,6 +9,7 @@ description = "Offline magyar beszédfelismerés – fejlesztői alapok"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
+    "av==18.1.1",
     "faster-whisper==1.2.1",
     "numpy>=2,<3",
     "PySide6-Essentials==6.12.0",

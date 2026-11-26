@@ -51,7 +51,7 @@ jobs:
       - name: Strict typecheck
         run: .\.venv\Scripts\python.exe -m mypy
 
-      - name: Unit and installed CLI tests
+      - name: Unit and source integration tests
         run: .\.venv\Scripts\python.exe -m pytest --basetemp=.tools/ci-pytest -p no:cacheprovider
 
       - name: Installed config entrypoint

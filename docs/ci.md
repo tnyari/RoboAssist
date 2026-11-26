@@ -37,8 +37,9 @@ checkout nem módosítja a forrásfájl byte szerinti SHA-256 értékét (#32).
 | Natív smoke | `python scripts/check-environment.py` |
 
 Minden Python-parancs a projekt `.venv/Scripts/` környezetéből fut.
-A meglévő készlet 30 konfigurációteszt és 2 subprocess CLI-teszt; a pytest a
-`pyproject.toml` összes aktuális tesztjét gyűjti, nincs fix darabszámra szűrés.
+A készlet konfiguráció-, subprocess CLI-, resampling- és audioforrás-integrációs
+teszteket tartalmaz. A pytest a `pyproject.toml` összes aktuális tesztjét gyűjti,
+nincs fix darabszámra szűrés; a normál CI mikrofont nem nyit.
 Nincs `continue-on-error`, feltételes tesztkihagyás vagy üres tesztet zöldnek
 jelölő ág. Az első hibás kötelező lépés sikertelen jobot ad; az utána következő
 lépések GitHub alapértelmezett viselkedése szerint nem futnak.

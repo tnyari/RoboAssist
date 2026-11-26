@@ -83,7 +83,9 @@ av==18.1.1 \
     --hash=sha256:c3a3bb19b3d570fada856e58a67628436e0530d65f8668a45c8c22dfed699b7a \
     --hash=sha256:e0b7d988e5013866426fb6ab5b06c7797f80d6e2c04ff72aaf71121e93d5a670 \
     --hash=sha256:e3bddd6bb9873e87e9e9217e2ebc454700a67b0728368901620fc7ae86d601d7
-    # via faster-whisper
+    # via
+    #   roboassist-offline-stt (pyproject.toml)
+    #   faster-whisper
 cffi==2.1.1 \
     --hash=sha256:046bfc24911b37851ee1b51aab8bffe713d89c68c6a057b09484ce9fd5f69b4e \
     --hash=sha256:06c72bb76605a4b0cd0aad6930b69d4baf7dd5d806cfc409b824191099700e66 \

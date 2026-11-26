@@ -6,6 +6,8 @@ A cél helyi, CPU-n is futó, közel valós idejű feliratozás. **M1:** mikrofo
 
 Elkészült a Python 3.11 x64 fejlesztői setup, a verzió- és hash-rögzített dependency lock, valamint a konfigurációbetöltő és validáló CLI. A [Windows CI workflow](docs/ci.md) a meglévő ellenőrzéseket futtatja; futtatható STT alkalmazás még nincs.
 
+A [mikrofon capture, állapottartó resampling és időzített WAV replay](docs/audio.md) közös 16 kHz mono float32 audioforrást ad. Eszközlistázás és explicit, hangmentés nélküli mikrofonpróba a fejlesztői parancssorból indítható.
+
 ## 🧭 Indulás
 
 - [Fejlesztési ütemterv és összes főjegy](https://github.com/tnyari/RoboAssist/issues/2)

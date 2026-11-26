@@ -66,7 +66,7 @@ ellenőrzéseket. A közvetlen `==` verziók cseréjéhez a `pyproject.toml` mó
 is kell. A bootstrap uv-verzióváltásához a script URL/hash, a dev-lista és a lock
 együttes frissítése szükséges. Ne szerkeszd kézzel a generált hash-eket.
 
-Futásidejű készlet: faster-whisper, NumPy, sounddevice és **PySide6 Essentials**.
+Futásidejű készlet: faster-whisper, NumPy, sounddevice, **PyAV** és **PySide6 Essentials**.
 Az Essentials az [önálló hivatalos Qt/PySide6 csomag](https://doc.qt.io/qtforpython-6/package_details.html),
 amely tartalmazza a QtCore/QtGui/QtWidgets modulokat. A tervezett M1 feliratablakhoz nem kell
 Addons vagy WebEngine. A [Qt 6.12 platformleírása](https://doc.qt.io/qtforpython-6/overviews/qtdoc-windows.html)
@@ -101,6 +101,10 @@ Replay integráció: #20; modellbenchmark és hardveres/offline/stabilitási ell
 a későbbi M1 jegyekben. M2 előtt az M1 kapu (#10) kötelező.
 
 ## ⚙️ Konfiguráció
+
+A [mikrofon és WAV replay leírása](audio.md) tartalmazza az audioforrás-szerződést,
+az eszközlistázó és az explicit, memóriában futó mikrofonpróba parancsait.
+Audioellenőrzési bizonyíték: [#4 riport](reports/issue-4-audio.md).
 
 `offline_stt.config.load_config(path)` egy explicit útvonalú, teljes schema-v1 TOML-t
 olvas és változtathatatlan dataclass struktúrát ad vissza. A mintát a
