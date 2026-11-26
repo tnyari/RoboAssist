@@ -16,7 +16,7 @@ csomagra.
 
 | Csomag / pontos verzió | Telepített metaadat | Terjesztési megjegyzés |
 |---|---|---|
-| [av 18.1.1](https://pypi.org/project/av/18.1.1/) | BSD-3-Clause | A PyPI Windows wheel FFmpeg binárisokat is tartalmaz. A licencút és az ehhez tartozó forrásanyag tisztázásáig ne tekintsd késznek a binary redisztribúciót: [#42](https://github.com/tnyari/RoboAssist/issues/42). |
+| [av 18.1.1](https://pypi.org/project/av/18.1.1/) | BSD-3-Clause | A PyAV `v18.1.1` forrása a `pyav-ffmpeg` `8.1.3-1` Windows buildet rögzíti, benne x264/x265 integrációval. Az upstream buildforrás GPL-kapcsolója ellentmondásos, a tényleges licencút és source/notices anyag nincs tisztázva: [#42](https://github.com/tnyari/RoboAssist/issues/42), [részletes riport](docs/reports/issue-25-license-audit.md). |
 | [faster-whisper 1.2.1](https://pypi.org/project/faster-whisper/1.2.1/) | MIT | A PyAV külön tranzitív/bundled függőség. |
 | [CTranslate2 4.9.1](https://pypi.org/project/ctranslate2/4.9.1/) | MIT | A teljes tranzitív verziólista a riportban van. |
 | [NumPy 2.4.6](https://pypi.org/project/numpy/2.4.6/) | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | Az adott wheel saját license fájljai is megőrzendők. |
