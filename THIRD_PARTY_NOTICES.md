@@ -1,6 +1,6 @@
 # Harmadik fél komponensei
 
-🟨 **Előkészítés alatt.** A #16 függőségei verzió- és hash-rögzítettek a `requirements.lock` fájlban. Az alábbi lista a ténylegesen telepített wheel-metaadatok kiinduló leltára, nem végleges terjesztési licencjegyzék. Modell még nincs telepítve.
+🟨 **Előkészítés alatt.** A #16 függőségei verzió- és hash-rögzítettek a `requirements.lock` fájlban. Az alábbi lista a ténylegesen telepített wheel-metaadatok kiinduló leltára, nem végleges terjesztési licencjegyzék. A #5 modellek külön leltára lent szerepel.
 
 A teljes ellenőrzés és projektlicenc-döntés: [STT-008-C #25](https://github.com/tnyari/RoboAssist/issues/25).
 
@@ -22,6 +22,14 @@ komponensek teljes notices-gyűjtése és terjesztési ellenőrzése #25 feladat
 | [PyAV 18.1.1](https://pypi.org/project/av/18.1.1/) | BSD-3-Clause; a mellékelt FFmpeg külön ellenőrzendő |
 
 ## 🧩 Még ellenőrizendő a végleges csomaghoz
+
+A #5 alatt a Systran többnyelvű base és small modellek helyileg telepítve és
+hash-ellenőrizve lettek. A [modelljegyzék](models/README.md) és
+[manifest](models/manifest.json) rögzíti a pontos immutable forrásokat, minden fájl
+SHA-256 értékét és a modellkártyák MIT jelölését. Az upstream OpenAI Whisper
+[MIT licencszövege](models/WHISPER_LICENSE.txt) rögzített forrásból származik,
+telepítéskor a modell mellé kerül. Súly nincs Gitben. Ez nem dönt a projekt
+licencéről és nem váltja ki a #25 teljes terjesztési auditját.
 
 | Ellenőrizendő jelölt a tervből | Rögzítendő bizonyíték |
 |---|---|

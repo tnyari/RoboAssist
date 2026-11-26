@@ -149,7 +149,7 @@ def load_config(path: str | Path) -> Config:
 
     An explicit path keeps configuration independent of the working directory or
     editable installation. No silent defaults are applied to incomplete files.
-    Model availability is checked by the future local engine adapter (#5).
+    Model availability is checked by the local engine adapter (#5).
     """
     try:
         with Path(path).open("rb") as stream:
