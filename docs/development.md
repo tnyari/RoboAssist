@@ -94,7 +94,9 @@ A tényleges eredményeket és korlátokat a [#16 riportja](reports/issue-16-env
 tartalmazza. A felhasználó által kijelölt Windows 10 célgép setupja, 32+32 tesztje,
 natív smoke-ja és audioformátum-lekérdezése sikeres; ugyanebben a riportban a #28
 kiegészítés tartalmazza a gépleltárt és a futtatott parancsokat. Ez nem tiszta
-OS-/Windows 11-próba, és nem modellinference-benchmark. Windows CI még nincs: [#17](https://github.com/tnyari/RoboAssist/issues/17).
+OS-/Windows 11-próba, és nem modellinference-benchmark. A tiszta Windows-próba
+a felhasználó döntése alapján egyelőre halasztott (#28); a fejlesztés ezen a gépen folytatódik.
+Windows CI: [workflow és hatókör](ci.md), [#17](https://github.com/tnyari/RoboAssist/issues/17).
 Replay integráció: #20; modellbenchmark és hardveres/offline/stabilitási ellenőrzések
 a későbbi M1 jegyekben. M2 előtt az M1 kapu (#10) kötelező.
 
