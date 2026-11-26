@@ -37,7 +37,7 @@ jobs:
           $PSVersionTable.PSVersion.ToString()
           Write-Output "Runner image: $env:ImageOS / $env:ImageVersion"
           Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, OSArchitecture
-          Get-FileHash requirements.lock -Algorithm SHA256
+          Write-Output ("Lock SHA-256: " + (Get-FileHash -LiteralPath requirements.lock -Algorithm SHA256).Hash)
 
       - name: Setup locked Python environment
         run: .\scripts\setup-dev.ps1

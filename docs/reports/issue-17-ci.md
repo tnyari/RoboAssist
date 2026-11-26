@@ -21,7 +21,7 @@
 | Shell | Windows PowerShell `5.1.26100.33822` |
 | Python | A setup által telepített CPython **3.11.18 x64**, nem a runner előtelepített Pythonja |
 | Függőségek | `uv pip check`: **45 kompatibilis disztribúció** |
-| Lock SHA-256 | `7472cc372365bcb9478600d0d48ce6692a7e32c44af39e961dc8f7540afb16fd` |
+| Forrás lock SHA-256 (az első CI-naplóból hiányzott, #31) | `7472cc372365bcb9478600d0d48ce6692a7e32c44af39e961dc8f7540afb16fd` |
 
 A GitHub Actions a pull request merge-refjét ellenőrzi; a fenti SHA a futás
 API-ból visszaolvasott PR-headje. A workflow/ref, joblépések, végállapot és napló
@@ -29,7 +29,7 @@ a GitHub bővítményen keresztül kerültek ellenőrzésre.
 
 | Kötelező lépés | Tényleges kimenet |
 |---|---|
-| Runner és lock azonosítás | OS, image, shell és SHA-256 a naplóban |
+| Runner és lock azonosítás | OS, image és shell a naplóban; a hash kijelzési hibáját #31 követi |
 | Hash-lockos setup | Telepítés sikeres, 45 csomag kompatibilis; konfiguráció rendben |
 | Ruff lint | `All checks passed!` |
 | Ruff formátum | `7 files already formatted` |
@@ -40,6 +40,20 @@ a GitHub bővítményen keresztül kerültek ellenőrzésre.
 
 A job összes kötelező lépése sikeres; nincs elnyelt hiba vagy kihagyott
 ellenőrzés. A tesztfutás ideje nem beszédfelismerési teljesítménymérés.
+
+## 🟠 Naplózási javítás – #31
+
+Az első futásban a PowerShell az OS-objektum után a FileHashInfo objektumot is
+Caption/Version/OSArchitecture oszlopokkal próbálta formázni, így a hash helyén
+üres sor jelent meg. Emiatt az első sikeres futás nem bizonyítja a hash naplóba
+írását; a fenti hash a tényleges forrásfájlból származik. A hiba külön aljegy:
+[#31](https://github.com/tnyari/RoboAssist/issues/31), szülője #17.
+
+A külön javító commit a számított `.Hash` értéket explicit, címkézett szövegként
+írja ki. A módosított lépés helyi Windows PowerShell 5.1 kimenetében a teljes
+64 karakteres `7472cc…fb16fd` érték megjelenik. Az új Actions-futás konkrét hash-sora
+és a javítás elfogadása #31-ben és a PR #30-ban kerül rögzítésre; a kezdeti
+kijelzési hiány nem szerepel sikeres ellenőrzésként.
 
 ## 🧪 Helyi ellenőrzés
 
