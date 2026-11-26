@@ -99,19 +99,41 @@ hash-ei között is megtalálható. A helyi csomag DLL-jei között FFmpeg, x264
 fájlnevek látszanak. Az av disztribúció BSD-3-Clause metaadata csak a PyAV
 forráslicencét jelzi, nem az egész binary wheel licence.
 
-A PyAV maintainer az upstream [#2270 beszélgetésben](https://github.com/PyAV-Org/PyAV/issues/2270#issuecomment-4594631670)
-a wheel licencútját „LGPLv2.1 vagy későbbi + kereskedelmi kivételek” vagy „GPLv2 vagy későbbi”
-lehetőségként írta le. A beszélgetés az [8.1.2-1 vendor build tree-re](https://github.com/PyAV-Org/pyav-ffmpeg/tree/8.1.2-1)
-és az [x265 licencelésre](https://www.x265.org/#licensing) mutat; az upstream maintainer
-később azt írta, hogy az x265 kereskedelmi feltételei eseti megállapodás tárgyai
-([#2270, 2026-10](https://github.com/PyAV-Org/PyAV/issues/2270#issuecomment-6409103808)).
+Az adott PyAV kiadáshoz tartozó elsődleges forráslánc most verziópontos:
+[PyAV `v18.1.1` konfigurációja](https://github.com/PyAV-Org/PyAV/blob/v18.1.1/scripts/ffmpeg-latest.json)
+a `pyav-ffmpeg` `8.1.3-1` kiadását rögzíti. A [PyAV release workflow](https://github.com/PyAV-Org/PyAV/blob/v18.1.1/.github/workflows/tests.yml)
+ezt a konfigurációt használja Windows wheel építése előtt, majd a wheelöket PyPI-re
+publikálja. A [vendor fetch script](https://github.com/PyAV-Org/PyAV/blob/v18.1.1/scripts/fetch-vendor.py)
+Windows x86_64-en a `ffmpeg-windows-x86_64.tar.gz` archívumot választja.
 
-**Nyitott döntés:** az adott wheelhez tartozó x264/x265 feltételek, a megfelelő
-redisztribúciós út és a teljes corresponding-source/notices csomag nincs egyértelműen
-lezárva. Ebből nem következik, hogy a wheel biztosan GPL, vagy hogy kereskedelmi
-használatra engedélyezett. Követés: [#42](https://github.com/tnyari/RoboAssist/issues/42).
-Amíg a terjesztési út nincs bizonyítva vagy a függőség nincs kiváltva, a Windows
-kiadási csomag licencellenőrzése nem teljes.
+A [vendor `11aa2e2` forrásfája](https://github.com/PyAV-Org/pyav-ffmpeg/tree/11aa2e2)
+FFmpeg 8.1.3-at, x264 `b35605ace3ddf7c1a5d67a2eb553f034aef41d55` commitet és x265 4.3-at
+rögzít. Ugyanott a [`scripts/pkg.py`](https://github.com/PyAV-Org/pyav-ffmpeg/blob/11aa2e2/scripts/pkg.py)
+a codec függőségek pontos forrás URL-jeit és SHA-256 értékeit tartalmazza. A
+[`scripts/build-ffmpeg.py`](https://github.com/PyAV-Org/pyav-ffmpeg/blob/11aa2e2/scripts/build-ffmpeg.py)
+Windows buildje a `libx264` és `libx265` FFmpeg integrációt is engedélyezi; az aktuális
+helyi `av.libs` mappában mindkét DLL ténylegesen jelen van.
+
+**Nyitott licencút-ellentmondás:** a vendor build script `--enable-version3` opciót ad,
+de a vizsgált forrásban nem szerepel `--enable-gpl`. Az [FFmpeg 8.1.3 licencleírása](https://ffmpeg.org/legal.html)
+és az [FFmpeg 8.1.3 `configure` forrása](https://github.com/FFmpeg/FFmpeg/blob/n8.1.3/configure)
+az x264 és x265 külső könyvtárakat GPL-ként sorolja fel, és GPL-függőséghez
+`--enable-gpl` kapcsolót ír elő. Ez a vendor konfiguráció és a helyben megfigyelt
+DLL-ek közötti, elsődleges forrásokból nem feloldott eltérés. A PyPI kiadás a kiválasztott
+wheelhez nem jelez provenance attestationt, ezért a lockolt fájlhash önmagában nem
+igazolja az upstream build tényleges konfigurációját.
+
+A PyAV maintainer az upstream [#2270 beszélgetésben](https://github.com/PyAV-Org/PyAV/issues/2270#issuecomment-4594631670)
+a wheel lehetséges licencútjaként „LGPLv2.1 vagy későbbi + kereskedelmi kivételek”
+vagy „GPLv2 vagy későbbi” lehetőséget említett, majd az [x265 kereskedelmi feltételeiről](https://github.com/PyAV-Org/PyAV/issues/2270#issuecomment-6409103808)
+azt írta, hogy azok egyedi megállapodás tárgyai. Ez nem oldja fel az adott Windows
+wheel buildkonfigurációját vagy a kapcsolódó feltételeket.
+
+**Nyitott döntés:** a tényleges build licencútja, minden beágyazott komponens
+licencszövege, a megfelelő corresponding-source/notices csomag és az x265 kereskedelmi
+feltételei nincsenek bizonyítva. Ebből nem következtetek üzleti engedélyre. Követés:
+[#42](https://github.com/tnyari/RoboAssist/issues/42). A Windows kiadási csomag
+licencellenőrzése ezért nem teljes.
 
 ### Qt for Python
 
