@@ -53,6 +53,11 @@ alapértékpótlás. A privacy/export-szabályok változatlanok.
 | pipeline.event_queue_capacity | 64, eseményenként legfeljebb 32768 szövegkarakter |
 | pipeline.stop_timeout_ms | 5000 ms, megengedett tartomány 1000–60000 ms |
 
+A session 100 ms-onként küldött számlálója az aktuális bemeneti RMS-szintet dBFS-ben
+(`input_level_dbfs`, −120 dBFS padló), valamint a decoder foglaltságát (`decoder_busy`)
+is tartalmazza. Ezek a GUI jelszintmérőjét és feldolgozásjelzését táplálják; nem
+helyettesítik a #8 CPU/RAM-, késleltetés- vagy minőségi benchmarkját.
+
 A kezdő VAD egyszerű energia-kapu, nem neurális beszédfelismerő. Hangos zajt is
 beszédnek vehet, halk beszédet kihagyhat. Küszöb/hiszterézis és végpont hangolása,
 zajos/valós magyar beszédmérés a #8 benchmarkhoz tartozik; ezek nem mért minőségi
@@ -169,3 +174,4 @@ A modell előzetesen, külön és explicit telepített kell legyen. A parancs cs
 metaadatot/eseményszámot ír ki, átiratot nem. Nem ment hangot, átiratot vagy
 metrikafájlt. A [#6 riport](reports/issue-6-pipeline.md) különíti el a szintetikus
 CI-t és a célgépen, valódi helyi modellekkel futtatott működési próbákat.
+

@@ -4,14 +4,15 @@
 
 A cél helyi, CPU-n is futó, közel valós idejű feliratozás. **M1:** mikrofon → Windows feliratablak. **M2:** kiválasztott Chrome/Edge fül → ugyanaz a helyi STT core → böngészős felirat.
 
-Elkészült a Python 3.11 x64 fejlesztői setup, a verzió- és hash-rögzített dependency lock, valamint a konfigurációbetöltő és validáló CLI. A [Windows CI workflow](docs/ci.md) a meglévő ellenőrzéseket futtatja; futtatható STT alkalmazás még nincs.
+Elkészült a Python 3.11 x64 fejlesztői setup, a verzió- és hash-rögzített dependency lock, a konfigurációbetöltő és validáló CLI, valamint a PySide6 Windows feliratablak első változata. A [Windows CI workflow](docs/ci.md) futtatja az automatizált ellenőrzéseket; a csomagolás és a benchmark még hátravan.
 
 A [mikrofon capture, állapottartó resampling és időzített WAV replay](docs/audio.md) közös 16 kHz mono float32 audioforrást ad. Eszközlistázás és explicit, hangmentés nélküli mikrofonpróba a fejlesztői parancssorból indítható.
 
 A [helyi SpeechEngine](docs/engine.md) workerből használható CPU INT8 adaptert,
 korlátos audiopuffert és reset/flush életciklust ad. A [base/small modellek](models/README.md)
-külön, explicit telepíthetők, rögzített revision/SHA/licenc alapján. A UI bekötése
-a következő M1 feladat része.
+külön, explicit telepíthetők, rögzített revision/SHA/licenc alapján. A [Windows feliratablak](docs/user-guide.md)
+mikrofon-, modell- és nyelvválasztást, Start/Stop/Clear, részleges/végleges feliratot,
+jelszintet, másolást és tudatos TXT exportot ad.
 
 A [session pipeline](docs/pipeline.md) energia-VAD-ot, korlátos sorokat és külön
 folyamatban futó dekódolást ad. A partial revíziók cserélhetők, a final egyszeri;
@@ -54,3 +55,4 @@ A modell előzetes telepítése után az STT internet nélkül működjön, clou
 A [PROJECT_PLAN.md](PROJECT_PLAN.md) a kapott `OFFLINE_STT_PROJECT_PLAN.md` változatlan tartalmú másolata. Tervezési bemenet; technológiai javaslatai és hivatkozásai implementációkor ellenőrzendők. A munkarendet a felhasználói kérés és a repó szabályai határozzák meg.
 
 A projektlicenc még nincs kiválasztva. A terv MIT-javaslata nem licencengedély. [Licencdöntés és harmadik fél feltételei (#25)](https://github.com/tnyari/RoboAssist/issues/25), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+

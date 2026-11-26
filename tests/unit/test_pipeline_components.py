@@ -108,6 +108,17 @@ def test_frame_queue_never_waits_for_capacity_and_counts_dropped_audio():
         queue.put(frame(count=481))
 
 
+def test_pipeline_stats_publish_input_level_and_decoder_activity():
+    counters = Counters()
+    counters.set("input_level_dbfs", -18.5)
+    counters.set("decoder_busy", True)
+
+    stats = counters.snapshot()
+
+    assert stats.input_level_dbfs == -18.5
+    assert stats.decoder_busy
+
+
 def test_eof_race_drains_last_frame_arriving_between_empty_read_and_producer_done(monkeypatch):
     queue = FrameQueue(2, Counters())
     done = Event()

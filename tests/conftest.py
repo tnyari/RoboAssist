@@ -2,10 +2,13 @@
 
 import hashlib
 import json
+import os
 import socket
 from types import SimpleNamespace
 
 import pytest
+
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from offline_stt.engines import LocalModelStore
 

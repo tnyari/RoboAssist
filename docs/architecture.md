@@ -29,13 +29,18 @@ flowchart LR
 | benchmarks/results | Mért, anonimizált összefoglalók | #8, #15 |
 
 A konfigurációbetöltő, validáló CLI, a [mikrofon/WAV audioforrások](audio.md), a
-[helyi CPU INT8 engine](engine.md) és a [session pipeline](pipeline.md) elkészültek.
+[helyi CPU INT8 engine](engine.md), a [session pipeline](pipeline.md) és a #7 első
+PySide6 ablak elkészült.
 A capture callback korlátos pufferbe
 ír; a 16 kHz mono átalakítás a pull olvasónál fut. Az engine `push_audio` metódusa
 csak pufferel; a worker `preview`/`flush` hívása dekódol. A #6/#18/#19/#20 pipeline
 külön spawn folyamatban, korlátos sorokon ütemez, revision/final eseményeket ad.
-A benchmark metrics #8, a UI #7 feladata. A reader worker
-hívja az audioforrás read metódusát; UI/capture callback nem dekódolhat. A session
-időalap monoton; a stabil final esemény nem módosulhat és nem duplikálódhat.
+A részletes benchmark metrikák a #8 feladatai. A UI külön Qt-szálon indítja/leállítja
+a sessiont, eseményeket és számlálókat olvas; a decoder_busy és a bemeneti dBFS
+jelszint a session statisztikáiból jön. CPU/RAM és minőségi/késleltetési eredményeket
+csak a benchmark mérhet hitelesen. A reader worker hívja az audioforrás read
+metódusát; UI/capture callback nem dekódolhat. A session időalap monoton; a stabil
+final esemény nem módosulhat és nem duplikálódhat.
 
 A modellek, függőségek és böngésző API-k aktuális változatait implementációkor kell ellenőrizni; ez az ábra a terv szerinti irány.
+
