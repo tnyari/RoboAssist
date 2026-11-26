@@ -69,8 +69,11 @@ A jogosultság- és shell-szabályok forrása a
   Windows 10 gépen történik; a tiszta Windows 10/11 és hiányzó VC++ runtime próba
   [#28](https://github.com/tnyari/RoboAssist/issues/28) alatt **halasztott, Open**.
   #16 és #3 nyitott elfogadása megmarad; #17 ezen döntés alapján folytatható.
-- A PR #29 tartalmazza a #16 alapját. A CI PR erre az ágra épül; a főágba kerüléshez
-  előbb az alap PR rendezése, majd a CI PR főágra irányítása szükséges.
+- A #16 környezetalap a [PR #29](https://github.com/tnyari/RoboAssist/pull/29)
+  [`5ec0126` merge commitjával](https://github.com/tnyari/RoboAssist/commit/5ec0126e6e4898e39fe6a1d022e2b3105ff91bad)
+  a main ágon van. A CI PR #30 célága main; az összevonás feltétele az új
+  merge-ref sikeres Windows CI-ellenőrzése. A főági bevezetés és a push-futás
+  tényleges eredményét #17 és a PR #30 követi.
 - A kis replay integráció és annak CI-bekötése [#20](https://github.com/tnyari/RoboAssist/issues/20)
   pipeline-függő munka; itt nincs helyette üres vagy szintetikus sikerjelzés.
 - Modellsúly, modellinference, teljes benchmark, hardveres mikrofonteszt és
