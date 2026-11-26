@@ -55,6 +55,22 @@ A külön javító commit a számított `.Hash` értéket explicit, címkézett 
 és a javítás elfogadása #31-ben és a PR #30-ban kerül rögzítésre; a kezdeti
 kijelzési hiány nem szerepel sikeres ellenőrzésként.
 
+## 🟠 Windows checkout sorvége – #32
+
+A #31 utáni [CI #3](https://github.com/tnyari/RoboAssist/actions/runs/45861542089)
+sikeres volt, és már ténylegesen kiírta a hash-t:
+`406de88c20be894b7a1e0f7dbcf973fe88e81b67fbde8731f1208753e0ccf6ee`.
+Ez a Git LF forrását CRLF-re alakító Windows checkout hash-e. A helyi
+LF→CRLF ellenőrző számítás byte-ra ezt az értéket adta, míg az LF változaté a
+fenti `7472cc…fb16fd`. A korábbi Windows checkout ezért nem szerepel
+byte-azonos forrásfájlként.
+
+Külön bug aljegy: [#32](https://github.com/tnyari/RoboAssist/issues/32), szülő #17.
+A javítás kizárólag a `requirements.lock text eol=lf` sort adja a
+`.gitattributes` fájlhoz; a lock tartalma, a verziók és a csomaghash-ek változatlanok.
+A javított checkout teljes CI-jének és pontos hash-sorának bizonyítéka #32-ben,
+#17-ben és a PR #30 végső állapotában követett.
+
 ## 🧪 Helyi ellenőrzés
 
 A workflow YAML-ja parse-olható, mind a nyolc `run` blokk Windows PowerShell 5.1

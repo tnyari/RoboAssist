@@ -21,6 +21,8 @@ A CI a [fejlesztői setupot](development.md) hívja Windows PowerShell 5.1 alatt
 3.11.18 x64 interpretert, teljes `requirements.lock` hash-ellenőrzést, kizárólag
 wheel telepítést és offline editable projekttelepítést használ.
 A runner előtelepített Pythonjától független; a setup nem frissíti a lockot.
+A `.gitattributes` a `requirements.lock` sorvégét LF-re rögzíti, így a Windows
+checkout nem módosítja a forrásfájl byte szerinti SHA-256 értékét (#32).
 
 ## 🧪 Kötelező ellenőrzések
 
