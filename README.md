@@ -8,6 +8,11 @@ Elkészült a Python 3.11 x64 fejlesztői setup, a verzió- és hash-rögzített
 
 A [mikrofon capture, állapottartó resampling és időzített WAV replay](docs/audio.md) közös 16 kHz mono float32 audioforrást ad. Eszközlistázás és explicit, hangmentés nélküli mikrofonpróba a fejlesztői parancssorból indítható.
 
+A [helyi SpeechEngine](docs/engine.md) workerből használható CPU INT8 adaptert,
+korlátos audiopuffert és reset/flush életciklust ad. A [base/small modellek](models/README.md)
+külön, explicit telepíthetők, rögzített revision/SHA/licenc alapján. Az UI és a
+session pipeline bekötése a következő M1 feladatok része.
+
 ## 🧭 Indulás
 
 - [Fejlesztési ütemterv és összes főjegy](https://github.com/tnyari/RoboAssist/issues/2)

@@ -28,6 +28,12 @@ flowchart LR
 | tests/unit, tests/integration, tests/fixtures | Célzott tesztek és kis, nem érzékeny minták | Az adott fejlesztési jegy |
 | benchmarks/results | Mért, anonimizált összefoglalók | #8, #15 |
 
-A konfigurációbetöltő, validáló CLI és a [mikrofon/WAV audioforrások](audio.md) elkészültek. A capture callback előre lefoglalt korlátos pufferbe ír; a 16 kHz mono átalakítás a pull olvasó oldalán fut. Az engine/pipeline/metrics/UI még helyőrző; a VAD #6 feladata. A SpeechEngine és TranscriptEvent szerződés részleteit a [forrásterv](../PROJECT_PLAN.md) §3.3, az implementációt #5 és #19 követi. A későbbi worker hívja az audioforrás read metódusát; UI/capture callback nem futtathat dekódolást. A session időalap monoton; final esemény nem módosulhat és nem duplikálódhat.
+A konfigurációbetöltő, validáló CLI, a [mikrofon/WAV audioforrások](audio.md) és a
+[helyi CPU INT8 engine](engine.md) elkészültek. A capture callback korlátos pufferbe
+ír; a 16 kHz mono átalakítás a pull olvasónál fut. Az engine `push_audio` metódusa
+csak pufferel; a worker `preview`/`flush` hívása dekódol. A pipeline/VAD #6,
+a stabil TranscriptEvent #19, a metrics #8, a UI #7 feladata. A későbbi worker
+hívja az audioforrás read metódusát; UI/capture callback nem dekódolhat. A session
+időalap monoton; a stabil final esemény nem módosulhat és nem duplikálódhat.
 
 A modellek, függőségek és böngésző API-k aktuális változatait implementációkor kell ellenőrizni; ez az ábra a terv szerinti irány.

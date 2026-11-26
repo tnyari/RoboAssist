@@ -7,3 +7,4 @@
 *.json text eol=lf
 *.ps1 text eol=crlf
 requirements.lock text eol=lf
+models/WHISPER_LICENSE.txt text eol=lf

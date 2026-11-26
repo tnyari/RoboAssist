@@ -14,7 +14,7 @@ frame_ms = 20
 [engine]
 backend = "faster-whisper"
 model = "base-multilingual"
-# Logikai modellazonosító; a helyi feloldás/hiányellenőrzés az engine (#5) feladata.
+# Logikai modellazonosító; kizárólag a models/manifest.json szerinti helyi modell.
 device = "cpu"
 compute_type = "int8"
 allow_automatic_download = false

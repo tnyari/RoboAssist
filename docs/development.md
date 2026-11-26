@@ -106,6 +106,11 @@ A [mikrofon és WAV replay leírása](audio.md) tartalmazza az audioforrás-szer
 az eszközlistázó és az explicit, memóriában futó mikrofonpróba parancsait.
 Audioellenőrzési bizonyíték: [#4 riport](reports/issue-4-audio.md).
 
+A [helyi engine szerződése](engine.md), [külön modelltelepítő](../models/README.md)
+és [#5 ellenőrzési riport](reports/issue-5-engine.md) írja le a base/small CPU INT8
+baseline-t. A normál pytest szintetikus fixture-ökkel fut; a valódi modellek smoke-ja
+külön, előzetes explicit telepítés után indítható.
+
 `offline_stt.config.load_config(path)` egy explicit útvonalú, teljes schema-v1 TOML-t
 olvas és változtathatatlan dataclass struktúrát ad vissza. A mintát a
 `configs/default.toml` tartalmazza. Hiányzó/ismeretlen mező, téves típus, sérült
@@ -121,7 +126,7 @@ Nincs részleges konfiguráció csendes alapértékpótlással.
 - Audio/átirat mentése alapból kikapcsolva; ezek explicit konfigurációs opt-innel
   engedélyezhetők. `export_requires_user_action = true` kötelező marad.
 - A modell logikai azonosítója önmagában nem igazol helyi telepítést. A helyi
-  feloldás/hiányhiba az engine (#5) feladata; itt nincs modellbetöltés vagy fallback.
+  feloldást/hiányhibát a helyi engine (#5) végzi; a config CLI nem tölt be modellt.
 
 A loader csak olvas. Az engine és a későbbi export/UI köteles a validált szabályokat
 érvényesíteni; a beállítások létezése nem igazol kész STT/export funkciót.

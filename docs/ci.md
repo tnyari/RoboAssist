@@ -38,7 +38,9 @@ checkout nem módosítja a forrásfájl byte szerinti SHA-256 értékét (#32).
 
 Minden Python-parancs a projekt `.venv/Scripts/` környezetéből fut.
 A készlet konfiguráció-, subprocess CLI-, resampling- és audioforrás-integrációs
-teszteket tartalmaz. A pytest a `pyproject.toml` összes aktuális tesztjét gyűjti,
+teszteket, valamint helyi modellkezelési és lazy fake decoderes engine-teszteket
+tartalmaz. Az engine-tesztek Python DNS/TCP hozzáférése tiltott; súlyt nem töltenek
+le és nem töltenek be. A pytest a `pyproject.toml` összes aktuális tesztjét gyűjti,
 nincs fix darabszámra szűrés; a normál CI mikrofont nem nyit.
 Nincs `continue-on-error`, feltételes tesztkihagyás vagy üres tesztet zöldnek
 jelölő ág. Az első hibás kötelező lépés sikertelen jobot ad; az utána következő
