@@ -149,13 +149,23 @@ revisionen; ez nem pontosságmérés vagy teljes modell-audit.
 
 ## 🔍 Sérülékenység-ellenőrzés
 
-**Eredmény nem készült.** A repository requirements.lock fájlja pip stílusú,
-uv.lock nincs. A telepített uv audit a projekt lockfájlját igényli és hálózatra
-csatlakozik. Az izolált, figyelmen kívül hagyott auditmásolat zárolása offline módban
-azért nem sikerült, mert az av 18.1.1 nem volt a cache-ben; a hálózatos
-uv lock próbát a környezet PyPI felé menő kapcsolatát elutasító proxy szakította meg
-(tcp connect error / os error 10061). Az audit parancs nem jutott el
-sérülékenységi adatbázishoz, ezért nincs pass/fail vagy „nincs ismert hiba” állítás.
+**Eredmény:** 2026-11-26-án az uv 0.13.10 auditja a [uv dokumentált OSV szolgáltatásával](https://docs.astral.sh/uv/reference/cli/#uv-audit)
+44 hash-lockban szereplő Python csomagverziót ellenőrzött. Az audit **nem talált
+ismert sérülékenységet vagy adverse package státuszt**.
+
+Az input a requirements.lock mind a 44 pontos name/version párjából készült
+ideiglenes PEP 723 audit-script; annak generált uv lockját az eredeti lockkal
+összevetve 44/44 egyezés volt, eltérés/hiányzó/többlet csomag nélkül. Az uv audit
+OSV hálózati lekérdezése sikeres volt. Az ideiglenes bemenet és lock kizárólag a
+figyelmen kívül hagyott .tools könyvtárban keletkezett; a projekt dependency lockja
+nem változott.
+
+**Korlát:** az eredmény az OSV adatbázis 2026-11-26-i állapotára és Python
+disztribúciók név/verzió azonosítóira vonatkozik. Nem külön natív DLL/SBOM vizsgálat,
+nem jogi licencellenőrzés, és nem jövőbeli sérülékenységmentességi garancia. Egy korábbi
+ideiglenes projektfeloldás a huggingface-hub 2.5.0-at választotta a lock 2.4.0-ja
+helyett; azt nem használtam, az eredmény nem része ennek az auditnak. A végleges
+vizsgálat a rögzített, 44/44 egyező bemenetet használta.
 
 ## ⏭️ M1 előtt nyitva marad
 
@@ -163,8 +173,8 @@ sérülékenységi adatbázishoz, ezért nincs pass/fail vagy „nincs ismert hi
   a beágyazott FFmpeg/kodek licencútja, forrásai és notices anyagai.
 - [ ] #24: a pontos PyInstaller kiadás, Qt licencút, natív/third-party notices
   és telepítési út ellenőrzése.
-- [ ] [#43](https://github.com/tnyari/RoboAssist/issues/43): sérülékenység-audit
-  hálózati OSV/PyPI hozzáféréssel, a ténylegesen használt hash-rögzített verziókra.
+- [x] [#43](https://github.com/tnyari/RoboAssist/issues/43): 2026-11-26-os
+  sérülékenység-audit a hash-rögzített Python verziókra; részletes eredmény fent.
 - [ ] Szükséges license fájlok/notices tényleges beillesztése és ellenőrzése a
   csomagban.
 
