@@ -44,8 +44,9 @@ helyezi a telepített modell mellé. A súlyok nem kerülnek ebbe a Git repóba.
   PortAudio és a többi beágyazott komponens licenceit/notices fájljait.
 - [ ] A csomag átadási módjának teljesítenie kell a kiválasztott Qt LGPL licencút
   feltételeit, ha ilyen utat választunk.
-- [ ] A függőségek sérülékenység-ellenőrzése még nem adott eredményt. Ezt a
-  [#25 riport](docs/reports/issue-25-license-audit.md) rögzíti.
+- [x] A 44 hash-rögzített Python függőség uv/OSV sérülékenység-auditja 2026-11-26-án
+  nem talált ismert sérülékenységet vagy adverse státuszt. Ez nem natív DLL-vizsgálat;
+  a [#25 riport](docs/reports/issue-25-license-audit.md) rögzíti a módszert és korlátokat.
 
 Addig ez a fájl a forrás-repó leltára, nem a kiadás teljes és ellenőrzött
 third-party notices csomagja.
