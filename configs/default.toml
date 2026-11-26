@@ -1,4 +1,4 @@
-# Tervezési minta; a loader/validáció és a végleges séma STT-001-A (#16).
+# Teljes schema-v1 konfiguráció. Betöltő: offline_stt.config.load_config (#16).
 schema_version = 1
 
 [application]
@@ -14,6 +14,7 @@ frame_ms = 20
 [engine]
 backend = "faster-whisper"
 model = "base-multilingual"
+# Logikai modellazonosító; a helyi feloldás/hiányellenőrzés az engine (#5) feladata.
 device = "cpu"
 compute_type = "int8"
 allow_automatic_download = false
