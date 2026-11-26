@@ -111,6 +111,11 @@ A [helyi engine szerződése](engine.md), [külön modelltelepítő](../models/R
 baseline-t. A normál pytest szintetikus fixture-ökkel fut; a valódi modellek smoke-ja
 külön, előzetes explicit telepítés után indítható.
 
+A [VAD/session pipeline](pipeline.md) és [#6 riport](reports/issue-6-pipeline.md)
+tartalmazza a bounded queue, partial/final események, Windows spawn és Stop/hiba
+életciklus szerződését. A teljes TOML új `[pipeline]` táblája és VAD-küszöbmezői
+kötelezők; korábbi saját konfigurációnál vedd át őket az aktuális mintából.
+
 `offline_stt.config.load_config(path)` egy explicit útvonalú, teljes schema-v1 TOML-t
 olvas és változtathatatlan dataclass struktúrát ad vissza. A mintát a
 `configs/default.toml` tartalmazza. Hiányzó/ismeretlen mező, téves típus, sérült

@@ -10,8 +10,12 @@ A [mikrofon capture, állapottartó resampling és időzített WAV replay](docs/
 
 A [helyi SpeechEngine](docs/engine.md) workerből használható CPU INT8 adaptert,
 korlátos audiopuffert és reset/flush életciklust ad. A [base/small modellek](models/README.md)
-külön, explicit telepíthetők, rögzített revision/SHA/licenc alapján. Az UI és a
-session pipeline bekötése a következő M1 feladatok része.
+külön, explicit telepíthetők, rögzített revision/SHA/licenc alapján. A UI bekötése
+a következő M1 feladat része.
+
+A [session pipeline](docs/pipeline.md) energia-VAD-ot, korlátos sorokat és külön
+folyamatban futó dekódolást ad. A partial revíziók cserélhetők, a final egyszeri;
+a Stop timeout és a túlterhelés látható hiba. [Tényleges ellenőrzések](docs/reports/issue-6-pipeline.md).
 
 ## 🧭 Indulás
 

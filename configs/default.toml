@@ -23,6 +23,16 @@ allow_automatic_download = false
 pre_roll_ms = 250
 end_silence_ms = 500
 max_segment_ms = 12000
+energy_threshold_db = -42.0
+hysteresis_db = 6.0
+
+[pipeline]
+partial_interval_ms = 750
+partial_window_ms = 5000
+frame_queue_capacity = 64
+final_queue_capacity = 4
+event_queue_capacity = 64
+stop_timeout_ms = 5000
 
 [privacy]
 save_audio = false

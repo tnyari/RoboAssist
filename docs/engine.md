@@ -2,8 +2,8 @@
 
 **Feladat:** [#5](https://github.com/tnyari/RoboAssist/issues/5).
 Az adapter a [#4 audioforrások](audio.md) `AudioFrame` blokkjait fogadja.
-A szerződés UI- és backendfüggetlen; a VAD, queue, ütemezés és stabil események
-#6/#19 feladata. A pipeline és UI bekötése még nincs kész.
+A szerződés UI- és backendfüggetlen; a VAD, queue, ütemezés és stabil események a
+[#6/#19 session pipeline-ban](pipeline.md) vannak. A UI bekötése #7 feladata.
 
 ## Szerződés
 

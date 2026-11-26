@@ -39,7 +39,10 @@ checkout nem módosítja a forrásfájl byte szerinti SHA-256 értékét (#32).
 Minden Python-parancs a projekt `.venv/Scripts/` környezetéből fut.
 A készlet konfiguráció-, subprocess CLI-, resampling- és audioforrás-integrációs
 teszteket, valamint helyi modellkezelési és lazy fake decoderes engine-teszteket
-tartalmaz. Az engine-tesztek Python DNS/TCP hozzáférése tiltott; súlyt nem töltenek
+tartalmaz. A #20 replay integráció valódi, futáskor generált WAV olvasót, VAD-ot,
+Windows-spawn sessiont és fake decoderes engine-t használ; Stop/restart/hiba és
+timeout regressziókat is futtat. A [#6 riport](reports/issue-6-pipeline.md) rögzíti
+a helyi eredményeket és hatókört. Az engine-tesztek Python DNS/TCP hozzáférése tiltott; súlyt nem töltenek
 le és nem töltenek be. A pytest a `pyproject.toml` összes aktuális tesztjét gyűjti,
 nincs fix darabszámra szűrés; a normál CI mikrofont nem nyit.
 Nincs `continue-on-error`, feltételes tesztkihagyás vagy üres tesztet zöldnek
@@ -78,7 +81,8 @@ A jogosultság- és shell-szabályok forrása a
   merge-ref sikeres Windows CI-ellenőrzése. A főági bevezetés és a push-futás
   tényleges eredményét #17 és a PR #30 követi.
 - A kis replay integráció és annak CI-bekötése [#20](https://github.com/tnyari/RoboAssist/issues/20)
-  pipeline-függő munka; itt nincs helyette üres vagy szintetikus sikerjelzés.
+  részeként a normál pytestben fut. Szintetikus audio és fake decoder; ez nem
+  valódi modell- vagy beszédpontosság-benchmark.
 - Modellsúly, modellinference, teljes benchmark, hardveres mikrofonteszt és
   hosszú stabilitási mérés nincs a normál CI-ben. Ezek külön M1 ellenőrzések.
 
