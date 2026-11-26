@@ -74,5 +74,7 @@ A jogosultság- és shell-szabályok forrása a
 - Modellsúly, modellinference, teljes benchmark, hardveres mikrofonteszt és
   hosszú stabilitási mérés nincs a normál CI-ben. Ezek külön M1 ellenőrzések.
 
-A tényleges Actions-futás és helyi ellenőrzés bizonyítéka a #17 jegyen és a
-megvalósítási PR-ben szerepel; egy workflow-fájl létezése önmagában nem CI-siker.
+A tényleges Actions-futás és helyi ellenőrzés bizonyítéka az
+[ellenőrzési riportban](reports/issue-17-ci.md), a #17 jegyen és a
+[PR #30-ban](https://github.com/tnyari/RoboAssist/pull/30) szerepel.
+Egy workflow-fájl létezése önmagában nem CI-siker.
