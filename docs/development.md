@@ -91,7 +91,10 @@ kirajzolását. Python socket-szinten tiltja a DNS/TCP kísérleteket. Nem vége
 modellinference-t, hangrögzítést vagy teljes operációsrendszer-szintű hálózatfigyelést.
 
 A tényleges eredményeket és korlátokat a [#16 riportja](reports/issue-16-environment.md)
-tartalmazza. Windows CI még nincs: [#17](https://github.com/tnyari/RoboAssist/issues/17).
+tartalmazza. A felhasználó által kijelölt Windows 10 célgép setupja, 32+32 tesztje,
+natív smoke-ja és audioformátum-lekérdezése sikeres; ugyanebben a riportban a #28
+kiegészítés tartalmazza a gépleltárt és a futtatott parancsokat. Ez nem tiszta
+OS-/Windows 11-próba, és nem modellinference-benchmark. Windows CI még nincs: [#17](https://github.com/tnyari/RoboAssist/issues/17).
 Replay integráció: #20; modellbenchmark és hardveres/offline/stabilitási ellenőrzések
 a későbbi M1 jegyekben. M2 előtt az M1 kapu (#10) kötelező.
 
