@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv-*/
+.tools/
 venv/
 .pytest_cache/
 .mypy_cache/
@@ -12,6 +14,7 @@ htmlcov/
 # Build output
 build/
 dist/
+wheelhouse/
 node_modules/
 # Local configuration and secrets
 .env

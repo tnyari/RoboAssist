@@ -4,7 +4,7 @@
 
 A cél helyi, CPU-n is futó, közel valós idejű feliratozás. **M1:** mikrofon → Windows feliratablak. **M2:** kiválasztott Chrome/Edge fül → ugyanaz a helyi STT core → böngészős felirat.
 
-Ez a repó jelenleg tervet, feladatbontást, munkaszabályokat, issue-sablonokat és könyvtárvázat tartalmaz. Futtatható STT alkalmazás, dependency lock és sikeresen futó CI még nincs.
+Elkészült a Python 3.11 x64 fejlesztői setup, a verzió- és hash-rögzített dependency lock, valamint a konfigurációbetöltő és validáló CLI. Futtatható STT alkalmazás és Windows CI még nincs.
 
 ## 🧭 Indulás
 
@@ -15,7 +15,9 @@ Ez a repó jelenleg tervet, feladatbontást, munkaszabályokat, issue-sablonokat
 - [Hozzájárulás](CONTRIBUTING.md) · [Agent szabályok](AGENTS.md)
 - [Architektúra és repo struktúra](docs/architecture.md)
 
-Első végrehajtható feladat: [Python 3.11 x64 környezet és lock (#16)](https://github.com/tnyari/RoboAssist/issues/16), majd [Windows CI (#17)](https://github.com/tnyari/RoboAssist/issues/17). Az STT-001 főjegy ezek lezárásáig nyitva marad.
+Fejlesztői setup a repó gyökeréből: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-dev.ps1`. [Parancsok és előfeltételek](docs/development.md), [tényleges ellenőrzési riport](docs/reports/issue-16-environment.md).
+
+A [#16 környezetfeladat](https://github.com/tnyari/RoboAssist/issues/16) tiszta Windows gépes ellenőrzése [#28](https://github.com/tnyari/RoboAssist/issues/28), a Windows CI [#17](https://github.com/tnyari/RoboAssist/issues/17) feladata. Az STT-001 főjegy ezek lezárásáig nyitva marad.
 
 ## 🚦 Sorrend és elfogadás
 
