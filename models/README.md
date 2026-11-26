@@ -52,9 +52,12 @@ futtatott próbát is dokumentál.
 
 ## Licenc és Git
 
-A modellkártyák MIT licencet jelölnek. A [Whisper licencszöveg](WHISPER_LICENSE.txt)
+A két rögzített modellkártya MIT licencet jelöl. A [Whisper licencszöveg](WHISPER_LICENSE.txt)
 az [OpenAI Whisper rögzített upstream forrásából](https://github.com/openai/whisper/blob/86098128c0b4f24f0e2aa2994de830614b474227/LICENSE)
 származik; hash-e és forrása a manifestben van. Az installer ezt `LICENSE.txt` néven
-mellékeli. A projektlicenc és a teljes csomagolási licencaudit továbbra is #25.
+mellékeli. A RoboAssist saját forráskódjának licence MIT ([LICENSE](../LICENSE)); a
+független modell- és függőségfeltételeket, illetve a még nyitott csomagolási kérdéseket
+a [#25 licencaudit](../docs/reports/issue-25-license-audit.md) követi.
 
 Súly, cache és letöltés nem kerül Gitbe. Futás közben nincs automatikus letöltés.
+

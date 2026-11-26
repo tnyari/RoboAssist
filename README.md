@@ -54,5 +54,5 @@ A modell előzetes telepítése után az STT internet nélkül működjön, clou
 
 A [PROJECT_PLAN.md](PROJECT_PLAN.md) a kapott `OFFLINE_STT_PROJECT_PLAN.md` változatlan tartalmú másolata. Tervezési bemenet; technológiai javaslatai és hivatkozásai implementációkor ellenőrzendők. A munkarendet a felhasználói kérés és a repó szabályai határozzák meg.
 
-A projektlicenc még nincs kiválasztva. A terv MIT-javaslata nem licencengedély. [Licencdöntés és harmadik fél feltételei (#25)](https://github.com/tnyari/RoboAssist/issues/25), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+A RoboAssist saját forráskódjának választott licence az [MIT](LICENSE). Ez nem írja felül a külön csomagolt függőségek és modellek feltételeit. A [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) és a [#25 licencaudit-riport](docs/reports/issue-25-license-audit.md) a ténylegesen vizsgált verziókat és a még nyitott terjesztési kérdéseket rögzíti; az audit és az M1 kapu még nincs lezárva.
 
