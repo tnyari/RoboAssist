@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import time
 from collections.abc import Callable
 from multiprocessing.connection import Connection
@@ -58,6 +59,12 @@ def run_session(
             while not quit_reader.is_set() and not stop.is_set():
                 frame = source.read(timeout=0.05)
                 if frame is not None:
+                    mean_square = math.fsum(float(sample) ** 2 for sample in frame.samples) / len(
+                        frame.samples
+                    )
+                    rms = math.sqrt(mean_square)
+                    level = 20 * math.log10(max(rms, 1e-6))
+                    counters.set("input_level_dbfs", max(-120.0, min(0.0, level)))
                     frames.put(frame)
                 elif source.state == SourceState.ENDED:
                     break
@@ -88,33 +95,37 @@ def run_session(
             counters.add("engine_warmup_calls", engine.stats.warmup_calls)
             engine_ready.set()
             while (job := jobs.get()) is not None:
-                engine.reset(start_sample=job.frame.start_sample)
-                engine.push_audio(job.frame)
-                result = engine.flush() if job.final else engine.preview()
-                kind = "final" if job.final else "partial"
-                counters.add(kind + "_decodes")
-                counters.add(kind + "_decode_seconds", result.decode_seconds)
-                counters.add("decoded_audio_samples", len(job.frame.samples))
-                if segment == job.segment:
-                    overlap = max(
-                        0,
-                        min(previous_end, job.frame.end_sample)
-                        - max(previous_start, job.frame.start_sample),
+                counters.set("decoder_busy", True)
+                try:
+                    engine.reset(start_sample=job.frame.start_sample)
+                    engine.push_audio(job.frame)
+                    result = engine.flush() if job.final else engine.preview()
+                    kind = "final" if job.final else "partial"
+                    counters.add(kind + "_decodes")
+                    counters.add(kind + "_decode_seconds", result.decode_seconds)
+                    counters.add("decoded_audio_samples", len(job.frame.samples))
+                    if segment == job.segment:
+                        overlap = max(
+                            0,
+                            min(previous_end, job.frame.end_sample)
+                            - max(previous_start, job.frame.start_sample),
+                        )
+                        counters.add("repeated_decode_samples", overlap)
+                    else:
+                        segment = job.segment
+                        previous_start = job.frame.start_sample
+                    previous_end = max(
+                        previous_end if segment == job.segment else 0, job.frame.end_sample
                     )
-                    counters.add("repeated_decode_samples", overlap)
-                else:
-                    segment = job.segment
-                    previous_start = job.frame.start_sample
-                previous_end = max(
-                    previous_end if segment == job.segment else 0, job.frame.end_sample
-                )
-                if jobs.stale(job):
-                    if not job.final:
-                        counters.add("partial_jobs_dropped")
-                    continue
-                event = stabilizer.accept(job, result)
-                if event is not None:
-                    send("event", event)
+                    if jobs.stale(job):
+                        if not job.final:
+                            counters.add("partial_jobs_dropped")
+                        continue
+                    event = stabilizer.accept(job, result)
+                    if event is not None:
+                        send("event", event)
+                finally:
+                    counters.set("decoder_busy", False)
         except Exception as exc:
             fail(f"Engine failure: {exc}")
         finally:

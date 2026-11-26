@@ -39,6 +39,8 @@ class TranscriptEvent:
 
 @dataclass(frozen=True)
 class PipelineStats:
+    input_level_dbfs: float = -120.0
+    decoder_busy: bool = False
     audio_frames: int = 0
     audio_samples: int = 0
     dropped_frames: int = 0

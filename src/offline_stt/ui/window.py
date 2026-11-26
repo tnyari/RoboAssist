@@ -1,0 +1,513 @@
+"""Responsive Windows transcript window."""
+
+from __future__ import annotations
+
+import html
+from pathlib import Path
+
+from PySide6.QtCore import QSettings, Qt, QThread, QTimer, Signal, Slot
+from PySide6.QtGui import QCloseEvent, QTextCursor, QTextOption
+from PySide6.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QFileDialog,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QSizePolicy,
+    QTextBrowser,
+    QVBoxLayout,
+    QWidget,
+)
+
+from offline_stt.audio.microphone import InputDevice, input_devices
+from offline_stt.config import Config
+from offline_stt.pipeline.types import PipelineStats
+from offline_stt.ui.controller import SessionController
+from offline_stt.ui.transcript import TranscriptBuffer
+
+_LANGUAGES = (
+    ("Magyar", "hu"),
+    ("English", "en"),
+    ("Čeština", "cs"),
+    ("Slovenčina", "sk"),
+    ("Română", "ro"),
+)
+
+
+class MainWindow(QMainWindow):
+    start_requested = Signal(int, int, str, str)
+    stop_requested = Signal()
+    close_requested = Signal()
+
+    def __init__(
+        self,
+        config: Config,
+        catalog_path: Path,
+        model_root: Path,
+        installed_models: tuple[tuple[str, str], ...],
+    ) -> None:
+        super().__init__()
+        self._config = config
+        self._catalog_path = catalog_path
+        self._model_root = model_root
+        self._installed_models = installed_models
+        self._devices: list[InputDevice] = []
+        self._buffer = TranscriptBuffer()
+        self._accept_events = False
+        self._capture_state = "idle"
+        self._closing = False
+        self._allow_close = False
+
+        self.setWindowTitle("RoboAssist · offline felirat")
+        self.setMinimumSize(680, 560)
+        self.resize(940, 720)
+        self._restore_settings()
+        self._build_ui()
+        if self._always_on_top.isChecked():
+            self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
+        self._load_devices()
+        self._populate_models()
+
+        self._thread = QThread(self)
+        self._controller = SessionController(config, str(catalog_path), str(model_root))
+        self._controller.moveToThread(self._thread)
+        self.start_requested.connect(self._controller.start)
+        self.stop_requested.connect(self._controller.stop)
+        self.close_requested.connect(self._controller.close_session)
+        self._controller.state_changed.connect(self._on_state_changed)
+        self._controller.session_started.connect(self._on_session_started)
+        self._controller.session_stopped.connect(self._on_session_stopped)
+        self._controller.closed.connect(self._on_controller_closed)
+        self._controller.closed.connect(self._thread.quit)
+        self._thread.finished.connect(self._controller.deleteLater)
+        self._thread.start()
+
+        self._poller = QTimer(self)
+        self._poller.setInterval(100)
+        self._poller.timeout.connect(self._poll_session)
+        self._poller.start()
+
+    def _build_ui(self) -> None:
+        self.setStyleSheet(
+            """
+            QMainWindow { background: #f4f6fa; }
+            QFrame#hero { background: #15243a; border-radius: 14px; }
+            QLabel#brand { color: #ffffff; font-size: 21px; font-weight: 700; }
+            QLabel#tagline { color: #b8c7dc; font-size: 11px; }
+            QLabel#status { color: #ffffff; font-size: 13px; font-weight: 600; }
+            QLabel#sectionTitle { color: #172438; font-size: 14px; font-weight: 650; }
+            QGroupBox { border: 1px solid #dce2eb; border-radius: 10px; margin-top: 9px;
+                        padding: 12px; background: #ffffff; color: #334155; font-weight: 600; }
+            QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 5px; }
+            QComboBox { min-height: 34px; border: 1px solid #d5dce7; border-radius: 7px;
+                        padding: 2px 9px; background: #ffffff; }
+            QPushButton { min-height: 34px; padding: 0 13px; border-radius: 7px;
+                          border: 1px solid #d5dce7; background: #ffffff; color: #172438; }
+            QPushButton:hover { background: #edf2f8; }
+            QPushButton:disabled { color: #9aa5b5; background: #f0f2f5; }
+            QPushButton#primary { background: #1769d2; border-color: #1769d2; color: #ffffff;
+                                  font-weight: 650; }
+            QPushButton#primary:hover { background: #0f58b6; }
+            QTextBrowser { border: 1px solid #dce2eb; border-radius: 10px; background: #ffffff;
+                           color: #172438; padding: 16px; selection-background-color: #b7d5ff; }
+            QProgressBar { height: 10px; border: 0; border-radius: 5px; background: #e7ebf1; }
+            QProgressBar::chunk { border-radius: 5px; background: #27a679; }
+            QLabel.metric { color: #5c6879; font-size: 11px; }
+            QLabel.metricValue { color: #172438; font-size: 14px; font-weight: 650; }
+            """
+        )
+        root = QWidget(self)
+        layout = QVBoxLayout(root)
+        layout.setContentsMargins(22, 20, 22, 18)
+        layout.setSpacing(13)
+
+        hero = QFrame()
+        hero.setObjectName("hero")
+        hero_layout = QHBoxLayout(hero)
+        hero_layout.setContentsMargins(18, 15, 18, 15)
+        brand_box = QVBoxLayout()
+        brand = QLabel("RoboAssist")
+        brand.setObjectName("brand")
+        tagline = QLabel("HELYI BESZÉDFELISMERÉS  ·  OFFLINE")
+        tagline.setObjectName("tagline")
+        brand_box.addWidget(brand)
+        brand_box.addWidget(tagline)
+        hero_layout.addLayout(brand_box)
+        hero_layout.addStretch(1)
+        self._status_dot = QLabel("●")
+        self._status_dot.setStyleSheet("color: #94a3b8; font-size: 18px;")
+        self._status_label = QLabel("Készen áll")
+        self._status_label.setObjectName("status")
+        status_box = QHBoxLayout()
+        status_box.addWidget(self._status_dot)
+        status_box.addWidget(self._status_label)
+        hero_layout.addLayout(status_box)
+        layout.addWidget(hero)
+
+        settings = QGroupBox("Munkamenet")
+        grid = QGridLayout(settings)
+        grid.setHorizontalSpacing(10)
+        grid.setVerticalSpacing(8)
+        grid.addWidget(QLabel("Mikrofon"), 0, 0)
+        self._device_combo = QComboBox()
+        self._device_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self._device_combo.setAccessibleName("Mikrofon kiválasztása")
+        grid.addWidget(self._device_combo, 0, 1)
+        self._refresh_devices = QPushButton("Frissítés")
+        self._refresh_devices.setToolTip("Újraolvassa a Windows hangbemeneteit")
+        self._refresh_devices.clicked.connect(self._load_devices)
+        grid.addWidget(self._refresh_devices, 0, 2)
+        grid.addWidget(QLabel("Helyi modell"), 1, 0)
+        self._model_combo = QComboBox()
+        self._model_combo.setAccessibleName("Helyi beszédfelismerő modell")
+        grid.addWidget(self._model_combo, 1, 1)
+        grid.addWidget(QLabel("Nyelv"), 1, 2)
+        self._language_combo = QComboBox()
+        for label, code in _LANGUAGES:
+            self._language_combo.addItem(label, code)
+        language_index = self._language_combo.findData(self._config.application.language)
+        self._language_combo.setCurrentIndex(max(0, language_index))
+        self._language_combo.setAccessibleName("Besédfelismerés nyelve")
+        grid.addWidget(self._language_combo, 1, 3)
+        self._always_on_top = QPushButton("Mindig felül")
+        self._always_on_top.setCheckable(True)
+        self._always_on_top.setAccessibleName("Ablak mindig felül")
+        self._always_on_top.setChecked(bool(self._settings.value("always_on_top", False, bool)))
+        self._always_on_top.toggled.connect(self._set_always_on_top)
+        grid.addWidget(self._always_on_top, 0, 3)
+        layout.addWidget(settings)
+
+        level_row = QHBoxLayout()
+        self._level_label = QLabel("Bemeneti jelszint")
+        self._level_label.setObjectName("sectionTitle")
+        level_row.addWidget(self._level_label)
+        self._level_bar = QProgressBar()
+        self._level_bar.setRange(0, 100)
+        self._level_bar.setValue(0)
+        self._level_bar.setTextVisible(False)
+        self._level_bar.setAccessibleName("Mikrofon bemeneti jelszint")
+        level_row.addWidget(self._level_bar, 1)
+        self._level_db = QLabel("−∞ dBFS")
+        self._level_db.setMinimumWidth(64)
+        self._level_db.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        level_row.addWidget(self._level_db)
+        layout.addLayout(level_row)
+
+        transcript_head = QHBoxLayout()
+        transcript_title = QLabel("Élő átirat")
+        transcript_title.setObjectName("sectionTitle")
+        transcript_head.addWidget(transcript_title)
+        transcript_head.addStretch(1)
+        self._partial_legend = QLabel("Halvány szöveg: ideiglenes")
+        self._partial_legend.setStyleSheet("color: #8b96a5; font-size: 11px;")
+        transcript_head.addWidget(self._partial_legend)
+        layout.addLayout(transcript_head)
+
+        self._transcript = QTextBrowser()
+        self._transcript.setOpenExternalLinks(False)
+        self._transcript.setWordWrapMode(QTextOption.WrapMode.WordWrap)
+        self._transcript.setPlaceholderText(
+            "A felirat itt jelenik meg, miután elindítottad a mikrofont."
+        )
+        self._transcript.setAccessibleName("Élő magyar átirat")
+        self._transcript.setMinimumHeight(240)
+        layout.addWidget(self._transcript, 1)
+
+        controls = QHBoxLayout()
+        self._start_button = QPushButton("▶  Indítás")
+        self._start_button.setObjectName("primary")
+        self._start_button.setDefault(True)
+        self._start_button.setShortcut("F5")
+        self._start_button.clicked.connect(self._start)
+        controls.addWidget(self._start_button)
+        self._stop_button = QPushButton("■  Leállítás")
+        self._stop_button.setShortcut("Esc")
+        self._stop_button.setEnabled(False)
+        self._stop_button.clicked.connect(self._stop)
+        controls.addWidget(self._stop_button)
+        self._clear_button = QPushButton("Törlés")
+        self._clear_button.setToolTip("Eltávolítja az aktuálisan látható átiratot")
+        self._clear_button.clicked.connect(self._clear_transcript)
+        controls.addWidget(self._clear_button)
+        controls.addStretch(1)
+        self._copy_button = QPushButton("Másolás")
+        self._copy_button.clicked.connect(self._copy_transcript)
+        controls.addWidget(self._copy_button)
+        self._export_button = QPushButton("TXT export…")
+        self._export_button.clicked.connect(self._export_transcript)
+        controls.addWidget(self._export_button)
+        layout.addLayout(controls)
+
+        stats_box = QGroupBox("Élő feldolgozás")
+        stats = QGridLayout(stats_box)
+        self._queue_value = self._metric(stats, 0, "Várakozó munka")
+        self._dropped_value = self._metric(stats, 1, "Eldobott audio frame")
+        self._decode_value = self._metric(stats, 2, "Dekódolások · részleges / végleges")
+        layout.addWidget(stats_box)
+
+        self._model_help = QLabel()
+        self._model_help.setWordWrap(True)
+        self._model_help.setStyleSheet("color: #697586; font-size: 11px;")
+        layout.addWidget(self._model_help)
+        self.setCentralWidget(root)
+        self._refresh_actions()
+
+    @staticmethod
+    def _metric(grid: QGridLayout, column: int, title: str) -> QLabel:
+        cell = QVBoxLayout()
+        label = QLabel(title)
+        label.setProperty("class", "metric")
+        value = QLabel("0")
+        value.setProperty("class", "metricValue")
+        cell.addWidget(label)
+        cell.addWidget(value)
+        grid.addLayout(cell, 0, column)
+        return value
+
+    def _load_devices(self) -> None:
+        selected = self._device_combo.currentData()
+        self._device_combo.clear()
+        try:
+            self._devices = input_devices()
+        except Exception as exc:
+            self._devices = []
+            self._device_combo.addItem("A mikrofonlista nem olvasható")
+            self._device_combo.setEnabled(False)
+            self._set_status("error", str(exc) or "Hangbemenet nem érhető el")
+            self._refresh_actions()
+            return
+        self._device_combo.setEnabled(bool(self._devices))
+        for device in self._devices:
+            suffix = " · alapértelmezett" if device.is_default else ""
+            self._device_combo.addItem(
+                f"{device.name}  ·  {device.host_api}  ·  "
+                f"{device.default_sample_rate:g} Hz{suffix}",
+                device.index,
+            )
+        if not self._devices:
+            self._device_combo.addItem("Nem található mikrofon")
+        elif selected is not None:
+            index = self._device_combo.findData(selected)
+            if index >= 0:
+                self._device_combo.setCurrentIndex(index)
+        self._refresh_actions()
+
+    def _populate_models(self) -> None:
+        self._model_combo.clear()
+        for label, model_id in self._installed_models:
+            self._model_combo.addItem(label, model_id)
+        if not self._installed_models:
+            self._model_combo.addItem("Nincs helyben telepített modell")
+            self._model_combo.setEnabled(False)
+            self._model_help.setText(
+                "A feliratfeldolgozáshoz előre telepített helyi modell kell. "
+                "A RoboAssist futás közben nem tölt le modellt és nem használ "
+                "hálózati szolgáltatást. "
+                "Telepítési útmutató: models/README.md."
+            )
+        else:
+            self._model_combo.setEnabled(True)
+            self._model_help.setText(
+                "A hang és az átirat csak a munkamenet memóriájában él. "
+                "A TXT export külön, felhasználói művelet. "
+                "Leállításkor a munkamenet adatai törlődnek."
+            )
+        self._refresh_actions()
+
+    def _refresh_actions(self) -> None:
+        ready = bool(self._devices and self._installed_models and not self._closing)
+        active = self._capture_state in ("loading", "running", "stopping")
+        self._start_button.setEnabled(ready and not active)
+        self._stop_button.setEnabled(self._capture_state == "running" and not self._closing)
+        self._refresh_devices.setEnabled(not active and not self._closing)
+        self._device_combo.setEnabled(bool(self._devices) and not active and not self._closing)
+        self._model_combo.setEnabled(
+            bool(self._installed_models) and not active and not self._closing
+        )
+        self._language_combo.setEnabled(not active and not self._closing)
+        self._always_on_top.setEnabled(not self._closing)
+        self._clear_button.setEnabled(not self._buffer.is_empty)
+        self._copy_button.setEnabled(not self._buffer.is_empty)
+        self._export_button.setEnabled(not self._buffer.is_empty)
+
+    def _start(self) -> None:
+        if not self._devices or not self._installed_models:
+            return
+        item = self._devices[self._device_combo.currentIndex()]
+        rate = int(round(item.default_sample_rate))
+        self._buffer.begin_session()
+        self._accept_events = True
+        self._render_transcript()
+        self._set_status("loading", "Helyi modell betöltése…")
+        self._refresh_actions()
+        self.start_requested.emit(
+            item.index,
+            rate,
+            str(self._model_combo.currentData()),
+            str(self._language_combo.currentData()),
+        )
+
+    def _stop(self) -> None:
+        if self._capture_state != "running":
+            return
+        self._set_status("stopping", "Leállítás és adatok ürítése…")
+        self._refresh_actions()
+        self.stop_requested.emit()
+
+    def _clear_transcript(self) -> None:
+        self._buffer.clear_visible()
+        self._render_transcript()
+        self._refresh_actions()
+
+    def _copy_transcript(self) -> None:
+        text = self._buffer.plain_text
+        if text:
+            QApplication.clipboard().setText(text)
+
+    def _export_transcript(self) -> None:
+        text = self._buffer.plain_text
+        if not text:
+            return
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Átirat mentése", "roboassist-átirat.txt", "Szövegfájl (*.txt)"
+        )
+        if not path:
+            return
+        try:
+            Path(path).write_text(text + "\n", encoding="utf-8")
+        except OSError as exc:
+            QMessageBox.critical(self, "Export hiba", f"Az átirat nem menthető:\n{exc}")
+
+    @Slot(str, str)
+    def _on_state_changed(self, state: str, message: str) -> None:
+        self._capture_state = state
+        self._set_status(state, message)
+        if state == "error":
+            self._accept_events = False
+            self._buffer.end_session()
+            self._render_transcript()
+        elif state == "running":
+            self._accept_events = True
+        self._refresh_actions()
+
+    @Slot(str)
+    def _on_session_started(self, _session_id: str) -> None:
+        self._set_status("running", "Mikrofon figyel")
+
+    @Slot(str)
+    def _on_session_stopped(self, error: str) -> None:
+        self._accept_events = False
+        self._buffer.end_session()
+        self._render_transcript()
+        self._set_status("error" if error else "idle", error or "Leállítva · munkamenet törölve")
+        self._refresh_actions()
+
+    @Slot()
+    def _poll_session(self) -> None:
+        events, stats, session_state, session_error = self._controller.snapshot()
+        changed = False
+        if self._accept_events:
+            for event in events:
+                changed = self._buffer.accept(event) or changed
+        if self._capture_state == "running" and session_state in ("error", "stopped"):
+            self._on_state_changed(
+                "error",
+                session_error or "A mikrofon-munkamenet váratlanul leállt.",
+            )
+        if changed:
+            self._render_transcript()
+            self._refresh_actions()
+        self._render_stats(stats)
+
+    def _render_transcript(self) -> None:
+        scroll_bar = self._transcript.verticalScrollBar()
+        old_scroll = scroll_bar.value()
+        was_at_bottom = scroll_bar.maximum() - old_scroll < 28
+        pieces = []
+        if self._buffer.truncated:
+            pieces.append(
+                '<span style="color:#8995a5">… a régebbi feliratok a memóriakorlát '
+                "miatt törölve …</span>"
+            )
+        for text, final in self._buffer.parts:
+            safe = html.escape(text).replace("\n", "<br>")
+            if final:
+                pieces.append(f'<span style="color:#172438">{safe}</span>')
+            else:
+                pieces.append(f'<span style="color:#8995a5">{safe}</span>')
+        self._transcript.setHtml("<div style='line-height:1.65'>" + " ".join(pieces) + "</div>")
+        if was_at_bottom:
+            self._transcript.moveCursor(QTextCursor.MoveOperation.End)
+        else:
+            scroll_bar.setValue(min(old_scroll, scroll_bar.maximum()))
+        self._refresh_actions()
+
+    def _render_stats(self, stats: PipelineStats) -> None:
+        dbfs = max(-60.0, min(0.0, stats.input_level_dbfs))
+        self._level_bar.setValue(int((dbfs + 60.0) / 60.0 * 100))
+        self._level_db.setText("−∞ dBFS" if dbfs <= -59.9 else f"{dbfs:.0f} dBFS")
+        self._queue_value.setText(str(stats.frame_backlog + stats.job_backlog))
+        self._dropped_value.setText(str(stats.dropped_frames))
+        self._decode_value.setText(f"{stats.partial_decodes} / {stats.final_decodes}")
+        if self._capture_state == "running":
+            if stats.decoder_busy or stats.job_backlog:
+                self._set_status("processing", "Beszéd feldolgozása")
+            elif self._status_label.text() != "Mikrofon figyel":
+                self._set_status("running", "Mikrofon figyel")
+
+    def _set_status(self, state: str, message: str) -> None:
+        colors = {
+            "idle": "#94a3b8",
+            "loading": "#f4b740",
+            "running": "#32c48d",
+            "processing": "#5ca5ff",
+            "stopping": "#f4b740",
+            "error": "#ff7373",
+        }
+        self._status_dot.setStyleSheet(f"color:{colors.get(state, '#94a3b8')};font-size:18px;")
+        self._status_label.setText(message)
+
+    def _set_always_on_top(self, enabled: bool) -> None:
+        self._settings.setValue("always_on_top", enabled)
+        flags = self.windowFlags()
+        flag = Qt.WindowType.WindowStaysOnTopHint
+        self.setWindowFlags(flags | flag if enabled else flags & ~flag)
+        self.show()
+
+    @property
+    def _settings(self) -> QSettings:
+        return QSettings("RoboAssist", "OfflineSTT")
+
+    def _restore_settings(self) -> None:
+        geometry = self._settings.value("geometry")
+        if geometry:
+            self.restoreGeometry(geometry)
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        if self._allow_close:
+            self._settings.setValue("geometry", self.saveGeometry())
+            event.accept()
+            return
+        event.ignore()
+        if self._closing:
+            return
+        self._closing = True
+        self._set_status("stopping", "A munkamenet lezárása…")
+        self._refresh_actions()
+        self.close_requested.emit()
+
+    @Slot()
+    def _on_controller_closed(self) -> None:
+        self._accept_events = False
+        self._buffer.end_session()
+        self._thread.quit()
+        self._thread.wait(6500)
+        self._allow_close = True
+        self.close()

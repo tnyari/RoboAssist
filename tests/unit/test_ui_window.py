@@ -1,0 +1,59 @@
+from pathlib import Path
+
+import pytest
+from PySide6.QtWidgets import QApplication
+
+from offline_stt.audio.microphone import InputDevice
+from offline_stt.config import Config
+from offline_stt.pipeline.types import TranscriptEvent
+from offline_stt.ui import window as window_module
+from offline_stt.ui.window import MainWindow
+
+
+@pytest.fixture(scope="module")
+def qt_app():
+    app = QApplication.instance() or QApplication([])
+    yield app
+    app.quit()
+
+
+def test_window_exposes_session_controls_and_renders_partial_and_final(qt_app, monkeypatch):
+    device = InputDevice(0, "Teszt mikrofon", "WASAPI", 1, 48000.0, True)
+    settings = type(
+        "MemorySettings",
+        (),
+        {
+            "value": lambda self, _key, default=None, *_args: default,
+            "setValue": lambda self, _key, _value: None,
+        },
+    )()
+    monkeypatch.setattr(window_module, "input_devices", lambda: [device])
+    monkeypatch.setattr(window_module.MainWindow, "_settings", property(lambda _self: settings))
+    window = MainWindow(
+        Config(),
+        Path("models/manifest.json"),
+        Path("models/cache"),
+        (("Base", "base-multilingual"),),
+    )
+    try:
+        assert window._start_button.isEnabled()
+        assert not window._stop_button.isEnabled()
+        assert window._device_combo.currentData() == 0
+        assert window._model_combo.currentData() == "base-multilingual"
+        window._buffer.accept(
+            TranscriptEvent(1, "s", "s:1", 1, "microphone", "hu", "partial", 0, 1000, "Jó nap", 10)
+        )
+        window._buffer.accept(
+            TranscriptEvent(1, "s", "s:1", 2, "microphone", "hu", "final", 0, 1000, "Jó napot", 20)
+        )
+        window._render_transcript()
+        assert window._transcript.toPlainText() == "Jó napot"
+        assert window._copy_button.isEnabled()
+        assert window._export_button.isEnabled()
+    finally:
+        window._poller.stop()
+        window._thread.quit()
+        assert window._thread.wait(2000)
+        window._allow_close = True
+        window.close()
+        qt_app.processEvents()

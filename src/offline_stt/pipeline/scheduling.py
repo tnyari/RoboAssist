@@ -20,6 +20,10 @@ class Counters:
         with self._lock:
             self._values[name] += value
 
+    def set(self, name: str, value: int | float | bool) -> None:
+        with self._lock:
+            self._values[name] = value
+
     def backlog(self, kind: str, count: int) -> None:
         with self._lock:
             self._values[kind + "_backlog"] = count

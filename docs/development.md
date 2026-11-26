@@ -46,6 +46,20 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-dev.ps1 -Venv 
 A `-Venv` csak `.venv` vagy `.venv-<név>` lehet közvetlenül a repóban. A setup
 nem indít alkalmazást, mikrofont, modelltelepítőt vagy modellletöltést.
 
+## 🪟 Windows alkalmazás indítása
+
+Előbb telepíts egy modellt külön az [útmutató](../models/README.md) szerint; a
+GUI nem kezdeményez hálózati letöltést. Ezután a repó gyökeréből:
+
+```powershell
+.\.venv\Scripts\roboassist.exe
+```
+
+Vagy futtasd modulból: `python -m offline_stt.ui`. Saját beállításfájlhoz add meg
+a `--config <útvonal>` kapcsolót. A GUI a helyi modellek között csak a telepített
+modelleket kínálja fel. A Windows felület használatáról és adatkezeléséről a
+[felhasználói útmutató](user-guide.md) szól.
+
 ## 📌 Függőségek és lock frissítése
 
 A `pyproject.toml` a közvetlen függőségek és build-metaadatok forrása.
@@ -138,3 +152,4 @@ A loader csak olvas. Az engine és a későbbi export/UI köteles a validált sz
 
 A projektlicenc nincs kiválasztva; a [harmadik fél jegyzék](../THIRD_PARTY_NOTICES.md)
 metadataalapú kiindulópont, a végleges ellenőrzés [#25](https://github.com/tnyari/RoboAssist/issues/25).
+

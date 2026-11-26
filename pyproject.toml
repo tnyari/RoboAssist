@@ -18,6 +18,7 @@ dependencies = [
 
 [project.scripts]
 roboassist-config = "offline_stt.__main__:main"
+roboassist = "offline_stt.ui.main:main"
 
 [dependency-groups]
 dev = [
@@ -47,3 +48,4 @@ select = ["E", "F", "I", "UP", "B"]
 python_version = "3.11"
 strict = true
 files = ["src/offline_stt"]
+
