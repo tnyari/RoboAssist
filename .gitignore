@@ -1,0 +1,52 @@
+# Python / tooling
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+# Build output
+build/
+dist/
+node_modules/
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Model binaries: models/manifest.json remains tracked
+*.onnx
+*.pt
+*.pth
+*.safetensors
+*.gguf
+*.ggml
+*.bin
+models/downloads/
+models/cache/
+# Private audio, transcripts and local runtime data
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.pcm
+*.raw
+private/
+recordings/
+transcripts/
+logs/
+benchmark-local/
+# Commit only explicitly reviewed synthetic/licensed test fixtures
+!tests/fixtures/
+!tests/fixtures/**
+# Machine/editor files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

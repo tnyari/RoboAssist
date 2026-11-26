@@ -1,0 +1,68 @@
+name: "🟦 Változtatás / új funkció"
+description: "Új változtatási kérés, konkrét eredménnyel és elfogadási feltételekkel."
+title: "[CHANGE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🟦 Új kérés
+        Minden új kérés saját issue-t kap. A további vagy maradó munka külön, kétirányban hivatkozott aljegy.
+        Gyári címkéket és natív Open/Closed állapotot használunk; nincs GitHub Project.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritás
+      description: Leírásbeli tervezési jelölés, nem natív GitHub prioritásmező.
+      options:
+        - "🟠 P1 – kötelező szállítás"
+        - "🔴 P0 – előfeltétel vagy blokkoló"
+        - "🟡 P2 – összehasonlítás vagy optimalizálás"
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Szakasz
+      options:
+        - "Repo / előkészítés"
+        - "M1 – Windows alkalmazás"
+        - "M2 – böngészőbővítmény"
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Szülőjegy / kapcsolódó issue
+      description: "Aljegynél kötelező szülő: #N. A szülőben is legyen az aljegyre mutató checklist."
+      placeholder: "#N vagy önálló kérés"
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Kért eredmény és hatókör
+      description: Mi változzon, miért, és hogyan látszik majd a siker?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Elfogadási feltételek
+      description: Ellenőrizhető, konkrét feltételek; szükség esetén checklist.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Előfeltételek és ellenőrzési terv
+      description: Kapcsolódó issue-k, függőségek és a siker igazolásának módja.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## 📝 Munkakövetés
+        Kezdéskor, fontos mérföldkőnél, akadálynál és lezáráskor rövid komment:
+        **eredmény · ellenőrzés · következő lépés**.
+        A szülő nyitva marad, amíg a vállalt feltételei és aljegyei nem készültek el.

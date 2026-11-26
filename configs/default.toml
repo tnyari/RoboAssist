@@ -1,0 +1,31 @@
+# Tervezési minta; a loader/validáció és a végleges séma STT-001-A (#16).
+schema_version = 1
+
+[application]
+language = "hu"
+offline = true
+telemetry = false
+
+[audio]
+sample_rate_hz = 16000
+channels = 1
+frame_ms = 20
+
+[engine]
+backend = "faster-whisper"
+model = "base-multilingual"
+device = "cpu"
+compute_type = "int8"
+allow_automatic_download = false
+
+[vad]
+pre_roll_ms = 250
+end_silence_ms = 500
+max_segment_ms = 12000
+
+[privacy]
+save_audio = false
+save_transcript = false
+export_requires_user_action = true
+
+# A beállítások nem jelentenek mért késleltetési vagy pontossági eredményt.
