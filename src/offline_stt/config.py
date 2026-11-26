@@ -41,6 +41,18 @@ class VadConfig:
     pre_roll_ms: int = 250
     end_silence_ms: int = 500
     max_segment_ms: int = 12000
+    energy_threshold_db: float = -42.0
+    hysteresis_db: float = 6.0
+
+
+@dataclass(frozen=True)
+class PipelineConfig:
+    partial_interval_ms: int = 750
+    partial_window_ms: int = 5000
+    frame_queue_capacity: int = 64
+    final_queue_capacity: int = 4
+    event_queue_capacity: int = 64
+    stop_timeout_ms: int = 5000
 
 
 @dataclass(frozen=True)
@@ -57,6 +69,7 @@ class Config:
     audio: AudioConfig = AudioConfig()
     engine: EngineConfig = EngineConfig()
     vad: VadConfig = VadConfig()
+    pipeline: PipelineConfig = PipelineConfig()
     privacy: PrivacyConfig = PrivacyConfig()
 
     def __post_init__(self) -> None:
@@ -106,6 +119,17 @@ class Config:
             self.privacy.export_requires_user_action,
             "privacy.export_requires_user_action: true szükséges",
         )
+        _require(-90 <= self.vad.energy_threshold_db <= 0, "vad.energy_threshold_db: -90–0")
+        _require(0 <= self.vad.hysteresis_db <= 20, "vad.hysteresis_db: 0–20")
+        for name, low, high in (
+            ("partial_interval_ms", 100, 5000),
+            ("partial_window_ms", 1000, 60000),
+            ("frame_queue_capacity", 2, 500),
+            ("final_queue_capacity", 1, 16),
+            ("event_queue_capacity", 2, 1000),
+            ("stop_timeout_ms", 1000, 60000),
+        ):
+            _require(low <= getattr(self.pipeline, name) <= high, f"pipeline.{name}: {low}–{high}")
 
 
 _SECTIONS = {
@@ -113,10 +137,17 @@ _SECTIONS = {
     "audio": AudioConfig,
     "engine": EngineConfig,
     "vad": VadConfig,
+    "pipeline": PipelineConfig,
     "privacy": PrivacyConfig,
 }
 _Section = TypeVar(
-    "_Section", ApplicationConfig, AudioConfig, EngineConfig, VadConfig, PrivacyConfig
+    "_Section",
+    ApplicationConfig,
+    AudioConfig,
+    EngineConfig,
+    VadConfig,
+    PipelineConfig,
+    PrivacyConfig,
 )
 
 
@@ -164,5 +195,6 @@ def load_config(path: str | Path) -> Config:
         audio=_section(data, "audio", AudioConfig),
         engine=_section(data, "engine", EngineConfig),
         vad=_section(data, "vad", VadConfig),
+        pipeline=_section(data, "pipeline", PipelineConfig),
         privacy=_section(data, "privacy", PrivacyConfig),
     )

@@ -51,7 +51,7 @@ jobs:
       - name: Strict typecheck
         run: .\.venv\Scripts\python.exe -m mypy
 
-      - name: Unit and source integration tests
+      - name: Unit, audio and pipeline replay integration tests
         run: .\.venv\Scripts\python.exe -m pytest --basetemp=.tools/ci-pytest -p no:cacheprovider
 
       - name: Installed config entrypoint

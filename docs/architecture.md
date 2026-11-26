@@ -28,11 +28,13 @@ flowchart LR
 | tests/unit, tests/integration, tests/fixtures | Célzott tesztek és kis, nem érzékeny minták | Az adott fejlesztési jegy |
 | benchmarks/results | Mért, anonimizált összefoglalók | #8, #15 |
 
-A konfigurációbetöltő, validáló CLI, a [mikrofon/WAV audioforrások](audio.md) és a
-[helyi CPU INT8 engine](engine.md) elkészültek. A capture callback korlátos pufferbe
+A konfigurációbetöltő, validáló CLI, a [mikrofon/WAV audioforrások](audio.md), a
+[helyi CPU INT8 engine](engine.md) és a [session pipeline](pipeline.md) elkészültek.
+A capture callback korlátos pufferbe
 ír; a 16 kHz mono átalakítás a pull olvasónál fut. Az engine `push_audio` metódusa
-csak pufferel; a worker `preview`/`flush` hívása dekódol. A pipeline/VAD #6,
-a stabil TranscriptEvent #19, a metrics #8, a UI #7 feladata. A későbbi worker
+csak pufferel; a worker `preview`/`flush` hívása dekódol. A #6/#18/#19/#20 pipeline
+külön spawn folyamatban, korlátos sorokon ütemez, revision/final eseményeket ad.
+A benchmark metrics #8, a UI #7 feladata. A reader worker
 hívja az audioforrás read metódusát; UI/capture callback nem dekódolhat. A session
 időalap monoton; a stabil final esemény nem módosulhat és nem duplikálódhat.
 
