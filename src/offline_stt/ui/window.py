@@ -52,6 +52,28 @@ class TranscriptView(QTextBrowser):
         super().paintEvent(event)
         self.painted.emit(time.monotonic_ns())
 
+    def render_buffer(self, buffer: TranscriptBuffer) -> None:
+        scroll_bar = self.verticalScrollBar()
+        old_scroll = scroll_bar.value()
+        was_at_bottom = scroll_bar.maximum() - old_scroll < 28
+        pieces = []
+        if buffer.truncated:
+            pieces.append(
+                '<span style="color:#8995a5">… a régebbi feliratok a memóriakorlát '
+                "miatt törölve …</span>"
+            )
+        for text, final in buffer.parts:
+            safe = html.escape(text).replace("\n", "<br>")
+            if final:
+                pieces.append(f'<span style="color:#172438">{safe}</span>')
+            else:
+                pieces.append(f'<span style="color:#8995a5">{safe}</span>')
+        self.setHtml("<div style='line-height:1.65'>" + " ".join(pieces) + "</div>")
+        if was_at_bottom:
+            self.moveCursor(QTextCursor.MoveOperation.End)
+        else:
+            scroll_bar.setValue(min(old_scroll, scroll_bar.maximum()))
+
 
 class MainWindow(QMainWindow):
     start_requested = Signal(int, int, str, str)
@@ -467,26 +489,7 @@ class MainWindow(QMainWindow):
                 self._presentation_callback(event, displayed_monotonic_ns)
 
     def _render_transcript(self) -> None:
-        scroll_bar = self._transcript.verticalScrollBar()
-        old_scroll = scroll_bar.value()
-        was_at_bottom = scroll_bar.maximum() - old_scroll < 28
-        pieces = []
-        if self._buffer.truncated:
-            pieces.append(
-                '<span style="color:#8995a5">… a régebbi feliratok a memóriakorlát '
-                "miatt törölve …</span>"
-            )
-        for text, final in self._buffer.parts:
-            safe = html.escape(text).replace("\n", "<br>")
-            if final:
-                pieces.append(f'<span style="color:#172438">{safe}</span>')
-            else:
-                pieces.append(f'<span style="color:#8995a5">{safe}</span>')
-        self._transcript.setHtml("<div style='line-height:1.65'>" + " ".join(pieces) + "</div>")
-        if was_at_bottom:
-            self._transcript.moveCursor(QTextCursor.MoveOperation.End)
-        else:
-            scroll_bar.setValue(min(old_scroll, scroll_bar.maximum()))
+        self._transcript.render_buffer(self._buffer)
         self._refresh_actions()
 
     def _render_stats(self, stats: PipelineStats) -> None:
@@ -551,3 +554,4 @@ class MainWindow(QMainWindow):
         self._thread.wait(6500)
         self._allow_close = True
         self.close()
+
