@@ -1,16 +1,19 @@
 # Qt/PySide licenc- és attribution bundle audit
 
 **Ellenőrzött artifact:** `RoboAssist-0.1.0-windows-x64.zip`  
-**SHA-256:** `0a75779765687cff222e8f17c307797ad85f565eb58ba3c82092f640e24bd3c8`  
+**SHA-256:** `08172151946834876be0c98bb084ab2b2435bd799eb5613c237172b7ff2b332a`  
 **GitHub követés:** [#54](https://github.com/tnyari/RoboAssist/issues/54), a #25 audit része.
 
 ## ✅ Mit tartalmaz a csomag
 
 - Az `_internal/licenses/upstream-sources/` mappában négy hash-ellenőrzött
   Qt/PySide 6.12.0 source archive található.
-- Az `_internal/licenses/qt/` mappában **101** upstream licenc-,
+- Az `_internal/licenses/qt/` mappában **174** upstream licenc-,
   copyright-, attribution- és notice-fájl szerepel, az eredeti forrásútvonalat,
   fájlméretet és SHA-256 értéket rögzítő `manifest.json` mellett.
+- A manifest külön indexeli a négy forrásmodulból kinyert **76**
+  `qt_attribution.json` fájlt. Ezek a Qt source komponens-, verzió-, license ID-
+  és konfigurációs információi; a vendor binary összeállítását nem bizonyítják.
 - A bundle tartalmazza a QtBase, QtSvg, Qt Image Formats és PySide forráscsomagok
   `LICENSES/` fájljait; köztük az LGPL-3.0-only, GPL-2.0-only és GPL-3.0-only
   szövegeket.
@@ -42,9 +45,10 @@ A nem regular tar tagokat (például symlinket) a kinyerő kihagyja; nem bontja 
 őket a staging könyvtárba.
 
 A tényleges ZIP-ből újraszámoltam a ZIP sidecar hashét, a manifestben felsorolt
-101 fájl hashét és méretét, valamint ellenőriztem a source archive-ok jelenlétét.
-Az ellenőrzés 1345 ZIP-bejegyzést, 6 source archive-ot és **0 Qt bundle hash-
-eltérést** talált. A ZIP-ben 3 `.exe` van (két alkalmazás és a Microsoft VC
+174 licenc-/notice-fájl hashét és méretét, mind a 76 source attribution fájl
+hashét, valamint mind a 33 rögzített Qt runtime DLL/PYD fájl hashét és méretét.
+A ZIP 1 427 bejegyzést tartalmaz. Benne van mind a négy Qt/PySide source archive;
+a runtime lock eltéréseinek száma nulla. A ZIP-ben 3 `.exe` van (két alkalmazás és a Microsoft VC
 Redistributable installer); modellsúly nincs benne.
 
 ## ⚠️ Nyitva maradó feltételek
@@ -65,10 +69,15 @@ nem jogi minősítés.
 
 ## 🧪 Ténylegesen futtatott ellenőrzések
 
-- A bundle generálása négy hash-zárt archive-ból: **101 fájl előállítva**.
+- A bundle generálása négy hash-zárt archive-ból: **174 fájl**; közte 76 source attribution dokumentum.
 - `ruff check scripts/prepare-qt-license-bundle.py`: sikeres.
 - `ruff format --check scripts/prepare-qt-license-bundle.py`: sikeres.
 - Offline PyInstaller release build: sikeres.
-- A release ZIP-ből manifestelt fájlhash-ek újraszámítása: **101/101 egyezett**.
+- A release ZIP sidecar hash és tartalom: **1 427 bejegyzés**, hash egyezik.
+- Qt licenc-/notice fájlok: **174/174** hash és méret egyezik.
+- Qt source attribution fájlok: **76/76** hash egyezik.
+- Qt runtime lock: **33/33** DLL/PYD hash és méret egyezik.
+- A csomagolt `RoboAssistModels.exe --help` kilépési kódja **0**.
 - Tiszta Windows gépes telepítés/eltávolítás: nem futott, mert a felhasználó
   jelezte, hogy jelenleg nincs elérhető tesztgép vagy VM.
+
