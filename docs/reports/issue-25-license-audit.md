@@ -380,3 +380,29 @@ fixture-t és a manifest-átvételi állításokat. Helyi Ruff lint/format zöld
 pytest helyi futtatását a sandbox teszt-fixture könyvtárra adott WinError 5
 hibája miatt nem tudtam végrehajtani. A Qt LGPLv3 binary provenance/relink/
 telepítési útja és az M1 hangbenchmark ettől még nyitott.
+
+
+## 🧾 #54 – csomagolt Qt runtime fájllock és csereút · 2026-11-27
+
+A Qt runtime 33 DLL/PYD fájlos hash-zárja a ZIP-be is bekerül
+`_internal/licenses/qt/qt-runtime-file-lock.json` néven. A kiadási README
+előzetes műszaki leírást ad az azonos relatív útvonalon történő, ABI-kompatibilis
+Qt/PySide fájlcseréhez és a `Start-RoboAssist.cmd` indításához. A jelenlegi
+csomagindító nem hash-ellenőrzi a Qt/PySide DLL/PYD fájlokat; a fájllock az
+eredeti csomagállapotot jelöli.
+
+Az új offline ZIP SHA-256 értéke
+`bb94a58ea48d6919d65c674e423c2b1c36d52ac66bffdcd029cf619d2c4d3dc1`;
+statikus leltára 1 435 bejegyzés, 108 DLL és 3 EXE, modellsúly nélkül. A Qt
+fájllock 33/33 méret/hash, a Qt licencek/notices 174/174 méret/hash és a 76
+source attribution hash egyezett. Mind a 10 upstream forrás-/buildarchívum,
+a CPython/OpenSSL manifest referenciák, 3 runtime DLL és 2 licenc hash-e is
+ellenőrizve. `RoboAssistModels.exe --help` exit 0.
+
+A módosított Qt/PySide DLL/PYD-val történő futtatás nem történt meg. A tiszta
+Windows 10/11 környezet továbbra sem érhető el; nincs GUI-indítás, mikrofon,
+hangfelvétel vagy benchmark. A binary provenance, GPL-only closure, third-party
+linkelés, MSVC terjesztési jogcím és a licencút végleges elfogadása nyitva marad
+a [#54](https://github.com/tnyari/RoboAssist/issues/54) és [#25](https://github.com/tnyari/RoboAssist/issues/25)
+jegyen. A GitHub Windows CI az új fájllock/README csomagolási módosításaira még
+nem futott.
