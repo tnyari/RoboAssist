@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import html
+import time
+from collections.abc import Callable
 from pathlib import Path
 
 from PySide6.QtCore import QSettings, Qt, QThread, QTimer, Signal, Slot
-from PySide6.QtGui import QCloseEvent, QTextCursor, QTextOption
+from PySide6.QtGui import QCloseEvent, QPaintEvent, QTextCursor, QTextOption
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -28,7 +30,7 @@ from PySide6.QtWidgets import (
 
 from offline_stt.audio.microphone import InputDevice, input_devices
 from offline_stt.config import Config
-from offline_stt.pipeline.types import PipelineStats
+from offline_stt.pipeline.types import PipelineStats, TranscriptEvent
 from offline_stt.ui.controller import SessionController
 from offline_stt.ui.transcript import TranscriptBuffer
 
@@ -39,6 +41,16 @@ _LANGUAGES = (
     ("Slovenčina", "sk"),
     ("Română", "ro"),
 )
+
+
+class TranscriptView(QTextBrowser):
+    """Transcript browser that timestamps completed Qt paint passes."""
+
+    painted = Signal(object)
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        super().paintEvent(event)
+        self.painted.emit(time.monotonic_ns())
 
 
 class MainWindow(QMainWindow):
@@ -52,6 +64,8 @@ class MainWindow(QMainWindow):
         catalog_path: Path,
         model_root: Path,
         installed_models: tuple[tuple[str, str], ...],
+        presentation_callback: Callable[[TranscriptEvent, int], None] | None = None,
+        stats_callback: Callable[[PipelineStats], None] | None = None,
     ) -> None:
         super().__init__()
         self._config = config
@@ -60,6 +74,9 @@ class MainWindow(QMainWindow):
         self._installed_models = installed_models
         self._devices: list[InputDevice] = []
         self._buffer = TranscriptBuffer()
+        self._presentation_callback = presentation_callback
+        self._stats_callback = stats_callback
+        self._pending_presentations: dict[str, TranscriptEvent] = {}
         self._accept_events = False
         self._capture_state = "idle"
         self._closing = False
@@ -70,6 +87,7 @@ class MainWindow(QMainWindow):
         self.resize(940, 720)
         self._restore_settings()
         self._build_ui()
+        self._transcript.painted.connect(self._on_transcript_painted)
         if self._always_on_top.isChecked():
             self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
         self._load_devices()
@@ -213,7 +231,7 @@ class MainWindow(QMainWindow):
         transcript_head.addWidget(self._partial_legend)
         layout.addLayout(transcript_head)
 
-        self._transcript = QTextBrowser()
+        self._transcript = TranscriptView()
         self._transcript.setOpenExternalLinks(False)
         self._transcript.setWordWrapMode(QTextOption.WrapMode.WordWrap)
         self._transcript.setPlaceholderText(
@@ -346,6 +364,7 @@ class MainWindow(QMainWindow):
         item = self._devices[self._device_combo.currentIndex()]
         rate = int(round(item.default_sample_rate))
         self._buffer.begin_session()
+        self._pending_presentations.clear()
         self._accept_events = True
         self._render_transcript()
         self._set_status("loading", "Helyi modell betöltése…")
@@ -366,6 +385,7 @@ class MainWindow(QMainWindow):
 
     def _clear_transcript(self) -> None:
         self._buffer.clear_visible()
+        self._pending_presentations.clear()
         self._render_transcript()
         self._refresh_actions()
 
@@ -394,6 +414,7 @@ class MainWindow(QMainWindow):
         self._set_status(state, message)
         if state == "error":
             self._accept_events = False
+            self._pending_presentations.clear()
             self._buffer.end_session()
             self._render_transcript()
         elif state == "running":
@@ -407,6 +428,7 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def _on_session_stopped(self, error: str) -> None:
         self._accept_events = False
+        self._pending_presentations.clear()
         self._buffer.end_session()
         self._render_transcript()
         self._set_status("error" if error else "idle", error or "Leállítva · munkamenet törölve")
@@ -415,10 +437,15 @@ class MainWindow(QMainWindow):
     @Slot()
     def _poll_session(self) -> None:
         events, stats, session_state, session_error = self._controller.snapshot()
+        if self._stats_callback is not None:
+            self._stats_callback(stats)
         changed = False
         if self._accept_events:
             for event in events:
-                changed = self._buffer.accept(event) or changed
+                accepted = self._buffer.accept(event)
+                if accepted and self._presentation_callback is not None:
+                    self._pending_presentations[event.segment_id] = event
+                changed = accepted or changed
         if self._capture_state == "running" and session_state in ("error", "stopped"):
             self._on_state_changed(
                 "error",
@@ -428,6 +455,16 @@ class MainWindow(QMainWindow):
             self._render_transcript()
             self._refresh_actions()
         self._render_stats(stats)
+
+    @Slot(object)
+    def _on_transcript_painted(self, displayed_monotonic_ns: int) -> None:
+        """Record only the newest revision that is still visible after painting."""
+        if self._presentation_callback is None or not self._pending_presentations:
+            return
+        pending, self._pending_presentations = self._pending_presentations, {}
+        for segment_id, event in pending.items():
+            if self._buffer.current_revision(segment_id) == event.revision:
+                self._presentation_callback(event, displayed_monotonic_ns)
 
     def _render_transcript(self) -> None:
         scroll_bar = self._transcript.verticalScrollBar()

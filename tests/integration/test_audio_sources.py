@@ -236,6 +236,7 @@ def test_wav_replay_pcm_amplitude_sample_count_and_restart(tmp_path, rate, chann
     source = WavReplaySource(path, clock=clock, sleep=clock.sleep)
     source.start()
     started = clock.now
+    assert source.stats.started_monotonic == started
     assert source.read(0) is None
     frames = []
     while source.state == SourceState.RUNNING:

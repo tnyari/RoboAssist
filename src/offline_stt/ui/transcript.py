@@ -68,6 +68,11 @@ class TranscriptBuffer:
         self._ignored_segments.clear()
         self._truncated = False
 
+    def current_revision(self, segment_id: str) -> int | None:
+        """Return the revision still represented in the visible buffer."""
+        segment = self._segments.get(segment_id)
+        return segment.revision if segment is not None else None
+
     @property
     def is_empty(self) -> bool:
         return not self._segments

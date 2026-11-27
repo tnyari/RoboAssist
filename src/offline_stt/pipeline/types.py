@@ -62,3 +62,4 @@ class PipelineStats:
     forced_terminations: int = 0
     output_partial_dropped: int = 0
     output_final_failures: int = 0
+    source_started_monotonic_ns: int | None = None

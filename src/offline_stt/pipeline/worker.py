@@ -55,6 +55,13 @@ def run_session(
         try:
             source = source_factory()
             source.start()
+            source_start = source.stats.started_monotonic
+            counters.set(
+                "source_started_monotonic_ns",
+                time.monotonic_ns()
+                if source_start is None
+                else round(source_start * 1_000_000_000),
+            )
             source_ready.set()
             while not quit_reader.is_set() and not stop.is_set():
                 frame = source.read(timeout=0.05)

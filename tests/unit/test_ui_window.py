@@ -95,3 +95,51 @@ def test_start_button_looks_disabled_without_a_local_model(qt_app, monkeypatch):
         window._allow_close = True
         window.close()
         qt_app.processEvents()
+
+
+def test_presentation_callback_runs_after_transcript_paint(qt_app, monkeypatch):
+    device = InputDevice(0, "Teszt mikrofon", "WASAPI", 1, 48000.0, True)
+    settings = type(
+        "MemorySettings",
+        (),
+        {
+            "value": lambda self, _key, default=None, *_args: default,
+            "setValue": lambda self, _key, _value: None,
+        },
+    )()
+    monkeypatch.setattr(window_module, "input_devices", lambda: [device])
+    monkeypatch.setattr(window_module.MainWindow, "_settings", property(lambda _self: settings))
+    presented = []
+    stats_snapshots = []
+    window = MainWindow(
+        Config(),
+        Path("models/manifest.json"),
+        Path("models/cache"),
+        (("Base", "base-multilingual"),),
+        presentation_callback=lambda event, timestamp: presented.append((event, timestamp)),
+        stats_callback=stats_snapshots.append,
+    )
+    event = TranscriptEvent(
+        1, "session", "session:1", 1, "wav", "hu", "final", 0, 1000, "Jó napot", 10
+    )
+    try:
+        window.show()
+        qt_app.processEvents()
+        window._poll_session()
+        assert stats_snapshots
+        assert window._buffer.accept(event)
+        window._pending_presentations[event.segment_id] = event
+        window._render_transcript()
+        window._transcript.repaint()
+        qt_app.processEvents()
+
+        assert len(presented) == 1
+        assert presented[0][0] == event
+        assert presented[0][1] > 0
+    finally:
+        window._poller.stop()
+        window._thread.quit()
+        assert window._thread.wait(2000)
+        window._allow_close = True
+        window.close()
+        qt_app.processEvents()

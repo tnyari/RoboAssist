@@ -39,8 +39,10 @@ class WavReplaySource:
         self._file: wave.Wave_read | None = None
         self._normalizer: AudioNormalizer | None = None
         self._pending: deque[AudioFrame] = deque()
+        self._started: float | None = None
         self._input_blocks = self._input_samples = 0
         self._output_frames = self._output_samples = 0
+        self._started = None
         self._eof = False
 
     def start(self) -> None:
@@ -105,6 +107,7 @@ class WavReplaySource:
             raise AudioSourceError(self.error)
         if self.state != SourceState.RUNNING:
             return None
+        assert self._started is not None
         deadline = self._clock() + timeout
         while self.state == SourceState.RUNNING:
             if not self._pending:
@@ -154,6 +157,7 @@ class WavReplaySource:
             input_samples=self._input_samples,
             output_frames=self._output_frames,
             output_samples=self._output_samples,
+            started_monotonic=self._started,
         )
 
 
