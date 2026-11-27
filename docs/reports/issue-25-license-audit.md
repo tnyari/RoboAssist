@@ -369,6 +369,14 @@ valós/szintetikus beszédfelvételt ez az ellenőrzés nem vizsgált. Tiszta Wi
 
 A korábbi, ugyanezen a napon készült ZIP hash-ek és darabszámok az előző
 csomagverziók pillanatfelvételei; ez a bejegyzés a #56 legfrissebb helyi offline
-buildjét rögzíti. A legutóbbi forráscsomagolási módosításokra Windows GitHub CI
-még nem futott; a CI eredményét a PR új headjén kell rögzíteni. A Qt LGPLv3
-binary provenance/relink/telepítési útja és az M1 hangbenchmark ettől még nyitott.
+buildjét rögzíti. A source-csomagolási és fixture-módosításokat a Windows CI
+[#125](https://github.com/tnyari/RoboAssist/actions/runs/46010839872) teljesen
+ellenőrizte a [4f5eb47](https://github.com/tnyari/RoboAssist/commit/4f5eb47d1e90ed7ea4bc081693d8920a32a0724e)
+headen: lint, format, strict typecheck, teljes tesztkészlet, config entrypoint
+és native offline smoke zöld. A korábbi CI #124 egy teszt-fixture-ből hiányzó
+`source_archives` / `source_archive` mezőn bukott el (225 teszt sikeres, 1 hibás);
+a [#57 aljegy](https://github.com/tnyari/RoboAssist/issues/57) frissítette a
+fixture-t és a manifest-átvételi állításokat. Helyi Ruff lint/format zöld; a
+pytest helyi futtatását a sandbox teszt-fixture könyvtárra adott WinError 5
+hibája miatt nem tudtam végrehajtani. A Qt LGPLv3 binary provenance/relink/
+telepítési útja és az M1 hangbenchmark ettől még nyitott.
