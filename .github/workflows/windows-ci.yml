@@ -43,10 +43,14 @@ jobs:
         run: .\scripts\setup-dev.ps1
 
       - name: Lint
-        run: .\.venv\Scripts\python.exe -m ruff check src tests scripts/check-environment.py
+        run: >-
+          .\.venv\Scripts\python.exe -m ruff check src tests
+          scripts/check-environment.py scripts/prepare-qt-license-bundle.py
 
       - name: Format
-        run: .\.venv\Scripts\python.exe -m ruff format --check src tests scripts/check-environment.py
+        run: >-
+          .\.venv\Scripts\python.exe -m ruff format --check src tests
+          scripts/check-environment.py scripts/prepare-qt-license-bundle.py
 
       - name: Strict typecheck
         run: .\.venv\Scripts\python.exe -m mypy
