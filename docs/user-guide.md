@@ -58,7 +58,7 @@ része, és még nem igazolt.
 - A feliratablak legfeljebb 2 000 szegmenst és 100 000 karaktert tart memóriában;
   hosszú sessionnél a legrégebbi megjelenített szöveget törli és ezt jelzi.
 - A **Mindig felül** beállítás és az ablak mérete megmarad a következő indításra.
-- A **Súgó → Névjegy** az FFmpeg LGPLv2.1 tájékoztatását és a Windows csomagban
+- A **Súgó → Névjegy** az FFmpeg buildre kiválasztott LGPLv3 licencverziót és a Windows csomagban
   található forrásarchívumok/buildrecept útvonalát mutatja.
 - **Leállításkor** a session lezárja a mikrofont, kiüríti a belső audiopuffereket,
   majd törli a felirat memóriabeli tartalmát. Ha szükséged van az átiratra, exportáld
@@ -88,4 +88,3 @@ beszédbenchmark vagy teljesítményállítás.
 Rögzítés csak **Indítás** után történik. Audio és átirat alapból memóriában marad;
 hangfájlt az ablak nem készít. Nincs cloud STT, telemetry vagy futásidejű
 modellletöltés. A másolás és a TXT export a felhasználó által indított művelet.
-

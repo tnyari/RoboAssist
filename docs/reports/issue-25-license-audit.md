@@ -44,8 +44,12 @@ rögzíti (`SHA-256: 32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a281
 A recept a conda-forge `ffmpeg-feedstock` `f639462076b7d4d708c8b0b5a447be6776ecf9cf`
 commitjéből származik. A `recipe/build.sh` a `license_family != gpl` ágon
 `--disable-gpl` kapcsolót ad át; a közös konfiguráció `--enable-version3`-at
-állít be. Az elkészült FFmpeg 8.1.2 bináris `-buildconf` kimenete ugyanezeket a
-kapcsolókat tartalmazza. A próbacsomag licencmappájában ellenőriztem a
+állít be. A csomagolt `avcodec-62.dll` tényleges build-konfigurációját
+`avcodec_configuration()` hívással olvastam ki; ugyanezeket a kapcsolókat adja
+vissza. Az upstream [FFmpeg 8.1 licencdokumentációja](https://ffmpeg.org/doxygen/8.1/md_LICENSE.html)
+szerint a `--enable-version3` az LGPLv3 licencverziót aktiválja. Az artifact
+metadata továbbra is `LGPL-2.1-or-later`, míg ez a konkrét runtime build LGPLv3
+licencverziót választ. A próbacsomag licencmappájában ellenőriztem a
 `recipe/meta.yaml`, `recipe/build.sh`, `COPYING.LGPLv2.1` és `COPYING.LGPLv3`
 bejegyzéseket.
 
@@ -73,14 +77,19 @@ A rögzített `recipe/meta.yaml` szerint a build host FFmpeg 8.1.1 LGPL
 (`lgpl_h914209b_804`), míg az artifact futásidejű függősége `ffmpeg >=8.1.1,<9`;
 a RoboAssist ZIP-ben lévő runtime FFmpeg 8.1.2 LGPL.
 
-Ugyanennek a receptnek a külön tesztkörnyezet `ffmpeg * gpl*` függőséget kér,
+Ugyanennek a receptnek a külön tesztkörnyezete `ffmpeg * gpl*` függőséget kér,
 és az x264/x265 kodekek jelenlétét ellenőrzi. Ez a recept tesztkörnyezetére
 vonatkozó adat; önmagában nem bizonyítja, hogy az elkészült PyAV artifact GPL
-kodeket linkelt. A tényleges csomag 65 DLL-es zárában nincs x264/x265 DLL, és a
-csomagolt FFmpeg 8.1.2 `-buildconf` kimenete `--disable-gpl`-t mutat. A ZIP az
+kodeket linkelt. A 65 tételes staging DLL-zárból 62 app-local DLL kerül a ZIP-be
+méret/hash egyezéssel; a három Microsoft CRT DLL külön Redistributable úton
+települ. A csomagolt `avcodec-62.dll` tényleges `avcodec_configuration()`
+kimenete `--disable-gpl --enable-version3`; nincs `--enable-gpl`,
+`--enable-nonfree`, `--enable-libx264` vagy `--enable-libx265`. Az FFmpeg 8.1
+upstream dokumentációja a version3 kapcsolót LGPLv3-hoz rendeli. A ZIP az
 upstream PyAV source archive-ot, conda recept `meta.yaml` fájlját, patchfájlokat
-és BSD-3-Clause `LICENSE.txt`-t tartalmazza. E bizonyítékok mellett is nyitva
-marad a pontos PyAV/FFmpeg licencút; ez nem jogi minősítés.
+és BSD-3-Clause `LICENSE.txt`-t tartalmazza. Ez a konkrét build konfigurációját
+igazolja, nem minősíti a teljes PyAV/Qt/MSVC terjesztést; ezek átvétele továbbra
+is nyitott.
 
 ## 🐍 Python disztribúciók és ismert sérülékenységek
 
@@ -281,8 +290,9 @@ követi. Ez a rész nem jogi minősítés.
   licencszöveg, valamint a Pythonból származó OpenSSL 3.5.9 DLL-ek hash-zárja
   géppel ellenőrzött; a csomagmanifest külön leltározza őket.
 - ✅ A `conda-av-win64.lock` 98 explicit artifact URL-t és SHA-256-ot rögzít.
-- ✅ A stage manifest az FFmpeg 8.1.2 buildjét LGPL-2.1-or-laterként jelöli, és
-  rögzíti a DLL-zárat; x264/x265 DLL nincs benne.
+- ✅ A stage manifest rögzíti az FFmpeg 8.1.2 csomagmetaadatát és DLL-zárát;
+  a runtime `avcodec_configuration()` ellenőrzése LGPLv3 buildválasztást,
+  GPL/nonfree kikapcsolást, valamint x264/x265 nélküli app-local DLL-zárat igazol.
 - ✅ A csomagolt FFmpeg 8.1.2 és PyAV 17.1.0 source archive, buildrecept,
   patchfájlok, forrás URL/SHA-256, `--disable-gpl` buildág és tényleges bináris
   `-buildconf` egyezése ellenőrizve; a licencút teljes átvétele nyitott.

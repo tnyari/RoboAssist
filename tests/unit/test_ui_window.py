@@ -59,7 +59,8 @@ def test_window_exposes_session_controls_and_renders_partial_and_final(qt_app, m
         )
         about_action.trigger()
         assert about_dialogs[0][0] == "Névjegy – RoboAssist"
-        assert "FFmpeg" in about_dialogs[0][1] and "LGPLv2.1" in about_dialogs[0][1]
+        assert "FFmpeg 8.1.2" in about_dialogs[0][1] and "LGPLv3" in about_dialogs[0][1]
+        assert "LGPLv2.1" not in about_dialogs[0][1]
         assert "_internal/licenses/upstream-sources" in about_dialogs[0][1]
         assert window._start_button.isEnabled()
         assert _primary_background(window, qt_app) == "#1769d2"

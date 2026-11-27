@@ -17,7 +17,7 @@ csomagra.
 
 | Csomag / pontos verzió | Telepített metaadat | Terjesztési megjegyzés |
 |---|---|---|
-| [av 17.1.0](https://pypi.org/project/av/17.1.0/) | BSD-3-Clause | Artifact `py311h06a8702_0`, SHA-256 `978c663178d010a4d5bc2c76976abb96b132e8533c9e4d258f400e77935d619a`; source SHA-256 `7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3`, recipe commit `9fa9dab2c392eee688738ed9ecc47eb9fbfd87c5`. A recept hostja FFmpeg 8.1.1 LGPL, a külön tesztkörnyezet GPL FFmpeg-et és x264/x265-t kér; ez önmagában nem bizonyítja, hogy a kiadott PyAV artifact tartalmazza ezeket. A source archive, recept és LICENSE.txt bekerül a csomagba; a pontos licencút/#47 átvétele nyitott. |
+| [av 17.1.0](https://pypi.org/project/av/17.1.0/) | BSD-3-Clause | A Windows csomag conda-forge artifactja `py311h06a8702_0`, SHA-256 `978c663178d010a4d5bc2c76976abb96b132e8533c9e4d258f400e77935d619a`; PyAV source SHA-256 `7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3`. A külön rögzített FFmpeg 8.1.2 runtime `LGPL-2.1-or-later` metadata mellett `--disable-gpl --enable-version3` builddel készült; a csomagolt `avcodec-62.dll` konfigurációja ezt közvetlenül igazolja. Az FFmpeg upstream dokumentációja szerint a version3 kapcsoló LGPLv3-ra vált. A PyAV forrás/recept/licenc bekerül a csomagba; a pontos Qt/PyAV/MSVC terjesztési átvétel továbbra is nyitott, lásd #42/#47/#54 és [#58](https://github.com/tnyari/RoboAssist/issues/58). |
 | [faster-whisper 1.2.1](https://pypi.org/project/faster-whisper/1.2.1/) | MIT | A PyAV külön tranzitív/bundled függőség. |
 | [CTranslate2 4.9.1](https://pypi.org/project/ctranslate2/4.9.1/) | MIT | A teljes tranzitív verziólista a riportban van. |
 | [NumPy 2.4.6](https://pypi.org/project/numpy/2.4.6/) | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | Az adott wheel saját license fájljai is megőrzendők. |
@@ -150,16 +150,22 @@ A hozzá rögzített [FFmpeg 8.1.2 upstream forrásarchívum](https://ffmpeg.org
 SHA-256 értéke `32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22`;
 a conda-forge recept commitja `f639462076b7d4d708c8b0b5a447be6776ecf9cf`.
 A recept nem-GPL ága `--disable-gpl` kapcsolót használ, a közös konfiguráció
-pedig `--enable-version3`-at; a csomagolt FFmpeg bináris `-buildconf` kimenete
-ezeket mutatta. A ZIP tartalmazza a receptet, az LGPLv2.1/LGPLv3 szövegeket és
-az ellenőrzött `ffmpeg-8.1.2.tar.gz` source archive-ot.
+pedig `--enable-version3`-at. A csomagolt `avcodec-62.dll` tényleges
+`avcodec_configuration()` kimenete mindkét flaget mutatja, GPL/nonfree, x264 és
+x265 engedélyező flag nélkül. Az upstream [FFmpeg 8.1 licencdokumentációja](https://ffmpeg.org/doxygen/8.1/md_LICENSE.html)
+szerint a `--enable-version3` az LGPLv3 licencverziót aktiválja; a conda artifact
+metadata ettől függetlenül `LGPL-2.1-or-later`. A Névjegy ezért LGPLv3-at jelez.
+A ZIP tartalmazza a receptet, az LGPLv2.1/LGPLv3 szövegeket és az ellenőrzött
+`ffmpeg-8.1.2.tar.gz` source archive-ot.
 
 A PyAV 17.1.0 rögzített conda-receptjének build hostja FFmpeg 8.1.1 LGPL,
 viszont a recept külön tesztkörnyezete GPL FFmpeg-et és x264/x265 teszteket kér.
-Ezek csak a recipe tesztkonfigurációját írják le; a tényleges Windows artifact
-65 DLL-es leltárában x264/x265 DLL nincs, és a csomagolt FFmpeg bináris
-`--disable-gpl` konfigurációt jelentett. A forrásrecept, artifact- és forráshash
-a #25 riportban szerepel; a pontos licencút és source-átadás továbbra is nyitott.
+Ezek a recipe tesztkonfigurációját írják le, nem az alkalmazás runtime-ját. A
+ZIP-beli PyAV runtime 62 app-local DLL-jének méret/hash egyezése a manifesttel
+sikeres; három Microsoft CRT DLL-t külön VC Redistributable telepítő kezel.
+Nincs x264/x265 DLL a zárban, és a csomagolt FFmpeg DLL tényleges konfigurációja
+`--disable-gpl --enable-version3`. A forrásrecept, artifact- és forráshash a #25
+riportban szerepel; a teljes terjesztési/source/relink átvétel továbbra is nyitott.
 
 Az FFmpeg és PyAV source archive-ok az `_internal/licenses/upstream-sources/`
 könyvtárban vannak, hash-eiket a mappabeli README rögzíti; a hozzájuk tartozó

@@ -377,7 +377,8 @@ class MainWindow(QMainWindow):
         QMessageBox.about(
             self,
             "Névjegy – RoboAssist",
-            "A RoboAssist az FFmpeg projekt LGPLv2.1 licencű könyvtárait használja.\n\n"
+            "A csomagolt FFmpeg 8.1.2 build LGPLv3 licencverziót használ; "
+            "a GPL komponensek le vannak tiltva.\n\n"
             "A terjesztett Windows csomag FFmpeg forrásarchívuma az "
             "_internal/licenses/upstream-sources mappában, buildreceptjei és "
             "licencszövegei az _internal/licenses/av-runtime mappában találhatók.\n\n"

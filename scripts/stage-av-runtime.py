@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
 import hashlib
 import json
 import os
@@ -159,6 +160,45 @@ def _package_rows(prefix: Path) -> dict[str, dict[str, object]]:
     return rows
 
 
+def _verify_ffmpeg_configuration(configuration: str) -> dict[str, bool]:
+    """Require the staged FFmpeg build's LGPLv3 configuration and reject GPL/nonfree flags."""
+    tokens = set(configuration.split())
+    flags = {
+        "disable_gpl": "--disable-gpl" in tokens,
+        "enable_version3": "--enable-version3" in tokens,
+        "enable_gpl": "--enable-gpl" in tokens,
+        "enable_nonfree": "--enable-nonfree" in tokens,
+        "enable_libx264": "--enable-libx264" in tokens,
+        "enable_libx265": "--enable-libx265" in tokens,
+    }
+    if not flags["disable_gpl"] or not flags["enable_version3"]:
+        raise RuntimeError("The staged FFmpeg DLL must report --disable-gpl and --enable-version3.")
+    forbidden = [
+        name
+        for name in ("enable_gpl", "enable_nonfree", "enable_libx264", "enable_libx265")
+        if flags[name]
+    ]
+    if forbidden:
+        raise RuntimeError(f"The staged FFmpeg DLL enables forbidden build flags: {forbidden}")
+    return flags
+
+
+def _ffmpeg_configuration_from_dll(avcodec_path: Path) -> str:
+    if not avcodec_path.is_file():
+        raise RuntimeError(f"The staged FFmpeg codec DLL is missing: {avcodec_path}")
+    try:
+        with os.add_dll_directory(str(avcodec_path.parent)):
+            library = ctypes.WinDLL(str(avcodec_path))
+            query = library.avcodec_configuration
+            query.restype = ctypes.c_char_p
+            result = query()
+    except (AttributeError, OSError) as exc:
+        raise RuntimeError(f"Could not read FFmpeg configuration from {avcodec_path}") from exc
+    if not result:
+        raise RuntimeError(f"FFmpeg returned an empty build configuration: {avcodec_path}")
+    return result.decode("utf-8")
+
+
 def _runtime_dlls(prefix: Path, av_dir: Path) -> list[Path]:
     dll_root = prefix / "Library" / "bin"
     available: dict[str, Path] = {}
@@ -300,6 +340,9 @@ def stage(prefix: Path, site_packages: Path, distribution_root: Path) -> dict[st
     if ffmpeg_info.get("license") != "LGPL-2.1-or-later":
         raise RuntimeError(f"Unexpected FFmpeg license metadata: {ffmpeg_info.get('license')}")
 
+    ffmpeg_flags = _verify_ffmpeg_configuration(
+        _ffmpeg_configuration_from_dll(prefix / "Library" / "bin" / "avcodec-62.dll")
+    )
     dlls = _runtime_dlls(prefix, av_source)
     rows = _package_rows(prefix)
     owners: dict[str, set[str]] = {}
@@ -361,6 +404,7 @@ def stage(prefix: Path, site_packages: Path, distribution_root: Path) -> dict[st
             "version": EXPECTED_FFMPEG[0],
             "build": EXPECTED_FFMPEG[1],
             "license": "LGPL-2.1-or-later",
+            "configured_license_version": "LGPLv3",
         },
         "runtime_dll_count": len(dll_records),
         "runtime_dll_size_bytes": sum(int(item["size"]) for item in dll_records),
@@ -369,9 +413,13 @@ def stage(prefix: Path, site_packages: Path, distribution_root: Path) -> dict[st
         "verification": {
             "gpl_codecs_excluded_by_build_variant": True,
             "gpl_only_x264_x265_dlls_in_runtime_closure": False,
+            "ffmpeg_configuration_source": "avcodec_configuration() from avcodec-62.dll",
+            "ffmpeg_configuration_flags": ffmpeg_flags,
             "basis": (
-                "Exact conda-forge package build string and PE import closure; "
-                "run-time codec check remains separate."
+                "Exact conda-forge package build string, avcodec-62.dll configuration "
+                "(--disable-gpl and --enable-version3), and PE import closure. "
+                "The package metadata declares LGPL-2.1-or-later; the selected build "
+                "configuration uses LGPLv3."
             ),
         },
     }
@@ -381,9 +429,9 @@ def stage(prefix: Path, site_packages: Path, distribution_root: Path) -> dict[st
         "",
         "This folder accompanies the dynamically linked PyAV runtime. License texts, exact conda",
         "artifacts, source hashes and the conda-forge build recipes are preserved per package.",
-        "The packaged FFmpeg artifact is the LGPL build variant; the staged PE dependency",
-        "closure was checked for x264/x265 DLLs. This manifest is build evidence,",
-        "not a legal opinion.",
+        "The packaged FFmpeg DLL configuration verifies LGPLv3; GPL and nonfree configure flags "
+        "are disabled. The staged PE dependency closure contains no x264/x265 DLLs. This manifest "
+        "is build evidence, not a legal opinion.",
         "",
         "| Package | Version / build | Declared license | Artifact SHA-256 |",
         "|---|---|---|---|",
@@ -418,7 +466,8 @@ def main() -> int:
     args = parser.parse_args()
     result = stage(args.conda_prefix, args.site_packages, args.distribution_root)
     print(
-        f"Staged PyAV {result['pyav']['version']} + FFmpeg {result['ffmpeg']['version']}: "
+        f"Staged PyAV {result['pyav']['version']} + FFmpeg {result['ffmpeg']['version']} "
+        f"({result['ffmpeg']['configured_license_version']} verified): "
         f"{result['runtime_dll_count']} DLLs, {result['runtime_dll_size_bytes']} bytes"
     )
     return 0

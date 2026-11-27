@@ -29,6 +29,9 @@ distributed wheels and DLLs were built from these trees; vendor build configurat
 toolchain and binary provenance remain under review in
 [issue #54](https://github.com/tnyari/RoboAssist/issues/54).
 
-The FFmpeg runtime is staged from the LGPLv2.1-or-later conda-forge build with its
-recorded `--disable-gpl --enable-version3` configuration. Source material and build
-metadata improve traceability; they are not a legal compliance opinion.
+The FFmpeg package metadata declares LGPL-2.1-or-later. The packaged `avcodec-62.dll`
+configuration is read from the binary and records `--disable-gpl --enable-version3`;
+FFmpeg documents `--enable-version3` as selecting LGPLv3. GPL and nonfree configure
+flags are rejected during runtime staging. Source material and build metadata improve
+traceability; they are not a legal compliance opinion. See the
+[FFmpeg 8.1 license documentation](https://ffmpeg.org/doxygen/8.1/md_LICENSE.html).

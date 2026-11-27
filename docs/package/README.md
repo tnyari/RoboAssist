@@ -26,8 +26,11 @@ benchmark és annak annotációs sémája a
 [benchmark útmutatóban](_internal/docs/benchmark-metrics.md)
 van; valós méréshez jóváhagyott, annotált hangforrás szükséges.
 
-A RoboAssist FFmpeg könyvtárakat használ LGPLv2.1 licenc alatt. A megfelelő
-FFmpeg/PyAV forrásarchívumok és a buildrecept az
+A csomagolt FFmpeg 8.1.2 build `--enable-version3` konfigurációja LGPLv3
+licencverziót választ, miközben a GPL és nem terjeszthető komponensek tiltva
+vannak. Az upstream package metadata LGPL-2.1-or-later értéket jelez; a pontos
+buildkonfiguráció és forrás a csomagban ellenőrizhető. A megfelelő FFmpeg/PyAV
+forrásarchívumok és buildrecept az
 `_internal/licenses/upstream-sources/` és
 `_internal/licenses/av-runtime/` könyvtárban találhatók; a felületen a
 **Súgó → Névjegy** ablak is megadja ezeket az útvonalakat.

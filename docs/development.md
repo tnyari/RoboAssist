@@ -31,7 +31,8 @@ Ez a parancs explicit, hálózatos **fejlesztői telepítés**:
 3. Létrehozza a `.venv/` környezetet, majd a teljes `requirements.lock` alapján
    `--require-hashes --only-binary :all:` módban szinkronizálja a függőségeket.
 4. A `conda-av-win64.lock` explicit, SHA-256-tal rögzített conda-forge zárja alapján
-   PyAV 17.1.0 + FFmpeg 8.1.2 LGPL runtime-ot készít, és a zár pontos PyAV
+   PyAV 17.1.0 + FFmpeg 8.1.2 runtime-ot készít; a csomagolt DLL konfigurációja
+   az LGPLv3 licencverziót és a GPL-kapcsolók kikapcsolását is ellenőrzi. A zár pontos PyAV
    csomagját, DLL-függőségi láncát, licencfájljait és build receptjeit `.tools/`
    alatt stage-eli. A micromamba 2.10.0 projektlokális bootstrap csomagjának
    hash-e ellenőrzött; semmi nem települ globálisan.
@@ -136,8 +137,8 @@ bevezetése az érintett implementációs issue-ban történjen.
 ```powershell
 .\.venv\Scripts\python.exe -m offline_stt --config configs/default.toml
 .\.venv\Scripts\roboassist-config.exe --config configs/default.toml
-.\.venv\Scripts\python.exe -m ruff check src tests scripts/check-environment.py
-.\.venv\Scripts\python.exe -m ruff format --check src tests scripts/check-environment.py
+.\.venv\Scripts\python.exe -m ruff check src tests scripts/check-environment.py scripts/stage-av-runtime.py
+.\.venv\Scripts\python.exe -m ruff format --check src tests scripts/check-environment.py scripts/stage-av-runtime.py
 .\.venv\Scripts\python.exe -m mypy
 .\.venv\Scripts\python.exe -m pytest
 .\.venv\Scripts\python.exe scripts/check-environment.py
