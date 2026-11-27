@@ -110,8 +110,11 @@ A próbacsomag PySide6_Essentials és shiboken6 6.12.0 metadata LGPL/GPL
 alternatívákat jelez, a két licencmappában viszont csak
 LicenseRef-Qt-Commercial.txt található. A csomagolt fájllista 5 Qt6 DLL-t,
 20 plug-in DLL-t, 4 PySide .pyd modult és shiboken bindingfájlokat tartalmaz.
-Az 5 Qt runtime DLL hashét és az MSVC runtime leltárt a [#54 aljegy](https://github.com/tnyari/RoboAssist/issues/54)
-rögzíti.
+A végleges ZIP alatti összes Qt/PySide/shiboken DLL/PYD fájl pontos listája,
+mérete, PE verziója és SHA-256 értéke a [Qt runtime lockban](qt-runtime-file-lock.json)
+szerepel; ez 33 bináris fájlt és a hivatalos VC Redistributable minimumverzió/hash
+adatait rögzíti. Ez egészíti ki az [#54 aljegyen](https://github.com/tnyari/RoboAssist/issues/54)
+vezetett licencvizsgálatot.
 
 A PySide .pyd modulok és Qt Qt6*.dll fájlok különállóak, így a csomag
 dinamikus elrendezésű; ez önmagában nem bizonyítja a felhasználói relinkelést
