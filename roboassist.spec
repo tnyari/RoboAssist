@@ -11,9 +11,10 @@ configure_av_dll_search()
 
 SITE_PACKAGES = Path(sys.prefix) / "Lib" / "site-packages"
 AV_DLLS = SITE_PACKAGES / "av.libs"
+AV_PACKAGE = SITE_PACKAGES / "av"
 AV_LICENSES = ROOT / ".tools" / "av-vendor" / "av-runtime"
 PYTHON_LICENSES = ROOT / ".tools" / "python-license-bundle"
-for required in (AV_DLLS, AV_LICENSES, PYTHON_LICENSES):
+for required in (AV_DLLS, AV_PACKAGE, AV_LICENSES, PYTHON_LICENSES):
     if not required.is_dir():
         raise SystemExit(f"Required staged build input is missing: {required}")
 
@@ -24,6 +25,24 @@ def tree_data(source: Path, destination: str) -> list[tuple[str, str]]:
         for path in sorted(source.rglob("*"))
         if path.is_file()
     ]
+
+
+def package_modules(package: str, source: Path) -> list[str]:
+    """Find importable Python/extension modules without importing native code."""
+    modules = {package}
+    for path in source.rglob("*"):
+        if path.suffix == ".py":
+            parts = list(path.relative_to(source).with_suffix("").parts)
+        elif path.suffix == ".pyd":
+            parts = [*path.parent.relative_to(source).parts, path.name.split(".", 1)[0]]
+        else:
+            continue
+        if "__pycache__" in parts:
+            continue
+        if parts and parts[-1] == "__init__":
+            parts.pop()
+        modules.add(".".join((package, *parts)) if parts else package)
+    return sorted(modules)
 
 datas = [
     (str(ROOT / "configs" / "default.toml"), "configs"),
@@ -40,7 +59,11 @@ binaries = [(str(path), "av.libs") for path in sorted(AV_DLLS.glob("*.dll"))]
 if not binaries:
     raise SystemExit("No staged PyAV/FFmpeg DLLs were found")
 
-hiddenimports = ["av", "faster_whisper", "ctranslate2"]
+hiddenimports = [
+    "faster_whisper",
+    "ctranslate2",
+    *package_modules("av", AV_PACKAGE),
+]
 common_analysis = {
     "pathex": [str(ROOT / "src")],
     "binaries": binaries,
@@ -100,3 +123,4 @@ coll = COLLECT(
     upx=False,
     name="RoboAssist",
 )
+
