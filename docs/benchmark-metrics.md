@@ -39,4 +39,3 @@ Az annotációs JSONL minden sora az `utterance_id`, `speech_start_ms`, `speech_
 Az audiofájl és az annotáció a helyi útvonalán marad; riportba nyers átirat csak a külön `--include-transcript` kapcsolóval kerül. `--output-parent` megadása szükséges, és létező run könyvtár soha nem íródik felül.
 
 A metrikák számítását szintetikus, ismert példák fedik le. Ez a metrikakód és az export ellenőrzése, nem beszédpontossági vagy teljesítménybenchmark. A jóváhagyott, annotált magyar korpusz és az M1 hardverkategóriás futások a #21/#23 feladatokban készülnek; addig teljesítménycél eléréséről nem teszünk állítást.
-
