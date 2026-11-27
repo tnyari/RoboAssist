@@ -76,6 +76,7 @@ try {
         if (Test-Path -LiteralPath $fullTarget) { Remove-Item -LiteralPath $fullTarget -Recurse -Force }
     }
     Copy-Item -LiteralPath (Join-Path $buildDist 'RoboAssist') -Destination $packagePath -Recurse
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs/package/README.md') -Destination (Join-Path $packagePath 'README.md')
     Compress-Archive -LiteralPath $packagePath -DestinationPath $zipPath -CompressionLevel Fastest
     $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
     "$hash *$packageName.zip" | Set-Content -LiteralPath $hashPath -Encoding ascii
