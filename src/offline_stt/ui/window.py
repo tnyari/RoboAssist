@@ -115,6 +115,9 @@ class MainWindow(QMainWindow):
             QPushButton#primary { background: #1769d2; border-color: #1769d2; color: #ffffff;
                                   font-weight: 650; }
             QPushButton#primary:hover { background: #0f58b6; }
+            QPushButton#primary:disabled, QPushButton#primary:disabled:hover {
+                background: #f0f2f5; border-color: #d5dce7; color: #9aa5b5;
+            }
             QTextBrowser { border: 1px solid #dce2eb; border-radius: 10px; background: #ffffff;
                            color: #172438; padding: 16px; selection-background-color: #b7d5ff; }
             QProgressBar { height: 10px; border: 0; border-radius: 5px; background: #e7ebf1; }
@@ -511,3 +514,4 @@ class MainWindow(QMainWindow):
         self._thread.wait(6500)
         self._allow_close = True
         self.close()
+
