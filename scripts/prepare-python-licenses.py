@@ -144,6 +144,7 @@ def prepare(
             "build_marker": build_marker,
             "source_url": python_lock["source_url"],
             "distribution_artifact": python_lock["distribution_artifact"],
+            "source_archives": python_lock["source_archives"],
             "runtime_dll": {
                 **python_dll,
                 "package_path": python_lock["runtime_dll"]["package_path"],
@@ -158,6 +159,7 @@ def prepare(
             "version": expected_openssl_version,
             "license_expression": openssl_lock["license_expression"],
             "source_url": openssl_lock["source_url"],
+            "source_archive": openssl_lock["source_archive"],
             "license_source_url": openssl_lock["license_source_url"],
             "license_path": openssl_license_relative.as_posix(),
             "license_sha256": openssl_lock["license_sha256"],
