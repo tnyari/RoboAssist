@@ -32,6 +32,12 @@ FFmpeg/PyAV forrásarchívumok és a buildrecept az
 `_internal/licenses/av-runtime/` könyvtárban találhatók; a felületen a
 **Súgó → Névjegy** ablak is megadja ezeket az útvonalakat.
 
+A Qt/PySide közlemények és az upstream licencszövegek az
+`_internal/licenses/qt/` mappában találhatók; az eredeti Qt/PySide
+forrásarchívumok mellettük vannak az `_internal/licenses/upstream-sources/`
+mappában. A Qt binary provenance, a pontos third-party linkelés és az LGPL
+relink/telepítési út kiadási átvétele továbbra is nyitott.
+
 A Microsoft VC Redistributable telepítőjének verzióját és hashét a csomag
 `_internal/runtime/vc-runtime.json` fájlja rögzíti. A terjesztésre a Microsoft
 Visual Studio licencfeltételei vonatkoznak; az audit a #54 jegyben követi ezt.
@@ -41,5 +47,4 @@ Visual Studio licencfeltételei vonatkoznak; az audit a #54 jegyben követi ezt.
 Állítsd le a felvételt az alkalmazásban, zárd be az ablakot, majd töröld a
 kicsomagolt csomagmappát. A felhasználói adatkönyvtárba importált modell külön
 marad; ha már nincs rá szükség, külön törölhető.
-
 
