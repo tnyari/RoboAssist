@@ -1,7 +1,7 @@
 # Qt/PySide licenc- és attribution bundle audit
 
 **Ellenőrzött artifact:** `RoboAssist-0.1.0-windows-x64.zip`  
-**SHA-256:** `08172151946834876be0c98bb084ab2b2435bd799eb5613c237172b7ff2b332a`  
+**SHA-256:** `10d2d892ff9a939a3ce2a01def55801e608a6701fc42c5aa53b6602fca5c4555`  
 **GitHub követés:** [#54](https://github.com/tnyari/RoboAssist/issues/54), a #25 audit része.
 
 ## ✅ Mit tartalmaz a csomag
@@ -80,4 +80,3 @@ nem jogi minősítés.
 - A csomagolt `RoboAssistModels.exe --help` kilépési kódja **0**.
 - Tiszta Windows gépes telepítés/eltávolítás: nem futott, mert a felhasználó
   jelezte, hogy jelenleg nincs elérhető tesztgép vagy VM.
-
