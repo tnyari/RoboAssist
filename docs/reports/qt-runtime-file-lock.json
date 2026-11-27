@@ -5,7 +5,7 @@
   "python": "3.11",
   "release": {
     "filename": "RoboAssist-0.1.0-windows-x64.zip",
-    "sha256": "0a75779765687cff222e8f17c307797ad85f565eb58ba3c82092f640e24bd3c8"
+    "sha256": "08172151946834876be0c98bb084ab2b2435bd799eb5613c237172b7ff2b332a"
   },
   "scope": "Minden _internal/PySide6 és _internal/shiboken6 alatti DLL és PYD. A fájlhash-eket a ZIP bejegyzéseiből számoltuk, és ellenőriztük a kibontott csomagmappával.",
   "components": {
@@ -254,3 +254,4 @@
     }
   ]
 }
+
