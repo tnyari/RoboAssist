@@ -47,11 +47,14 @@ def package_modules(package: str, source: Path) -> list[str]:
 datas = [
     (str(ROOT / "configs" / "default.toml"), "configs"),
     (str(ROOT / "models" / "manifest.json"), "models"),
+    (str(ROOT / "models" / "README.md"), "models"),
     (str(ROOT / "models" / "WHISPER_LICENSE.txt"), "models"),
+    (str(ROOT / "LICENSE"), "."),
     (str(ROOT / "LICENSE"), "licenses/RoboAssist"),
     (str(ROOT / "THIRD_PARTY_NOTICES.md"), "."),
-    (str(ROOT / "README.md"), "docs"),
+    (str(ROOT / "docs" / "package" / "README.md"), "."),
     (str(ROOT / "docs" / "user-guide.md"), "docs"),
+    (str(ROOT / "docs" / "benchmark-metrics.md"), "docs"),
 ]
 datas += tree_data(AV_LICENSES, "licenses/av-runtime")
 datas += tree_data(PYTHON_LICENSES, "licenses/python")
@@ -123,4 +126,3 @@ coll = COLLECT(
     upx=False,
     name="RoboAssist",
 )
-
