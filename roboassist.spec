@@ -44,6 +44,10 @@ SOURCE_ARCHIVE_HASHES = {
     "qtsvg-everywhere-src-6.12.0.tar.xz": "e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331",
     "qtimageformats-everywhere-src-6.12.0.tar.xz": "0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762",
     "pyside-setup-v6.12.0.tar.gz": "dce2a944b34320e51a0ec8100cb983956399b97dec386f0fbe39e1b52571a336",
+    "openssl-3.5.9.tar.gz": "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a",
+    "cpython-3.11.18+20261124-x86_64-pc-windows-msvc-install_only.tar.gz": "3e4a35e3c238e5090d36bf95c041d9052bc82d6e298cb912ba7f70f6c66cf81a",
+    "Python-3.11.18.tgz": "5f62711b12470fd435f83f1451c1b1ef4a179aebc715c716874b0967567d814e",
+    "python-build-standalone-48d61fcd7d85d7013b95576f62f779008c316a63.tar.gz": "ca344c08ea7717d1b81fc915f4545098e0c60483137dbc47ce3c3588389e53dc",
 }
 for filename, expected_hash in SOURCE_ARCHIVE_HASHES.items():
     source_archive = UPSTREAM_SOURCE_ARCHIVES / filename
