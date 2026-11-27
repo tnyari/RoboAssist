@@ -47,8 +47,23 @@ csak helyi könyvtárat kap, teljes ellenőrzéssel; hiány/sérülés látható
 A verify nem tölt be neurális modellt. A smoke valódi helyi modellt tölt be egyszer,
 külön warm-up után két reset/flush ciklust futtat szintetikus csenden. Nem ment
 hangot/átiratot, és nem pontosságmérés vagy benchmark. A CLI maga nem telepít
-hálózati tűzfalat; a [#5 riport](../docs/reports/issue-5-engine.md) külön DNS/TCP-tiltással
-futtatott próbát is dokumentál.
+hálózati tűzfalat; az [#5 riport](https://github.com/tnyari/RoboAssist/issues/5)
+külön DNS/TCP-tiltással futtatott próbát is dokumentál.
+
+## Csomagolt Windows alkalmazás
+
+A `RoboAssistModels.exe` a hordozható csomagban ugyanazt az ellenőrző/telepítő CLI-t
+adja. Az alapértelmezett katalógus a csomag manifestje, a célkönyvtár pedig
+`%LOCALAPPDATA%\RoboAssist\OfflineSTT\models\cache`; ez megegyezik a GUI modellhelyével.
+Import offline, teljes fájlhash-ellenőrzéssel:
+
+```powershell
+.\RoboAssistModels.exe install base-multilingual --from-directory C:\Models\faster-whisper-base
+.\RoboAssistModels.exe verify base-multilingual
+```
+
+Hálózati letöltés csak a `--allow-network` kapcsoló explicit megadásával indul.
+Modellsúly nem része az alkalmazás ZIP-jének.
 
 ## Licenc és Git
 
@@ -57,7 +72,6 @@ az [OpenAI Whisper rögzített upstream forrásából](https://github.com/openai
 származik; hash-e és forrása a manifestben van. Az installer ezt `LICENSE.txt` néven
 mellékeli. A RoboAssist saját forráskódjának licence MIT ([LICENSE](../LICENSE)); a
 független modell- és függőségfeltételeket, illetve a még nyitott csomagolási kérdéseket
-a [#25 licencaudit](../docs/reports/issue-25-license-audit.md) követi.
+a [#25 licencaudit](https://github.com/tnyari/RoboAssist/issues/25) követi.
 
 Súly, cache és letöltés nem kerül Gitbe. Futás közben nincs automatikus letöltés.
-

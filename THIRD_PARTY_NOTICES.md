@@ -1,8 +1,9 @@
 # Harmadik fél komponensei
 
-🟨 **A kiadási licencaudit folyamatban van.** Ez a jegyzék a rögzített környezetből
-és a függőségek saját metaadataiból készült kiinduló leltár. Nem bizonyítja, hogy
-minden beágyazott bináris terjesztési feltétele teljesült. A részletes bizonyítékok
+🟨 **A kiadási licencaudit folyamatban van.** A PyInstaller próba-ZIP-be a Python
+disztribúciók licencfájljai, a PyAV/FFmpeg runtime DLL-zár licencfájljai, az
+upstream source tarballok és a conda-forge build-recept metaadatai bekerülnek. Ez még nem bizonyítja, hogy
+minden terjesztési kötelezettség teljesült. A részletes bizonyítékok
 és korlátok: [#25 licencaudit-riport](docs/reports/issue-25-license-audit.md).
 
 ## Saját forráskód
@@ -16,18 +17,162 @@ csomagra.
 
 | Csomag / pontos verzió | Telepített metaadat | Terjesztési megjegyzés |
 |---|---|---|
-| [av 18.1.1](https://pypi.org/project/av/18.1.1/) | BSD-3-Clause | A PyAV `v18.1.1` forrása a `pyav-ffmpeg` `8.1.3-1` Windows buildet rögzíti, benne x264/x265 integrációval. Az upstream buildforrás GPL-kapcsolója ellentmondásos, a tényleges licencút és source/notices anyag nincs tisztázva: [#42](https://github.com/tnyari/RoboAssist/issues/42), [részletes riport](docs/reports/issue-25-license-audit.md). |
+| [av 17.1.0](https://pypi.org/project/av/17.1.0/) | BSD-3-Clause | A Windows csomag conda-forge artifactja `py311h06a8702_0`, SHA-256 `978c663178d010a4d5bc2c76976abb96b132e8533c9e4d258f400e77935d619a`; PyAV source SHA-256 `7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3`. A külön rögzített FFmpeg 8.1.2 runtime `LGPL-2.1-or-later` metadata mellett `--disable-gpl --enable-version3` builddel készült; a csomagolt `avcodec-62.dll` konfigurációja ezt közvetlenül igazolja. Az FFmpeg upstream dokumentációja szerint a version3 kapcsoló LGPLv3-ra vált. A PyAV forrás/recept/licenc bekerül a csomagba; a pontos Qt/PyAV/MSVC terjesztési átvétel továbbra is nyitott, lásd #42/#47/#54 és [#58](https://github.com/tnyari/RoboAssist/issues/58). |
 | [faster-whisper 1.2.1](https://pypi.org/project/faster-whisper/1.2.1/) | MIT | A PyAV külön tranzitív/bundled függőség. |
 | [CTranslate2 4.9.1](https://pypi.org/project/ctranslate2/4.9.1/) | MIT | A teljes tranzitív verziólista a riportban van. |
 | [NumPy 2.4.6](https://pypi.org/project/numpy/2.4.6/) | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | Az adott wheel saját license fájljai is megőrzendők. |
 | [PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/) és [shiboken6 6.12.0](https://pypi.org/project/shiboken6/6.12.0/) | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | A Qt for Python közösségi kiadása LGPL/GPL feltételek alatt érhető el; a konkrét binary csomag, a Qt komponensek és a relink/source biztosítása még nem lett kiadási csomagon ellenőrizve. |
-| [sounddevice 0.5.6](https://pypi.org/project/sounddevice/0.5.6/) | MIT | A wheel PortAudio DLL-t is hoz; annak külön license szövegét és verzióját a riport rögzíti. |
+| [sounddevice 0.5.6](https://pypi.org/project/sounddevice/0.5.6/) | MIT | A PortAudio runtime saját licencszövege is bekerül a Python package licencmappájába, ha azt a pontos disztribúció tartalmazza. |
 | [onnxruntime 1.32.0](https://pypi.org/project/onnxruntime/1.32.0/) | MIT | A wheelben található [ThirdPartyNotices](https://github.com/microsoft/onnxruntime/blob/main/ThirdPartyNotices.txt) állományt is meg kell őrizni a csomagban. |
 
 Az összes további tranzitív runtime és csak fejlesztésre használt csomag verziója,
 forrása és telepített licencmetaadata a [#25 auditriportban](docs/reports/issue-25-license-audit.md)
 szerepel. A metaadat nem helyettesíti a wheelben vagy natív DLL-ben szállított
 kódok licencének ellenőrzését.
+
+## A CPython runtime-ból átvett OpenSSL DLL-ek
+
+A Windows alkalmazás a rögzített CPython 3.11.18 runtime-ot használja
+(`python-build-standalone` 20261124, uv 0.13.10). A release-bejegyzés a Windows
+x64 `install_only` archive nevét, méretét és SHA-256 értékét rögzíti; a
+csomagolt `python311.dll` fájl is méret/hash szerint zárt. A Python runtime saját
+`LICENSE.txt` fájlja PSF-2.0 licencként bekerül a csomagba. Ugyanebből a Python
+runtime-ból a PyInstaller két OpenSSL 3.5.9 DLL-t tesz a csomagba:
+`libcrypto-3-x64.dll` és `libssl-3-x64.dll`. Ezekhez az OpenSSL upstream
+Apache-2.0 licencszövege is bekerül az
+`_internal/licenses/python/python-runtime/` alá. A pontos DLL-méretek,
+SHA-256-ok, forrásverziók és licencfájl-hash-ek a csomag
+`_internal/licenses/python/python-runtime.json` manifestjében vannak.
+Az OpenSSL 3.5.9 forrásarchívumot, a CPython 3.11.18 forrást, a
+python-build-standalone buildforrást és a pontos CPython runtime-disztribúciót
+a ZIP hash-ellenőrzötten az `_internal/licenses/upstream-sources/` is tartalmazza.
+
+Ez külön runtime a PyAV/FFmpeg zár `av.libs` könyvtárában lévő OpenSSL 3.6.5
+DLL-ektől; a két OpenSSL-példány hash-e és eredete külön szerepel. A pontos
+Python és OpenSSL runtime fájlzár a
+`third_party_licenses/python-runtime/runtime-lock.json` állományban van. A rögzített
+adatok a jelenlegi CPython inputot és csomagolt DLL-eket azonosítják, de nem
+helyettesítik a CPython runtime teljes forrás/buildláncának kiadási átvételét.
+
+## Qt for Python és MSVC runtime: LGPLv3 közösségi út vizsgálata
+
+A tulajdonos az LGPLv3 közösségi út további vizsgálatát kérte; ez nem végleges
+licencválasztás. A PySide6_Essentials és shiboken6 6.12.0 csomagmetaadata
+LGPL/GPL alternatívákat jelez, de a ZIP Python licencbundle-jében mindkét
+csomagnál csak a Qt Commercial licenc-referenciafájl található. Az offline ZIP
+külön `_internal/licenses/qt/` közleménycsomagja a négy
+hash-zárt Qt/PySide 6.12.0 source archive-ból 174 licenc-, notice- és
+attribution-fájlt tesz elérhetővé, köztük 76 `qt_attribution.json`
+source-dokumentumot és a Community LGPL/GPL licencszövegeket. A manifest megadja
+az eredeti archívumútvonalakat és a fájlhash-eket. Ez részben pótolja a hiányzó,
+disztribúció-specifikus license textet, de a tényleges binary provenance,
+licencválasztás és source/relink/telepítési út nincs lezárva.
+
+A csomagban 5 Qt6 DLL, 20 Qt plug-in DLL, 4 PySide kötésmodul és shiboken
+modulok vannak; az MSVC runtime-ot a hivatalos VC Redistributable telepítő
+adja, app-local MSVC/UCRT runtime DLL-ek nincsenek a ZIP-ben. A különálló Qt DLL-ek dinamikus
+elrendezést mutatnak, de ez önmagában nem bizonyítja a felhasználói
+relink/futtatás feltétel teljesítését. A Qt LGPLv3 út a Qt könyvtárak teljes
+source átadását vagy ellenőrzött írásos forrásajánlatot, relinkelési és
+telepítési információt, teljes licencszöveget és jól látható tájékoztatást
+igényel a [Qt hivatalos útmutatója](https://www.qt.io/development/open-source-lgpl-obligations)
+szerint. A ZIP már tartalmazza a 33 fájlos runtime lockot és az előzetes technikai
+fájlcsere-leírást a README-ben; a tényleges módosított DLL/PYD-vel való indítást
+és a binary provenance-t még nem igazoltuk. A Qt 6.12 GPL-only moduljai és a pluginok harmadik fél kódjai a
+[#54 auditban](https://github.com/tnyari/RoboAssist/issues/54) maradnak
+ellenőrzés alatt.
+
+Az offline Windows csomag hash-ellenőrzött Qt/PySide source archívumokat hordoz
+az `_internal/licenses/upstream-sources/` könyvtárban:
+
+- QtBase 6.12.0 — SHA-256 `a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307`
+- QtSvg 6.12.0 — SHA-256 `e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331`
+- Qt Image Formats 6.12.0 — SHA-256 `0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762`
+- PySide / Qt for Python 6.12.0 — SHA-256 `dce2a944b34320e51a0ec8100cb983956399b97dec386f0fbe39e1b52571a336`
+
+A licencbundle külön `_internal/licenses/qt/README.md` fájlja leírja az
+útvonalakat és a bizonyíték korlátját; a ZIP hashét és az összes manifestelt
+fájl ellenőrzését a #25 auditriport rögzíti.
+
+A csomagban 20 plugin DLL van; ezek között `qjpeg.dll`, `qtiff.dll` és
+`qwebp.dll` is szerepel. A Qt 6.12 source `qt_attribution.json` fájljai
+libjpeg-turbo 3.2.0-at kapcsolnak a qjpeg-hez, ha nincs `-system-libjpeg`;
+libtiff 4.7.2-t és libwebp 1.6.0-t jelölnek a qtiff/qwebp pluginhoz, ha nincs
+system library. Ezek a verzióhoz tartozó upstream, feltételes source attributionök;
+a PyPI vendor binary konkrét build opcióit és linkelt third-party closure-t nem
+igazolják. Források: [Qt GUI attributions](https://doc.qt.io/qt-6.12/qtgui-index.html),
+[Qt Image Formats attributions](https://doc.qt.io/qt-6.12/qtimageformats-index.html),
+[Qt licensebundle audit](docs/reports/qt-license-bundle.md).
+
+A hivatalos `v6.12.0` source tagek feloldott commitjai:
+[pyside-setup](https://github.com/pyside/pyside-setup/tree/f50facb83fc3dc5f3240c854668c7a6dd93871b2)
+`f50facb83fc3dc5f3240c854668c7a6dd93871b2`,
+[qtbase](https://github.com/qt/qtbase/tree/025bdad181de241e81bf853c8a2d7bf3d19261a9)
+`025bdad181de241e81bf853c8a2d7bf3d19261a9`,
+[qtsvg](https://github.com/qt/qtsvg/tree/883a58532078d003cefef0a549bfe9f885ce41f5)
+`883a58532078d003cefef0a549bfe9f885ce41f5`, és
+[qtimageformats](https://github.com/qt/qtimageformats/tree/dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e)
+`dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e`. A tagek unsigned állapotúak;
+ezek traceability-referenciák, nem a csomagolt binárisok build-provenance
+bizonyítékai. A source archívumok a csomagban vannak, de a vendor buildlánc nincs.
+A [PyPI PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/)
+release oldala csak wheel fájlokat és provenance nélküli artefaktumokat listáz.
+
+A kiadási ZIP a Microsoft hivatalos x64 VC Redistributable 14.52.37029.0
+telepítőjét tartalmazza az `_internal/runtime/` mappában. SHA-256:
+`9c02c9ed120f671b900e6b9471d890e3b2414117a7e53f4ae2e855466fa2b7c9`; az
+Authenticode aláírás érvényes, a signer Microsoft Corporation. A
+`Start-RoboAssist.cmd` ellenőrzi a telepített runtime verzióját; hiány vagy
+14.52.37029.0-nál régebbi runtime esetén a csomagolt telepítőt indítja, amelyhez
+a Windows UAC-jóváhagyást kérhet. A szokásos MSVCP/VCRUNTIME/UCRT nevű DLL-eket a
+PyInstaller csomagból kiszűri. A lockolt NumPy 2.4.6 wheel tartalmazza a hash-elt
+`numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` fájlt
+(14.40.33810.0); a build ellenőrzi a wheel hashét és `RECORD`-ját, majd a két
+érintett `.pyd` importnevét a rendszer `msvcp140.dll` fájljára állítja egy külön,
+csak build idején használt overlay-ben. Az eredeti wheel nem módosul, a hash-elt
+DLL pedig kimarad a ZIP-ből. A csomagolt modell-CLI `--help` ellenőrzése sikeres.
+
+A [Qt Windows telepítési útmutatója](https://doc.qt.io/qt-6.12/windows-deployment.html)
+release buildhez a hivatalos Microsoft Redistributable telepítőt írja elő, és
+az egyedi compiler runtime DLL-ek közvetlen szállítása ellen figyelmeztet. A
+[Microsoft redisztribúciós dokumentációja](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files)
+szerint a runtime telepítő/Redistributable terjesztése csak licencelt Visual
+Studio felhasználóknak, a Visual Studio licencfeltételei szerint engedélyezett.
+Ezért a telepítő útja műszakilag be van építve, de a hivatalos Redistributable
+terjesztési jogcíme a #54 auditban továbbra is nyitott.
+Ez technikai leltár és nyitott licencvizsgálat, nem jogi minősítés.
+
+## FFmpeg 8.1.2 forrás és buildbeállítás
+
+A Windows x64 csomag az `ffmpeg-8.1.2-lgpl_haba0ffa_812` conda-forge artifactot
+használja (SHA-256: `903a1428dddb6a7568d82e767f0c793b6abcc621bd740bdde325be1889008f08`).
+A hozzá rögzített [FFmpeg 8.1.2 upstream forrásarchívum](https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.gz)
+SHA-256 értéke `32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22`;
+a conda-forge recept commitja `f639462076b7d4d708c8b0b5a447be6776ecf9cf`.
+A recept nem-GPL ága `--disable-gpl` kapcsolót használ, a közös konfiguráció
+pedig `--enable-version3`-at. A csomagolt `avcodec-62.dll` tényleges
+`avcodec_configuration()` kimenete mindkét flaget mutatja, GPL/nonfree, x264 és
+x265 engedélyező flag nélkül. Az upstream [FFmpeg 8.1 licencdokumentációja](https://ffmpeg.org/doxygen/8.1/md_LICENSE.html)
+szerint a `--enable-version3` az LGPLv3 licencverziót aktiválja; a conda artifact
+metadata ettől függetlenül `LGPL-2.1-or-later`. A Névjegy ezért LGPLv3-at jelez.
+A ZIP tartalmazza a receptet, az LGPLv2.1/LGPLv3 szövegeket és az ellenőrzött
+`ffmpeg-8.1.2.tar.gz` source archive-ot.
+
+A PyAV 17.1.0 rögzített conda-receptjének build hostja FFmpeg 8.1.1 LGPL,
+viszont a recept külön tesztkörnyezete GPL FFmpeg-et és x264/x265 teszteket kér.
+Ezek a recipe tesztkonfigurációját írják le, nem az alkalmazás runtime-ját. A
+ZIP-beli PyAV runtime 62 app-local DLL-jének méret/hash egyezése a manifesttel
+sikeres; három Microsoft CRT DLL-t külön VC Redistributable telepítő kezel.
+Nincs x264/x265 DLL a zárban, és a csomagolt FFmpeg DLL tényleges konfigurációja
+`--disable-gpl --enable-version3`. A forrásrecept, artifact- és forráshash a #25
+riportban szerepel; a teljes terjesztési/source/relink átvétel továbbra is nyitott.
+
+Az FFmpeg és PyAV source archive-ok az `_internal/licenses/upstream-sources/`
+könyvtárban vannak, hash-eiket a mappabeli README rögzíti; a hozzájuk tartozó
+recept és patchfájlok az `_internal/licenses/av-runtime/packages/` alatt vannak.
+Ez a csomagolt source és konfigurációs bizonyíték önmagában nem igazolja a teljes
+licencfeltételek teljesítését. A #47/#25 kiadási átvétel nyitott; a DLL-lista
+ellenőrzése nem jogi minősítés.
 
 ## Modellek
 
@@ -36,18 +181,23 @@ fájlmérettel és SHA-256 hash-sel rögzíti. Mindkét modellkártya MIT licenc
 az installer a rögzített [OpenAI Whisper MIT licencszöveget](models/WHISPER_LICENSE.txt)
 helyezi a telepített modell mellé. A súlyok nem kerülnek ebbe a Git repóba.
 
-## Windows terjesztés előtt szükséges
+## Windows terjesztési próba állapota
 
-- [ ] A #42 tisztázza a PyAV/FFmpeg/x264/x265 Windows wheel pontos licencútját és a
-  hozzá tartozó forrás/notices anyagokat.
-- [ ] A #24 tényleges PyInstaller csomagjából össze kell gyűjteni a Qt, ONNX Runtime,
-  PortAudio és a többi beágyazott komponens licenceit/notices fájljait.
+- [ ] A [#54](https://github.com/tnyari/RoboAssist/issues/54) pontosítja a Qt
+  Community LGPLv3 feltételeket, corresponding source/relink útját, plugin- és
+  MSVC runtime terjesztési alapját.
+- [ ] A #42 az exact PyAV/FFmpeg artefaktumok forrás- és receptláncát, licencszövegeit,
+  hash-eit és DLL-zárát rögzíti; az x264/x265 GPL-only DLL nincs a staged runtime-ban.
+- [ ] A #24 tényleges PyInstaller csomagjának Qt/ONNX Runtime/PortAudio függőségi
+  fájlleltára és felhasználói indítása ellenőrzendő.
 - [ ] A csomag átadási módjának teljesítenie kell a kiválasztott Qt LGPL licencút
   feltételeit, ha ilyen utat választunk.
-- [x] A 44 hash-rögzített Python függőség uv/OSV sérülékenység-auditja 2026-11-26-án
+- [x] Az aktuális zár 51 Python csomagjának uv/OSV sérülékenység-auditja 2026-11-27-én
   nem talált ismert sérülékenységet vagy adverse státuszt. Ez nem natív DLL-vizsgálat;
   a [#25 riport](docs/reports/issue-25-license-audit.md) rögzíti a módszert és korlátokat.
 
-Addig ez a fájl a forrás-repó leltára, nem a kiadás teljes és ellenőrzött
-third-party notices csomagja.
-
+Az aktuális csomagpróba a `.tools/python-license-bundle` és
+`.tools/av-vendor/av-runtime` leltárából készül; ezekből a spec a `licenses/`
+mappát másolja a kiadási onedir könyvtárba. A külön hash-ellenőrzött source
+tarballokat a `licenses/upstream-sources/` tartalmazza. A végleges terjesztési ellenőrzés,
+a tiszta Windows próba és az M1 hangbenchmark még nem teljesült.

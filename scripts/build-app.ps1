@@ -1,0 +1,132 @@
+param([switch]$Offline)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+$RepoRoot = Split-Path -Parent $PSScriptRoot
+$Python = Join-Path $RepoRoot '.venv/Scripts/python.exe'
+$setupDev = Join-Path $PSScriptRoot 'setup-dev.ps1'
+Push-Location $RepoRoot
+try {
+    if (-not (Test-Path -LiteralPath $Python)) {
+        if ($Offline) { throw 'Offline build requires the locked .venv to be prepared already.' }
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $setupDev
+        if ($LASTEXITCODE -ne 0) { throw 'The locked development environment could not be prepared.' }
+    }
+
+    $pyInstallerVersion = & $Python -m PyInstaller --version
+    if ($LASTEXITCODE -ne 0 -or $pyInstallerVersion.Trim() -ne '6.22.3') {
+        if ($Offline) { throw 'Offline build requires PyInstaller 6.22.3 in the locked .venv.' }
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $setupDev
+        if ($LASTEXITCODE -ne 0) { throw 'The locked development environment could not be prepared.' }
+        $pyInstallerVersion = & $Python -m PyInstaller --version
+        if ($LASTEXITCODE -ne 0 -or $pyInstallerVersion.Trim() -ne '6.22.3') {
+            throw "Expected PyInstaller 6.22.3, got $pyInstallerVersion"
+        }
+    }
+
+    $sourceDir = Join-Path (Join-Path $RepoRoot '.tools/av-vendor') 'upstream-sources'
+    $sourceHashes = [ordered]@{
+        'av-17.1.0.tar.gz' = '7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3'
+        'ffmpeg-8.1.2.tar.gz' = '32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22'
+        'qtbase-everywhere-src-6.12.0.tar.xz' = 'a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307'
+        'qtsvg-everywhere-src-6.12.0.tar.xz' = 'e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331'
+        'qtimageformats-everywhere-src-6.12.0.tar.xz' = '0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762'
+        'pyside-setup-v6.12.0.tar.gz' = 'dce2a944b34320e51a0ec8100cb983956399b97dec386f0fbe39e1b52571a336'
+        'openssl-3.5.9.tar.gz' = '603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a'
+        'cpython-3.11.18+20261124-x86_64-pc-windows-msvc-install_only.tar.gz' = '3e4a35e3c238e5090d36bf95c041d9052bc82d6e298cb912ba7f70f6c66cf81a'
+        'Python-3.11.18.tgz' = '5f62711b12470fd435f83f1451c1b1ef4a179aebc715c716874b0967567d814e'
+        'python-build-standalone-48d61fcd7d85d7013b95576f62f779008c316a63.tar.gz' = 'ca344c08ea7717d1b81fc915f4545098e0c60483137dbc47ce3c3588389e53dc'
+    }
+    foreach ($entry in $sourceHashes.GetEnumerator()) {
+        $sourcePath = Join-Path $sourceDir $entry.Key
+        if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+            throw "Missing upstream license source $($entry.Key). Run scripts/stage-license-sources.ps1 explicitly before building."
+        }
+        $sourceHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($sourceHash -ne $entry.Value) { throw "Upstream source hash mismatch: $($entry.Key)" }
+    }
+    $qtLicenseOutput = Join-Path (Join-Path $RepoRoot '.tools') 'qt-license-bundle'
+    & $Python (Join-Path $PSScriptRoot 'prepare-qt-license-bundle.py') `
+        --source-dir $sourceDir --output $qtLicenseOutput
+    if ($LASTEXITCODE -ne 0) { throw 'Qt/PySide license bundle preparation failed.' }
+
+    $stageRuntime = Join-Path $PSScriptRoot 'stage-vc-redist.ps1'
+    $runtimeArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $stageRuntime, '-Offline')
+    & powershell.exe @runtimeArgs
+    if ($LASTEXITCODE -ne 0) { throw 'The locked Microsoft VC Redistributable could not be verified.' }
+
+    $setupAv = Join-Path $PSScriptRoot 'setup-av-runtime.ps1'
+    $avArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $setupAv, '-Python', $Python)
+    if ($Offline) { $avArgs += '-Offline' }
+    & powershell.exe @avArgs
+    if ($LASTEXITCODE -ne 0) { throw 'The locked PyAV/FFmpeg runtime could not be staged.' }
+
+    $sitePackages = Join-Path (Split-Path -Parent (Split-Path -Parent $Python)) 'Lib/site-packages'
+    $pythonRoot = & $Python -c "import sys; print(sys.base_prefix)"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($pythonRoot)) {
+        throw 'The locked Python base runtime could not be identified.'
+    }
+    $pythonRoot = $pythonRoot.Trim()
+    $licenseOutput = Join-Path (Join-Path $RepoRoot '.tools') 'python-license-bundle'
+    & $Python (Join-Path $PSScriptRoot 'prepare-python-licenses.py') `
+        --site-packages $sitePackages --python-root $pythonRoot --output $licenseOutput
+    if ($LASTEXITCODE -ne 0) { throw 'Python license bundle preparation failed.' }
+
+    $numpyStage = Join-Path (Join-Path $RepoRoot '.tools') 'numpy-system-msvc'
+    & $Python (Join-Path $PSScriptRoot 'prepare_numpy_msvc.py') --site-packages $sitePackages --output $numpyStage
+    if ($LASTEXITCODE -ne 0) { throw 'NumPy system MSVC runtime staging failed.' }
+
+    $versionLine = Get-Content -LiteralPath (Join-Path $RepoRoot 'pyproject.toml') |
+        Select-String -Pattern '^version = "(\d+\.\d+\.\d+)"' | Select-Object -First 1
+    $version = $versionLine.Matches.Groups[1].Value
+    if ($LASTEXITCODE -ne 0 -or $version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid project version: $version" }
+
+    $pyiRoot = Join-Path (Join-Path $RepoRoot '.tools') 'pyinstaller-build'
+    $pyiRoot = [IO.Path]::GetFullPath($pyiRoot)
+    $allowedPrefix = [IO.Path]::GetFullPath((Join-Path $RepoRoot '.tools')) + [IO.Path]::DirectorySeparatorChar
+    if (-not $pyiRoot.StartsWith($allowedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Build output escaped the workspace: $pyiRoot"
+    }
+    if (Test-Path -LiteralPath $pyiRoot) { Remove-Item -LiteralPath $pyiRoot -Recurse -Force }
+    $buildDist = Join-Path $pyiRoot 'dist'
+    $workPath = Join-Path $pyiRoot 'work'
+    New-Item -ItemType Directory -Force -Path $buildDist, $workPath | Out-Null
+
+    $env:HF_HUB_OFFLINE = '1'
+    $env:HF_HUB_DISABLE_TELEMETRY = '1'
+    $buildCache = Join-Path (Join-Path $RepoRoot '.tools') 'build-cache'
+    $env:HF_HOME = Join-Path $buildCache 'huggingface'
+    $env:XDG_CACHE_HOME = Join-Path $buildCache 'xdg'
+    $env:PYINSTALLER_CONFIG_DIR = Join-Path $buildCache 'pyinstaller'
+    New-Item -ItemType Directory -Force -Path $env:HF_HOME, $env:XDG_CACHE_HOME,
+        $env:PYINSTALLER_CONFIG_DIR | Out-Null
+    & $Python -m PyInstaller --noconfirm --clean --distpath $buildDist --workpath $workPath roboassist.spec
+    if ($LASTEXITCODE -ne 0) { throw 'PyInstaller one-directory build failed.' }
+
+    $packageName = "RoboAssist-$version-windows-x64"
+    $distRoot = Join-Path $RepoRoot 'dist'
+    $packagePath = Join-Path $distRoot $packageName
+    $zipPath = Join-Path $distRoot "$packageName.zip"
+    $hashPath = "$zipPath.sha256"
+    foreach ($target in @($packagePath, $zipPath, $hashPath)) {
+        $fullTarget = [IO.Path]::GetFullPath($target)
+        $distPrefix = [IO.Path]::GetFullPath($distRoot) + [IO.Path]::DirectorySeparatorChar
+        if (-not $fullTarget.StartsWith($distPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to replace a path outside dist: $fullTarget"
+        }
+        if (Test-Path -LiteralPath $fullTarget) { Remove-Item -LiteralPath $fullTarget -Recurse -Force }
+    }
+    Copy-Item -LiteralPath (Join-Path $buildDist 'RoboAssist') -Destination $packagePath -Recurse
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs/package/README.md') -Destination (Join-Path $packagePath 'README.md')
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Prepare-RoboAssist.ps1') -Destination $packagePath
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Start-RoboAssist.cmd') -Destination $packagePath
+    Compress-Archive -LiteralPath $packagePath -DestinationPath $zipPath -CompressionLevel Fastest
+    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    "$hash *$packageName.zip" | Set-Content -LiteralPath $hashPath -Encoding ascii
+    Write-Host "Created: $packagePath"
+    Write-Host "ZIP: $zipPath"
+    Write-Host "SHA-256: $hash"
+    Write-Host 'The app package does not contain model weights; install/import a model offline from a separate verified bundle.'
+} finally {
+    Pop-Location
+}

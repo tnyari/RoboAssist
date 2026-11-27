@@ -174,4 +174,3 @@ A modell előzetesen, külön és explicit telepített kell legyen. A parancs cs
 metaadatot/eseményszámot ír ki, átiratot nem. Nem ment hangot, átiratot vagy
 metrikafájlt. A [#6 riport](reports/issue-6-pipeline.md) különíti el a szintetikus
 CI-t és a célgépen, valódi helyi modellekkel futtatott működési próbákat.
-

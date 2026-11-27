@@ -158,6 +158,8 @@ def test_generated_wav_replay_runs_vad_engine_events_and_closes_without_exports(
         assert finals[0].text == "Szintetikus egy kettő."
         stats = session.stats
         assert stats.audio_samples == len(samples)
+        assert stats.source_started_monotonic_ns is not None
+        assert stats.source_started_monotonic_ns > 0
         assert stats.engine_model_loads == stats.engine_warmup_calls == 1
         assert stats.final_decodes == 1 and stats.partial_decodes >= 1
         assert stats.repeated_decode_samples > 0

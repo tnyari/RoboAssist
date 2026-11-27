@@ -59,6 +59,16 @@ def test_session_end_removes_all_text_and_ignore_state():
     assert buffer.accept(event(revision=2, text="új session"))
 
 
+def test_current_revision_matches_only_the_visible_segment_revision():
+    buffer = TranscriptBuffer()
+    assert buffer.current_revision("session:1") is None
+    buffer.accept(event(revision=1))
+    buffer.accept(event(revision=2, text="friss"))
+    assert buffer.current_revision("session:1") == 2
+    buffer.clear_visible()
+    assert buffer.current_revision("session:1") is None
+
+
 def test_transcript_memory_limit_discards_oldest_segments():
     buffer = TranscriptBuffer(max_segments=2, max_characters=100)
     buffer.accept(event(segment="session:1", text="Első", start=0))

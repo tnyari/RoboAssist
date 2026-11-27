@@ -164,6 +164,7 @@ class MicrophoneSource:
         self._cleanup_failed = False
         self._output_frames = 0
         self._output_samples = 0
+        self._started_monotonic: float | None = None
 
     def _callback(self, data: FloatAudio, frames: int, timing: object, status: object) -> None:
         ring = self._ring
@@ -186,6 +187,7 @@ class MicrophoneSource:
         self._normalizer.reset()
         self._pending.clear()
         self._output_frames = self._output_samples = 0
+        self._started_monotonic = None
         self._unexpected_end = self._stopping = False
         self._ring = _CallbackRing(
             self.queue_blocks, self.sample_rate * self.frame_ms // 1000, self.channels
@@ -212,6 +214,7 @@ class MicrophoneSource:
                 ),
             )
             self.state = SourceState.RUNNING
+            self._started_monotonic = time.monotonic()
             self._stream.start()
         except Exception as exc:
             self._fail("A kiválasztott mikrofon nem indítható", exc)
@@ -309,12 +312,13 @@ class MicrophoneSource:
         if r is None:
             return SourceStats()
         return SourceStats(
-            r.input_blocks,
-            r.input_samples,
-            r.dropped_blocks,
-            r.dropped_samples,
-            r.overflow_events,
-            self._output_frames,
-            self._output_samples,
-            r.max_queue,
+            input_blocks=r.input_blocks,
+            input_samples=r.input_samples,
+            dropped_blocks=r.dropped_blocks,
+            dropped_samples=r.dropped_samples,
+            overflow_events=r.overflow_events,
+            output_frames=self._output_frames,
+            output_samples=self._output_samples,
+            max_queue_blocks=r.max_queue,
+            started_monotonic=self._started_monotonic,
         )

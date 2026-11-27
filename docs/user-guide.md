@@ -2,12 +2,48 @@
 
 ## Első indítás
 
-1. Futtasd a fejlesztői setupot a [fejlesztői útmutató](development.md) szerint.
-2. Telepítsd a `base-multilingual` vagy `small-multilingual` modellt a
-   [modellútmutató](../models/README.md) szerint. A modelltelepítés külön, explicit
-   lépés; az alkalmazás futás közben nem tölt le semmit.
+### Fejlesztői futtatás
+
+1. Futtasd a fejlesztői setupot a [fejlesztői útmutató](https://github.com/tnyari/RoboAssist/blob/main/docs/development.md) szerint.
+2. Telepítsd vagy importáld a `base-multilingual` vagy `small-multilingual` modellt a
+   [modellútmutató](../models/README.md) szerint.
 3. Indítsd a `roboassist.exe` parancsot a repó gyökeréből.
+
+### Hordozható Windows csomag
+
+1. Csomagold ki a verziózott ZIP-et egy olyan mappába, ahová a felhasználód írhat.
+2. Indítsd a `Start-RoboAssist.cmd` fájlt. Ez ellenőrzi a Microsoft Visual C++
+   x64 futtatókörnyezetet, és hiányzó vagy 14.52.37029.0-nál régebbi verzió
+   esetén elindítja a csomagolt Microsoft telepítőt. A Windows UAC-jóváhagyást
+   kérhet. Az alkalmazás futásához nem kell rendszergazdai jog.
+3. A modellkönyvtár nincs a ZIP-be építve. Nyiss PowerShellt a kicsomagolt
+   mappában, és importáld a külön, hash-ellenőrzött
+   modellkönyvtárat a mellékelt modellkezelővel:
+
+   ```powershell
+   .\RoboAssistModels.exe install base-multilingual --from-directory C:\Models\faster-whisper-base
+   .\RoboAssistModels.exe verify base-multilingual
+   ```
+
+   A `small-multilingual` modellhez cseréld ki a modellazonosítót és a könyvtárat.
+   A telepítő a fájlokat ellenőrzi, majd az alkalmazás helyi adatkönyvtárába másolja.
+   A parancssori modellkezelő első használata előtt a `Prepare-RoboAssist.ps1`
+   önmagában is futtatható a runtime ellenőrzéséhez.
 4. Válassz mikrofont, helyi modellt és nyelvet, majd kattints az **Indítás** gombra.
+
+Hálózati letöltés külön, felhasználó által indított műveletként érhető el:
+
+```powershell
+.\RoboAssistModels.exe install base-multilingual --allow-network
+```
+
+Az alkalmazás és a GUI indítása nem tölt le modellt.
+
+A csomag onedir elrendezésű, nem végez rendszerszintű telepítést. Eltávolításhoz
+zárd be az alkalmazást és töröld a kicsomagolt mappát. Az alkalmazás helyi
+adatkönyvtárában tárolt modellek külön maradnak; csak akkor töröld őket, ha már
+nincs rájuk szükséged. A tiszta Windows 10/11 próba a [#24](https://github.com/tnyari/RoboAssist/issues/24)
+része, és még nem igazolt.
 
 ## Használat
 
@@ -22,9 +58,18 @@
 - A feliratablak legfeljebb 2 000 szegmenst és 100 000 karaktert tart memóriában;
   hosszú sessionnél a legrégebbi megjelenített szöveget törli és ezt jelzi.
 - A **Mindig felül** beállítás és az ablak mérete megmarad a következő indításra.
+- A **Súgó → Névjegy** az FFmpeg buildre kiválasztott LGPLv3 licencverziót és a Windows csomagban
+  található forrásarchívumok/buildrecept útvonalát mutatja.
 - **Leállításkor** a session lezárja a mikrofont, kiüríti a belső audiopuffereket,
   majd törli a felirat memóriabeli tartalmát. Ha szükséged van az átiratra, exportáld
   vagy másold ki a leállítás előtt.
+
+## Benchmark reprodukció
+
+A helyi WAV replay futtatása, az annotációs JSONL séma, a 2/4/8 szálas mátrix és
+az adatvédelmi beállítások a [benchmark útmutatóban](benchmark-metrics.md) vannak.
+A runner fejlesztői környezetből fut; jóváhagyott hangforrás nélkül nincs valós
+beszédbenchmark vagy teljesítményállítás.
 
 ## Hibaelhárítás
 
@@ -43,4 +88,3 @@
 Rögzítés csak **Indítás** után történik. Audio és átirat alapból memóriában marad;
 hangfájlt az ablak nem készít. Nincs cloud STT, telemetry vagy futásidejű
 modellletöltés. A másolás és a TXT export a felhasználó által indított művelet.
-

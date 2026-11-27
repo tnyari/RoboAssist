@@ -28,6 +28,9 @@ def main() -> None:
         patch.object(socket.socket, "connect", deny_network),
         patch.object(socket.socket, "connect_ex", deny_network),
     ):
+        from offline_stt.native_deps import configure_av_dll_search
+
+        configure_av_dll_search()
         import av
         import ctranslate2
         import faster_whisper
@@ -48,6 +51,8 @@ def main() -> None:
         assert callable(faster_whisper.WhisperModel)
         assert tokenizers.Tokenizer is not None
         assert av.AudioFrame(format="s16", layout="mono", samples=320).samples == 320
+        assert av.__version__ == "17.1.0", av.__version__
+        assert not ({"libx264", "libx265"} & set(av.codecs_available))
         assert np.zeros(320, dtype=np.float32).shape == (320,)
         portaudio_version = sounddevice.get_portaudio_version()[1]
         app = QApplication([])

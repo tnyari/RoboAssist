@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from fractions import Fraction
+from typing import TYPE_CHECKING
 
-import av
 import numpy as np
 from numpy.typing import NDArray
 
 from offline_stt.audio.types import OUTPUT_RATE, AudioFrame, FloatAudio, SourceKind
+from offline_stt.native_deps import configure_av_dll_search
+
+if TYPE_CHECKING:
+    import av
 
 
 class AudioNormalizer:
@@ -32,6 +36,10 @@ class AudioNormalizer:
         self.reset()
 
     def reset(self) -> None:
+        configure_av_dll_search()
+        import av
+
+        self._av = av
         self._resampler = av.AudioResampler(format="fltp", layout="mono", rate=OUTPUT_RATE)
         self._pending: FloatAudio = np.empty(0, dtype=np.float32)
         self.input_samples = 0
@@ -40,7 +48,7 @@ class AudioNormalizer:
         self._flushed = False
 
     def _input_frame(self, mono: FloatAudio, start: int) -> av.AudioFrame:
-        frame = av.AudioFrame.from_ndarray(mono.reshape(1, -1), format="fltp", layout="mono")
+        frame = self._av.AudioFrame.from_ndarray(mono.reshape(1, -1), format="fltp", layout="mono")
         frame.sample_rate = self.sample_rate
         frame.pts = start
         frame.time_base = Fraction(1, self.sample_rate)

@@ -39,8 +39,10 @@ class WavReplaySource:
         self._file: wave.Wave_read | None = None
         self._normalizer: AudioNormalizer | None = None
         self._pending: deque[AudioFrame] = deque()
+        self._started: float | None = None
         self._input_blocks = self._input_samples = 0
         self._output_frames = self._output_samples = 0
+        self._started = None
         self._eof = False
 
     def start(self) -> None:
@@ -65,7 +67,11 @@ class WavReplaySource:
             self._started = self._clock()
             self.state = SourceState.RUNNING
         except Exception as exc:
-            self._fail("A WAV fájl nem nyitható meg támogatott helyi PCM hangként", exc)
+            self._fail(
+                f"A WAV fájl nem nyitható meg támogatott helyi PCM hangként "
+                f"({type(exc).__name__}{_errno_suffix(exc)})",
+                exc,
+            )
 
     def _close_file(self) -> None:
         stream, self._file = self._file, None
@@ -101,6 +107,7 @@ class WavReplaySource:
             raise AudioSourceError(self.error)
         if self.state != SourceState.RUNNING:
             return None
+        assert self._started is not None
         deadline = self._clock() + timeout
         while self.state == SourceState.RUNNING:
             if not self._pending:
@@ -110,7 +117,11 @@ class WavReplaySource:
                 try:
                     self._feed()
                 except Exception as exc:
-                    self._fail("WAV olvasási vagy átalakítási hiba", exc)
+                    self._fail(
+                        f"WAV olvasási vagy átalakítási hiba "
+                        f"({type(exc).__name__}{_errno_suffix(exc)})",
+                        exc,
+                    )
                 continue
             due = self._started + self._pending[0].end_sample / OUTPUT_RATE
             now = self._clock()
@@ -146,4 +157,11 @@ class WavReplaySource:
             input_samples=self._input_samples,
             output_frames=self._output_frames,
             output_samples=self._output_samples,
+            started_monotonic=self._started,
         )
+
+
+def _errno_suffix(exc: Exception) -> str:
+    """Expose safe OS error codes without putting local paths in UI/IPC errors."""
+    code = getattr(exc, "errno", None)
+    return f", errno={code}" if isinstance(code, int) else ""

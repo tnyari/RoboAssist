@@ -67,6 +67,7 @@ class SourceStats:
     output_frames: int = 0
     output_samples: int = 0
     max_queue_blocks: int = 0
+    started_monotonic: float | None = None
 
 
 class AudioSource(Protocol):

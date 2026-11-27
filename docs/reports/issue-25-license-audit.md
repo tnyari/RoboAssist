@@ -1,206 +1,421 @@
 # #25 projekt- és függőséglicenc-audit
 
-**Dátum:** 2026-11-26  
-**Állapot:** részleges; az M1 terjesztési/licenc kapu nyitva marad.
+**Frissítve:** 2026-11-27  
+**Állapot:** részleges; a licencválasztás rögzítve, a Windows terjesztési átvétel nyitva.
 
-## 🟦 Döntés és hatókör
+## 🟦 Saját projektlicenc
 
-A tulajdonos a RoboAssist saját forráskódjának licencét **MIT**-nek választotta
-([#25 döntés](https://github.com/tnyari/RoboAssist/issues/25#issuecomment-7204253707)).
-A repo gyökerében levő [LICENSE](../../LICENSE) ezt rögzíti. Ez a döntés nem
-helyettesíti és nem módosítja a függőségek, modellek vagy a későbbi Windows csomag
-saját feltételeit.
+A tulajdonos a feladat során **MIT** licencet választott a RoboAssist saját
+forráskódjához. A [LICENSE](../../LICENSE) és a [harmadik fél közleményei](../../THIRD_PARTY_NOTICES.md)
+ezt rögzítik. A választás nem vonatkozik a függőségekre vagy modellekre, és nem
+minősíti a teljes Windows csomag terjesztési feltételeit.
 
-Az ellenőrzés a Windows x64 / Python 3.11.18 virtuális környezet telepített
-disztribúcióinak importlib.metadata mezőit, a pyproject.toml kötéseit, a
-[requirements.lock](../../requirements.lock) hash-eit, a modell-manifestet és a helyi
-natív fájlokat vette alapul. A Windows markerrel értékelt runtime függőségi zárás
-**29 csomag**, a fejlesztői csoport további **15 csomagja** külön szerepel. A
-licencek itt a telepített csomagmetaadat állításai; nem bizonyítják automatikusan
-a wheelbe csomagolt natív komponensek feltételeit.
+## 🔍 Vizsgálati hatókör
 
-## 📦 Runtime függőségi zárás
+Az audit a [Python hash lockra](../../requirements.lock), a
+[conda-forge Windows x64 lockra](../../conda-av-win64.lock), a modellek
+[verzió- és hash-manifestjére](../../models/manifest.json), a PyInstaller build
+specifikációjára és az elkészült licenc-bundle leltárára támaszkodik. A build a
+függőségek licenceit és upstream közleményeit a csomag `licenses/` könyvtárába
+másolja. Ez reprodukálható leltár, nem jogi vélemény.
 
-Az összes sor a [PyPI](https://pypi.org/) adott verziójának csomag-metaadatára mutat.
-Az összetett/licencválasztást tartalmazó kifejezések változtatás nélkül szerepelnek.
+## 📦 PyAV és FFmpeg runtime
 
-| Csomag és verzió | Telepített licencmező |
-|---|---|
-| [anyio 4.16.0](https://pypi.org/project/anyio/4.16.0/) | MIT |
-| [av 18.1.1](https://pypi.org/project/av/18.1.1/) | BSD-3-Clause |
-| [cffi 2.1.1](https://pypi.org/project/cffi/2.1.1/) | MIT-0 |
-| [click 8.5.1](https://pypi.org/project/click/8.5.1/) | BSD-3-Clause |
-| [colorama 0.4.6](https://pypi.org/project/colorama/0.4.6/) | BSD License classifier |
-| [ctranslate2 4.9.1](https://pypi.org/project/ctranslate2/4.9.1/) | MIT |
-| [faster-whisper 1.2.1](https://pypi.org/project/faster-whisper/1.2.1/) | MIT |
-| [filelock 4.3.1](https://pypi.org/project/filelock/4.3.1/) | MIT |
-| [flatbuffers 25.12.19](https://pypi.org/project/flatbuffers/25.12.19/) | Apache 2.0 |
-| [fsspec 2026.9.0](https://pypi.org/project/fsspec/2026.9.0/) | BSD-3-Clause |
-| [h11 0.16.0](https://pypi.org/project/h11/0.16.0/) | MIT |
-| [hf-xet 1.8.0](https://pypi.org/project/hf-xet/1.8.0/) | Apache-2.0 |
-| [httpcore2 2.16.2](https://pypi.org/project/httpcore2/2.16.2/) | BSD-3-Clause |
-| [httpx2 2.16.2](https://pypi.org/project/httpx2/2.16.2/) | BSD-3-Clause |
-| [huggingface-hub 2.4.0](https://pypi.org/project/huggingface-hub/2.4.0/) | Apache-2.0 |
-| [idna 3.20](https://pypi.org/project/idna/3.20/) | BSD-3-Clause |
-| [numpy 2.4.6](https://pypi.org/project/numpy/2.4.6/) | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 |
-| [onnxruntime 1.32.0](https://pypi.org/project/onnxruntime/1.32.0/) | MIT License |
-| [packaging 26.4](https://pypi.org/project/packaging/26.4/) | Apache-2.0 OR BSD-2-Clause |
-| [protobuf 7.36.2](https://pypi.org/project/protobuf/7.36.2/) | 3-Clause BSD License |
-| [pycparser 3.12](https://pypi.org/project/pycparser/3.12/) | BSD-3-Clause |
-| [PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/) | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only |
-| [PyYAML 6.0.4](https://pypi.org/project/PyYAML/6.0.4/) | MIT |
-| [shiboken6 6.12.0](https://pypi.org/project/shiboken6/6.12.0/) | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only |
-| [sounddevice 0.5.6](https://pypi.org/project/sounddevice/0.5.6/) | MIT |
-| [tokenizers 0.23.3](https://pypi.org/project/tokenizers/0.23.3/) | Apache Software License classifier |
-| [tqdm 4.70.1](https://pypi.org/project/tqdm/4.70.1/) | MPL-2.0 AND MIT |
-| [truststore 0.10.5](https://pypi.org/project/truststore/0.10.5/) | MIT |
-| [typing_extensions 4.16.0](https://pypi.org/project/typing-extensions/4.16.0/) | PSF-2.0 |
+A Windows x64 / CPython 3.11 runtime a rögzített conda-forge csomagokat használja.
 
-## 🛠️ Csak fejlesztői zárás
-
-Ezek a verziók a development csoport és annak környezeti függőségei; a
-runtime appnak nem szánt csomagok.
-
-| Csomag és verzió | Telepített licencmező |
-|---|---|
-| [ast_serialize 0.13.1](https://pypi.org/project/ast-serialize/0.13.1/) | MIT |
-| [editables 0.5](https://pypi.org/project/editables/0.5/) | MIT License classifier |
-| [hatchling 1.33.0](https://pypi.org/project/hatchling/1.33.0/) | MIT |
-| [iniconfig 2.3.1](https://pypi.org/project/iniconfig/2.3.1/) | MIT |
-| [librt 0.17.0](https://pypi.org/project/librt/0.17.0/) | MIT |
-| [mypy 2.4.1](https://pypi.org/project/mypy/2.4.1/) | MIT |
-| [mypy_extensions 1.2.0](https://pypi.org/project/mypy-extensions/1.2.0/) | MIT |
-| [pathspec 1.1.1](https://pypi.org/project/pathspec/1.1.1/) | MPL-2.0 |
-| [pluggy 1.7.0](https://pypi.org/project/pluggy/1.7.0/) | MIT |
-| [Pygments 2.21.0](https://pypi.org/project/pygments/2.21.0/) | BSD-2-Clause |
-| [pytest 9.2.0](https://pypi.org/project/pytest/9.2.0/) | MIT |
-| [ruff 0.17.6](https://pypi.org/project/ruff/0.17.6/) | MIT |
-| [tomlkit 0.15.3](https://pypi.org/project/tomlkit/0.15.3/) | MIT |
-| [trove-classifiers 2026.9.21.13](https://pypi.org/project/trove-classifiers/2026.9.21.13/) | Apache Software License classifier |
-| [uv 0.13.10](https://pypi.org/project/uv/0.13.10/) | MIT OR Apache-2.0 |
-
-## 🪟 Csomagba ágyazott és natív kód
-
-### PyAV és FFmpeg
-
-A lock Windows x64 / CPython 3.11 környezetéhez tartozó wheelje:
-
-| Mező | Rögzített érték |
-|---|---|
-| Wheel | av-18.1.1-cp311-abi3-win_amd64.whl |
-| Forrás | [PyPI av 18.1.1 release](https://pypi.org/project/av/18.1.1/) |
-| PyPI SHA-256 | 2f93f859e0705abe2958889ef08699db44a3ff11964e1bbe2a6beb95a680e248 |
-| Release fájlméret | 29.0 MB |
-| Provenance | A PyPI a kiválasztott fájlhoz nem jelez provenance attestationt |
-
-A telepített wheel cp311-abi3-win_amd64 tagje megegyezik a rögzített
-artefaktummal; a SHA-256 a [requirements.lock](../../requirements.lock) engedélyezett
-hash-ei között is megtalálható. A helyi csomag DLL-jei között FFmpeg, x264 és x265
-fájlnevek látszanak. Az av disztribúció BSD-3-Clause metaadata csak a PyAV
-forráslicencét jelzi, nem az egész binary wheel licence.
-
-Az adott PyAV kiadáshoz tartozó elsődleges forráslánc most verziópontos:
-[PyAV `v18.1.1` konfigurációja](https://github.com/PyAV-Org/PyAV/blob/v18.1.1/scripts/ffmpeg-latest.json)
-a `pyav-ffmpeg` `8.1.3-1` kiadását rögzíti. A [PyAV release workflow](https://github.com/PyAV-Org/PyAV/blob/v18.1.1/.github/workflows/tests.yml)
-ezt a konfigurációt használja Windows wheel építése előtt, majd a wheelöket PyPI-re
-publikálja. A [vendor fetch script](https://github.com/PyAV-Org/PyAV/blob/v18.1.1/scripts/fetch-vendor.py)
-Windows x86_64-en a `ffmpeg-windows-x86_64.tar.gz` archívumot választja.
-
-A [vendor `11aa2e2` forrásfája](https://github.com/PyAV-Org/pyav-ffmpeg/tree/11aa2e2)
-FFmpeg 8.1.3-at, x264 `b35605ace3ddf7c1a5d67a2eb553f034aef41d55` commitet és x265 4.3-at
-rögzít. Ugyanott a [`scripts/pkg.py`](https://github.com/PyAV-Org/pyav-ffmpeg/blob/11aa2e2/scripts/pkg.py)
-a codec függőségek pontos forrás URL-jeit és SHA-256 értékeit tartalmazza. A
-[`scripts/build-ffmpeg.py`](https://github.com/PyAV-Org/pyav-ffmpeg/blob/11aa2e2/scripts/build-ffmpeg.py)
-Windows buildje a `libx264` és `libx265` FFmpeg integrációt is engedélyezi; az aktuális
-helyi `av.libs` mappában mindkét DLL ténylegesen jelen van.
-
-**Nyitott licencút-ellentmondás:** a vendor build script `--enable-version3` opciót ad,
-de a vizsgált forrásban nem szerepel `--enable-gpl`. Az [FFmpeg 8.1.3 licencleírása](https://ffmpeg.org/legal.html)
-és az [FFmpeg 8.1.3 `configure` forrása](https://github.com/FFmpeg/FFmpeg/blob/n8.1.3/configure)
-az x264 és x265 külső könyvtárakat GPL-ként sorolja fel, és GPL-függőséghez
-`--enable-gpl` kapcsolót ír elő. Ez a vendor konfiguráció és a helyben megfigyelt
-DLL-ek közötti, elsődleges forrásokból nem feloldott eltérés. A PyPI kiadás a kiválasztott
-wheelhez nem jelez provenance attestationt, ezért a lockolt fájlhash önmagában nem
-igazolja az upstream build tényleges konfigurációját.
-
-A PyAV maintainer az upstream [#2270 beszélgetésben](https://github.com/PyAV-Org/PyAV/issues/2270#issuecomment-4594631670)
-a wheel lehetséges licencútjaként „LGPLv2.1 vagy későbbi + kereskedelmi kivételek”
-vagy „GPLv2 vagy későbbi” lehetőséget említett, majd az [x265 kereskedelmi feltételeiről](https://github.com/PyAV-Org/PyAV/issues/2270#issuecomment-6409103808)
-azt írta, hogy azok egyedi megállapodás tárgyai. Ez nem oldja fel az adott Windows
-wheel buildkonfigurációját vagy a kapcsolódó feltételeket.
-
-**Nyitott döntés:** a tényleges build licencútja, minden beágyazott komponens
-licencszövege, a megfelelő corresponding-source/notices csomag és az x265 kereskedelmi
-feltételei nincsenek bizonyítva. Ebből nem következtetek üzleti engedélyre. Követés:
-[#42](https://github.com/tnyari/RoboAssist/issues/42). A Windows kiadási csomag
-licencellenőrzése ezért nem teljes.
-
-### Qt for Python
-
-A telepített PySide6-Essentials és shiboken6 metaadata LGPL-3.0-only OR
-GPL-2.0-only OR GPL-3.0-only kifejezést ad. A [Qt for Python](https://doc.qt.io/qtforpython-6.10/index.html)
-közösségi kiadása LGPLv3/GPLv3, külön commercial distribution is létezik.
-Az [LGPL használat feltétele](https://doc.qt.io/qt-6/licensing.html), hogy a választott
-licenc feltételei teljesüljenek. A jövőbeli PyInstaller csomagban a pontos Qt modulokat,
-licencfájlokat és az alkalmazandó forrás/újralinkelési módot ellenőrizni kell.
-Ez nem történt meg teljes kiadási artefaktumon; #24 és #25 nyitott.
-
-### PortAudio és ONNX Runtime
-
-A sounddevice wheel MIT metaadata önmagában nem azonosítja a hozzá csomagolt
-PortAudio DLL licencét. A helyi wheelben a PortAudio bináris jelen van; upstream
-license forrása a [PortAudio repó](https://github.com/PortAudio/portaudio/blob/master/LICENSE.txt).
-Végleges csomagba a hozzá tartozó license/notice fájlt is be kell tenni.
-
-Az ONNX Runtime Python wheel MIT metaadatot és külön
-[ThirdPartyNotices.txt](https://github.com/microsoft/onnxruntime/blob/main/ThirdPartyNotices.txt)
-fájlt tartalmaz. A fájl megőrzése és a pontos csomagverzióval való egyeztetése
-a #24 csomagolási ellenőrzés része.
-
-## 🗣️ Modellek
-
-| ID | Forrás / immutable revision | Manifestben lévő fájlhash-ek | Kártyalicenc |
+| Csomag | Build | Licencmetaadat | Artifact SHA-256 |
 |---|---|---|---|
-| base-multilingual | [Systran/faster-whisper-base](https://huggingface.co/Systran/faster-whisper-base/tree/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66), ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66 | [manifest](../../models/manifest.json) | MIT |
-| small-multilingual | [Systran/faster-whisper-small](https://huggingface.co/Systran/faster-whisper-small/tree/536b0662742c02347bc0e980a01041f333bce120), 536b0662742c02347bc0e980a01041f333bce120 | [manifest](../../models/manifest.json) | MIT |
+| `av` 17.1.0 | `py311h06a8702_0` | BSD-3-Clause | `978c663178d010a4d5bc2c76976abb96b132e8533c9e4d258f400e77935d619a` |
+| `ffmpeg` 8.1.2 | `lgpl_haba0ffa_812` | LGPL-2.1-or-later | `903a1428dddb6a7568d82e767f0c793b6abcc621bd740bdde325be1889008f08` |
 
-A rögzített [OpenAI Whisper licencszöveg](../../models/WHISPER_LICENSE.txt)
-SHA-256 értéke és forrása a manifestben található. A súlyokat nem commitoljuk.
-A base modell hash-ellenőrzése helyben, hálózat nélkül sikerült a rögzített
-revisionen; ez nem pontosságmérés vagy teljes modell-audit.
+A teljes natív környezet **98 hash-rögzített conda-forge artifactból** áll. A
+stage-elt DLL-zár 65 fájl, összesen 123,033,664 bájt; a manifest a fájlok
+hash-eit és a 44 csomagtulajdonos licenc- és buildmetaadatait rögzíti. A pontos
+zárhoz és buildhez tartozó licencszövegek, FFmpeg-receptek és manifest a
+`licenses/av-runtime/` könyvtár része. A PE importzár vizsgálata nem talált
+x264/x265 GPL-only DLL-t; ez a DLL-listára vonatkozó ellenőrzés, nem codec- vagy
+terjesztési jogi minősítés.
 
-## 🔍 Sérülékenység-ellenőrzés
+### Rögzített FFmpeg 8.1.2 forrás és buildkonfiguráció
 
-**Eredmény:** 2026-11-26-án az uv 0.13.10 auditja a [uv dokumentált OSV szolgáltatásával](https://docs.astral.sh/uv/reference/cli/#uv-audit)
-44 hash-lockban szereplő Python csomagverziót ellenőrzött. Az audit **nem talált
-ismert sérülékenységet vagy adverse package státuszt**.
+A lockolt `ffmpeg-8.1.2-lgpl_haba0ffa_812` conda-forge recept az upstream
+[FFmpeg 8.1.2 forrásarchívumot](https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.gz)
+rögzíti (`SHA-256: 32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22`).
+A recept a conda-forge `ffmpeg-feedstock` `f639462076b7d4d708c8b0b5a447be6776ecf9cf`
+commitjéből származik. A `recipe/build.sh` a `license_family != gpl` ágon
+`--disable-gpl` kapcsolót ad át; a közös konfiguráció `--enable-version3`-at
+állít be. A csomagolt `avcodec-62.dll` tényleges build-konfigurációját
+`avcodec_configuration()` hívással olvastam ki; ugyanezeket a kapcsolókat adja
+vissza. Az upstream [FFmpeg 8.1 licencdokumentációja](https://ffmpeg.org/doxygen/8.1/md_LICENSE.html)
+szerint a `--enable-version3` az LGPLv3 licencverziót aktiválja. Az artifact
+metadata továbbra is `LGPL-2.1-or-later`, míg ez a konkrét runtime build LGPLv3
+licencverziót választ. A próbacsomag licencmappájában ellenőriztem a
+`recipe/meta.yaml`, `recipe/build.sh`, `COPYING.LGPLv2.1` és `COPYING.LGPLv3`
+bejegyzéseket.
 
-Az input a requirements.lock mind a 44 pontos name/version párjából készült
-ideiglenes PEP 723 audit-script; annak generált uv lockját az eredeti lockkal
-összevetve 44/44 egyezés volt, eltérés/hiányzó/többlet csomag nélkül. Az uv audit
-OSV hálózati lekérdezése sikeres volt. Az ideiglenes bemenet és lock kizárólag a
-figyelmen kívül hagyott .tools könyvtárban keletkezett; a projekt dependency lockja
-nem változott.
+Az FFmpeg 8.1.2 és PyAV 17.1.0 upstream source archive-ok a Windows ZIP-be
+kerülnek (`_internal/licenses/upstream-sources/`); a source SHA-256 értékek és
+URL-ek ottani README-ben vannak. A conda-forge build recipe-k, patchfájlok,
+artifact metaadatok és licencszövegek `_internal/licenses/av-runtime/packages/`
+alatt találhatók. Ez a csomagolt source és konfigurációs bizonyíték önmagában
+nem igazolja a teljes licencfeltételek vagy a relinkelési út megfelelőségét.
+Ezek a #47/#25 kiadási átvételi feltételei maradnak.
 
-**Korlát:** az eredmény az OSV adatbázis 2026-11-26-i állapotára és Python
-disztribúciók név/verzió azonosítóira vonatkozik. Nem külön natív DLL/SBOM vizsgálat,
-nem jogi licencellenőrzés, és nem jövőbeli sérülékenységmentességi garancia. Egy korábbi
-ideiglenes projektfeloldás a huggingface-hub 2.5.0-at választotta a lock 2.4.0-ja
-helyett; azt nem használtam, az eredmény nem része ennek az auditnak. A végleges
-vizsgálat a rögzített, 44/44 egyező bemenetet használta.
+A korábbi PyPI `av` 18.1.0 kiadás yanked státuszt kapott memóriakorrupciós hiba
+miatt. A hiba javítását a [PyAV 18.1.1 kiadási jegyzete](https://github.com/PyAV-Org/PyAV/releases/tag/v18.1.1)
+rögzíti. Az aktuális csomag a conda-forge PyAV 17.1.0 LGPL FFmpeg buildjére
+állt át; nem használja a korábbi PyAV wheelt.
 
-## ⏭️ M1 előtt nyitva marad
+### PyAV 17.1.0 forrás és recipe
 
-- [ ] [#42](https://github.com/tnyari/RoboAssist/issues/42): a PyAV Windows wheel és
-  a beágyazott FFmpeg/kodek licencútja, forrásai és notices anyagai.
-- [ ] #24: a pontos PyInstaller kiadás, Qt licencút, natív/third-party notices
-  és telepítési út ellenőrzése.
-- [x] [#43](https://github.com/tnyari/RoboAssist/issues/43): 2026-11-26-os
-  sérülékenység-audit a hash-rögzített Python verziókra; részletes eredmény fent.
-- [ ] Szükséges license fájlok/notices tényleges beillesztése és ellenőrzése a
-  csomagban.
+A Windows artifact `av-17.1.0-py311h06a8702_0` SHA-256 értéke
+`978c663178d010a4d5bc2c76976abb96b132e8533c9e4d258f400e77935d619a`. A recept az
+[av 17.1.0 source archive](https://pypi.org/packages/source/a/av/av-17.1.0.tar.gz)
+fájlt használja (`SHA-256: 7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3`),
+a conda-forge `av-feedstock` receptcommitja `9fa9dab2c392eee688738ed9ecc47eb9fbfd87c5`.
+A rögzített `recipe/meta.yaml` szerint a build host FFmpeg 8.1.1 LGPL
+(`lgpl_h914209b_804`), míg az artifact futásidejű függősége `ffmpeg >=8.1.1,<9`;
+a RoboAssist ZIP-ben lévő runtime FFmpeg 8.1.2 LGPL.
 
-Ezek maradása miatt a #25 és az [M1 kapu #10](https://github.com/tnyari/RoboAssist/issues/10)
-Open állapotban marad. Ez a riport licencforrásokat és implementációs követelményeket
-rögzít, nem jogi vélemény.
+Ugyanennek a receptnek a külön tesztkörnyezete `ffmpeg * gpl*` függőséget kér,
+és az x264/x265 kodekek jelenlétét ellenőrzi. Ez a recept tesztkörnyezetére
+vonatkozó adat; önmagában nem bizonyítja, hogy az elkészült PyAV artifact GPL
+kodeket linkelt. A 65 tételes staging DLL-zárból 62 app-local DLL kerül a ZIP-be
+méret/hash egyezéssel; a három Microsoft CRT DLL külön Redistributable úton
+települ. A csomagolt `avcodec-62.dll` tényleges `avcodec_configuration()`
+kimenete `--disable-gpl --enable-version3`; nincs `--enable-gpl`,
+`--enable-nonfree`, `--enable-libx264` vagy `--enable-libx265`. Az FFmpeg 8.1
+upstream dokumentációja a version3 kapcsolót LGPLv3-hoz rendeli. A ZIP az
+upstream PyAV source archive-ot, conda recept `meta.yaml` fájlját, patchfájlokat
+és BSD-3-Clause `LICENSE.txt`-t tartalmazza. Ez a konkrét build konfigurációját
+igazolja, nem minősíti a teljes PyAV/Qt/MSVC terjesztést; ezek átvétele továbbra
+is nyitott.
 
+## 🐍 Python disztribúciók és ismert sérülékenységek
+
+A csomag **51 Python-disztribúció** licenc- és közleményfájlját, valamint a
+név/verzió/licencmetaadatot tartalmazó manifestet állítja elő. A 2026-11-27-i
+`uv audit` a hash lockból feloldott 51 Python csomagnál nem talált ismert
+sérülékenységet vagy kedvezőtlen projektstátuszt. Ez az eredmény a Python
+csomagnevekre és verziókra terjed ki; a 98 natív conda artifact külön OSV-auditja
+nem történt meg.
+
+A fő közvetlen komponensek licenceit és nyitott terjesztési kérdéseit a
+[THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md) sorolja fel. Különösen:
+
+- A PySide6 és a shiboken6 csomagmetaadata LGPL/GPL alternatívákat jelez; a
+  választott Qt licencút, relink/source átadás és a végső binary csomag feltételei
+  még kiadási átvételt igényelnek.
+- PortAudio, ONNX Runtime és egyéb natív összetevők közleményeit a tényleges
+  PyInstaller ZIP-ben kell ellenőrizni, nem csak a Python projektmetaadatból
+  következtetni.
+- A két rögzített Whisper modell külön, manifestben rögzített modellrevision és
+  SHA-256 mellett kerül importálásra; a csomag nem terjeszti a modell súlyait.
+
+### CPython runtime és OpenSSL DLL-ek
+
+A PyInstaller a Python interpreter által használt OpenSSL DLL-eket is a
+csomagba másolja. Az aktuális runtime a CPython 3.11.18, az Astral
+`python-build-standalone` 20261124 buildje, amelyet uv 0.13.10 telepített. A
+runtime gyökér `LICENSE.txt` fájlját PSF-2.0 licencként másoljuk a csomagba.
+Az input licenc SHA-256 értéke
+`886a0ead2d89030ee62dbff52b04e47ab91998341295bb9c56fb952b4e081c7a`.
+Hivatalos [python-build-standalone 20261124 release](https://github.com/astral-sh/python-build-standalone/releases/tag/20261124)
+Windows x64 artifactja `cpython-3.11.18+20261124-x86_64-pc-windows-msvc-install_only.tar.gz`
+(49,096,635 bájt; release API SHA-256
+`3e4a35e3c238e5090d36bf95c041d9052bc82d6e298cb912ba7f70f6c66cf81a`). A
+telepített runtime `BUILD` jelölője `20261124`; az archive hash upstream
+release-metaadat, míg a build a telepített DLL-ek tartalmát a fájlzárral
+külön ellenőrzi.
+
+PyInstaller által csomagolt interpreter DLL:
+
+| DLL | Méret | SHA-256 |
+|---|---:|---|
+| `python311.dll` | 5,844,992 bájt | `9d220475b4e442cbdee671791cd3a84ae89331d429d7fef419f8b7b0c58b4200` |
+
+A Pythonból származó OpenSSL 3.5.9 DLL-ek zárja:
+
+| DLL | Méret | SHA-256 |
+|---|---:|---|
+| `DLLs/libcrypto-3-x64.dll` | 7,861,248 bájt | `0b1a6f4504716e48b8ae5ce5dd894d6fa10ef79e78f8c3bcaac8a8160187441b` |
+| `DLLs/libssl-3-x64.dll` | 1,571,840 bájt | `72af62e08814444c408f5544a3729320b2b6dd37dc5cba81dd92b770856a8f7a` |
+
+Az OpenSSL 3.x Apache-2.0 licencszövege a rögzített
+[3.5.9 forrásrefből](https://github.com/openssl/openssl/blob/openssl-3.5.9/LICENSE.txt)
+származik; licencfájl SHA-256: `7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a`.
+A forráskiadás URL-je: `https://www.openssl-library.org/source/openssl-3.5.9.tar.gz`.
+A Python runtime DLL-jei nem azonosak a PyAV runtime `av.libs` könyvtárában
+lévő OpenSSL 3.6.5 DLL-ekkel. A csomagbuild verziót, buildmarkert, licenc- és
+DLL-hash-eket ellenőriz, eltérésnél leáll; a ZIP leltára a
+`licenses/python/python-runtime.json` alatt rögzíti az aktuális adatokat.
+Ez a zár nem bizonyítja a teljes Python runtime forrásból történő
+újraépíthetőségét. A nyitott eredet- és licencfeltételt a
+[#56 aljegy](https://github.com/tnyari/RoboAssist/issues/56) követi.
+Az inputzár a
+[`runtime-lock.json`](../../third_party_licenses/python-runtime/runtime-lock.json)
+fájlban található.
+
+### PySide6/Qt 6.12 közösségi LGPLv3 út vizsgálata
+
+A tulajdonos a közösségi LGPLv3 út vizsgálatát kérte; ez nem végleges licencválasztás.
+PySide6_Essentials és shiboken6 6.12.0 metadata LGPL/GPL alternatívákat jelez;
+a Python disztribúciók saját `licenses/` könyvtárában továbbra is csak
+`LicenseRef-Qt-Commercial.txt` található. A külön, explicit Qt közleménycsomag
+viszont már 174 forrásból kinyert licenc-, notice- és attribution-fájlt tesz a ZIP-be, köztük
+az LGPL-3.0-only, GPL-2.0-only és GPL-3.0-only szövegeket. Forrásarchívum,
+belső útvonal, fájlméret és SHA-256 a csomag `_internal/licenses/qt/manifest.json`
+fájljában szerepel. A csomagolt fájllista 5 Qt6 DLL-t,
+20 plug-in DLL-t, 4 PySide .pyd modult és shiboken bindingfájlokat tartalmaz.
+A végleges ZIP alatti összes Qt/PySide/shiboken DLL/PYD fájl pontos listája,
+mérete, PE verziója és SHA-256 értéke a [Qt runtime lockban](qt-runtime-file-lock.json)
+szerepel; ez 33 bináris fájlt és a hivatalos VC Redistributable minimumverzió/hash
+adatait rögzíti. Ez egészíti ki az [#54 aljegyen](https://github.com/tnyari/RoboAssist/issues/54)
+vezetett licencvizsgálatot.
+
+A PySide .pyd modulok és Qt Qt6*.dll fájlok különállóak, így a csomag
+dinamikus elrendezésű; ez önmagában nem bizonyítja a felhasználói relinkelést
+vagy az LGPL feltételek teljesítését. A Qt hivatalos tájékoztatója corresponding
+source átadást vagy írásos forrásajánlatot, módosított könyvtárral relinkelési
+és futtatási lehetőséget, telepítési információt, teljes LGPL szöveget és
+jól látható tájékoztatást ír le. A Qt Company nem ad jogi tanácsot a megfelelőség
+egyedi minősítéséről. Forrás: [Qt LGPLv3 kötelezettségek](https://www.qt.io/development/open-source-lgpl-obligations),
+[Qt licensing FAQ](https://www.qt.io/faq/qt-open-source-licensing).
+
+A QtBase, QtSvg, Qt Image Formats és PySide 6.12.0 source archive hash-ellenőrzött;
+az offline csomagbuild mind a négyet az `_internal/licenses/upstream-sources/`
+könyvtárba, az archívumokból származó licenc-/notice-fájlokat pedig az
+`_internal/licenses/qt/` könyvtárba teszi. A build a teljes forráscsomagokra
+illeszkedő SHA-256 után, explicit útvonalakat és archívumgyökereket ellenőrizve
+nyer ki fájlokat; a path traversal és nem regular file tagokat elutasítja.
+A géppel olvasható manifest a forrás- és kimeneti útvonalat, méretet és hash-t
+rögzíti. A PyPI PySide6-Essentials 6.12.0 release-oldalán öt wheel
+szerepel, source distribution és provenance attesztáció nélkül. A Qt for Python
+buildútmutató a pyside-setup forrásrepót és azonos verziójú Qt telepítést
+használja; a jelenlegi wheel-hashből nem áll elő forrásból buildelt binary
+chain; a hozzáadott source archive nem bizonyítja, hogy a wheel ezekből épült.
+Források: [QtBase 6.12.0 source archive](https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz),
+[PyPI artifactlista](https://pypi.org/project/PySide6-Essentials/6.12.0/),
+[Qt for Python buildútmutató](https://doc.qt.io/qtforpython-6/building_from_source/index.html).
+
+A hivatalos forrásrepók pontos 6.12.0 tagjei is azonosíthatók: a
+[pyside-setup v6.12.0](https://github.com/pyside/pyside-setup/tree/f50facb83fc3dc5f3240c854668c7a6dd93871b2)
+commitja `f50facb83fc3dc5f3240c854668c7a6dd93871b2`, a
+[qtbase](https://github.com/qt/qtbase/tree/025bdad181de241e81bf853c8a2d7bf3d19261a9)
+commitja `025bdad181de241e81bf853c8a2d7bf3d19261a9`, a
+[qtsvg](https://github.com/qt/qtsvg/tree/883a58532078d003cefef0a549bfe9f885ce41f5)
+commitja `883a58532078d003cefef0a549bfe9f885ce41f5`, a
+[qtimageformats](https://github.com/qt/qtimageformats/tree/dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e)
+commitja `dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e`. A GitHub API ezeket
+annotált, unsigned tagekhez rendeli; ez pontos source ref, de nem bizonyíték arra,
+hogy a csomagolt wheelek/binarisok ezekből a fájlokból készültek. A source tree-k
+archívumai a ZIP-be kerülnek; a vendor build konfiguráció, toolchain és binary
+provenance továbbra sincs a ZIP-ben.
+
+Az exact source archive-okban található `qt_attribution.json` rögzíti, hogy a
+QtBase `qjpeg` pluginnél libjpeg-turbo 3.2.0-at használ, ha nem a
+`-system-libjpeg` opciót választják; a Qt Image Formats `qtiff` és `qwebp`
+pluginje libtiff 4.7.2-t, illetve libwebp 1.6.0-t használ, ha nincs kiválasztott
+rendszerkönyvtár. Az ezekhez tartozó upstream license/copyright fájlok is külön
+bekerülnek a közleménycsomagba. Ez a Qt forrásverzióra vonatkozó feltételes
+attribution; a PyPI binary build opcióit és a ténylegesen linkelt kódot nem
+bizonyítja. A ZIP SHA-256 `10d2d892ff9a939a3ce2a01def55801e608a6701fc42c5aa53b6602fca5c4555`,
+1 427 bejegyzésű; a ZIP-ből mind a 174 manifestelt Qt licenc/notice-fájl és 76
+source attribution dokumentum hash-e, továbbá mind a 33 rögzített Qt runtime
+DLL/PYD mérete és hash-e egyezett. Mind a négy Qt/PySide archívum megtalálható.
+Részletes, csomagból származtatott leltár: [Qt licencbundle audit](qt-license-bundle.md).
+
+### MSVC runtime – hivatalos Redistributable csomagút
+
+A fejlesztői PySide6/shiboken6 mappák 14.44.35211.0, az `av.libs` 14.52.37029.0,
+a PyInstaller környezetből bekerülő gyökér DLL-ek 14.51.36231/36247.0, a NumPy
+wheel pedig `numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` néven
+14.40.33810.0 runtime-példányt hordoz. Ezek a fejlesztői inputok fájlverzió és
+aláíró alapján kerültek leltárba; az aláírás önmagában nem terjesztési engedély.
+A NumPy wheel `DELVEWHEEL` és `RECORD` állománya igazolja, hogy a hash-elt
+MSVCP DLL a wheel része, és a két NumPy `.pyd` importálja. A build most egy
+reprodukálható, csak `.tools/` alatti NumPy overlay-t készít: az ellenőrzött
+2.4.6 wheel két érintett `.pyd` importnevében a privát, hash-elt DLL nevét a
+szokásos `msvcp140.dll` névre cseréli, frissíti az overlay `RECORD`-ját, és a
+privát DLL-t kihagyja. Az eredeti wheel és a fejlesztői virtuális környezet
+változatlan marad. Ez technikai csomagolási megoldás; a Microsoft runtime
+terjesztési feltételeinek átvételét nem zárja le.
+
+A Qt 6.12 Windows deployment útmutatója a hivatalos Microsoft VC Redistributable
+telepítőt várja release alkalmazásnál; a fordító gépéről átmásolt egyedi runtime
+DLL-eket nem szabad közvetlenül szállítani. A Microsoft szerint a v14 telepítő
+verziója legalább olyan friss legyen, mint az alkalmazáshoz használt Build Tools,
+és a Redistributable terjesztése licencelt Visual Studio felhasználókra, illetve
+a Visual Studio licencfeltételeire korlátozott.
+
+Az offline ZIP aktuális hash-e
+(`10d2d892ff9a939a3ce2a01def55801e608a6701fc42c5aa53b6602fca5c4555`)
+ezért a Microsoft hivatalos `https://aka.ms/vc14/vc_redist.x64.exe` útvonalán
+letöltött, 14.52.37029.0 x64 telepítőt tartalmazza
+(`_internal/runtime/vc_redist.x64.exe`; SHA-256
+`9c02c9ed120f671b900e6b9471d890e3b2414117a7e53f4ae2e855466fa2b7c9`, érvényes
+Microsoft Authenticode aláírás). A PyInstaller build a szokásos MSVCP/VCRUNTIME,
+`concrt140`, `vccorlib140` és UCRT runtime DLL-neveket kiszűri; root
+`Start-RoboAssist.cmd` / `Prepare-RoboAssist.ps1` ellenőrzi a registry runtime
+verziót, hash-t és aláírást, majd csak hiányzó/régebbi futtatókörnyezetnél kér
+UAC-jóváhagyást. A ZIP-ből a NumPy privát, hash-elt runtime DLL hiányzik; a
+csomagolt `RoboAssistModels.exe --help` parancs sikeresen lefutott ezzel a
+NumPy builddel, de ez nem helyettesíti tiszta gépes ellenőrzést. A csomag
+statikus leltára 1 427 bejegyzés, 108 DLL, két
+alkalmazás-EXE és egy VC Redistributable telepítő (összesen három `.exe` fájl);
+app-local szabványos MSVC/UCRT DLL és
+Windows API-set contract fájl nincs benne; a modell-súlyok hiányoznak.
+
+A Microsoft telepítő helyi verziója 14.52.37029.0, aláírása érvényes; hash-e
+egyezik a ZIP-be csomagolt fájllal. A fejlesztői gép registry runtime-ja viszont
+14.51.36247.0, tehát a csomag UAC útvonala ezen a gépen telepítene. A friss
+`RoboAssist.exe` nem indult el újra, és tiszta Windows teszt nem történt; a
+lokális runtime megléte nem helyettesíti a #24 clean-install próbáját. A
+tesztkörnyezetben jelenleg nincs elérhető tiszta Windows gép vagy VM.
+
+Források: [Qt Windows deployment](https://doc.qt.io/qt-6.12/windows-deployment.html),
+[Microsoft VC fájlok terjesztése](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files),
+[Microsoft v14 letöltés és minimumverzió](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist),
+[Visual Studio 2022 REDIST-lista](https://learn.microsoft.com/en-us/visualstudio/releases/2022/redistribution).
+
+A Qt DLL-ek, pluginek, PySide corresponding source/buildlánc, a tényleges
+relink/telepítési út és az MSVC runtime átadása továbbra sincs lezárva; a
+vizsgálatot a [#54 aljegy](https://github.com/tnyari/RoboAssist/issues/54)
+követi. Ez a rész nem jogi minősítés.
+
+## ✅ Ellenőrzések és korlátok
+
+- ✅ A `requirements.lock` SHA-256-tal rögzíti a Python wheel artefaktumokat.
+- ✅ A CPython 3.11.18 / python-build-standalone 20261124 input, a CPython
+  licencszöveg, valamint a Pythonból származó OpenSSL 3.5.9 DLL-ek hash-zárja
+  géppel ellenőrzött; a csomagmanifest külön leltározza őket.
+- ✅ A `conda-av-win64.lock` 98 explicit artifact URL-t és SHA-256-ot rögzít.
+- ✅ A stage manifest rögzíti az FFmpeg 8.1.2 csomagmetaadatát és DLL-zárát;
+  a runtime `avcodec_configuration()` ellenőrzése LGPLv3 buildválasztást,
+  GPL/nonfree kikapcsolást, valamint x264/x265 nélküli app-local DLL-zárat igazol.
+- ✅ A csomagolt FFmpeg 8.1.2 és PyAV 17.1.0 source archive, buildrecept,
+  patchfájlok, forrás URL/SHA-256, `--disable-gpl` buildág és tényleges bináris
+  `-buildconf` egyezése ellenőrizve; a licencút teljes átvétele nyitott.
+- ✅ A ZIP Microsoft VC Redistributable 14.52.37029.0 installerének Authenticode,
+  verzió-, SHA-256- és csomaghash-ellenőrzése sikeres; a gyakori app-local
+  MSVC/UCRT DLL-ek és a NumPy privát hash-elt runtime DLL-je kiszűrve. A build
+  NumPy overlay importnév-módosítása és a csomagolt modell-CLI `--help`
+  ellenőrzése sikeres. A Redistributable terjesztési jogosultsága és a tiszta
+  gépes indítás továbbra sincs lezárva.
+- ✅ A végleges ZIP-ből olvasott modellmanifest a base/small modellek rögzített
+  revisionjét, fájlméretét és SHA-256 értékeit tartalmazza; mindkét rögzített
+  model card MIT licencet jelöl. A csomagolt `WHISPER_LICENSE.txt` SHA-256-a
+  (`b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d`) egyezik
+  mindkét manifestbejegyzéssel. A runtime manifest forrás-URL-je, minimumverziója
+  és hash-e egyezik a ZIP-ben lévő VC Redistributable telepítővel; modellsúly
+  nincs a kiadási ZIP-ben.
+- ✅ A `uv audit` 51 Python csomagra ismert sérülékenységet vagy kedvezőtlen
+  projektstátuszt nem jelzett; a natív conda closure nem tartozott a vizsgálatba.
+- ⏳ A ZIP-ben található Qt, ONNX Runtime, PortAudio és minden tranzitív notice
+  tényleges átvétele a #24/#54 csomagolási és licencjegyekben marad nyitva.
+- ⏳ A #24 tiszta Windows 10/11 gépes install/start/stop/uninstall próbája nem
+  történt meg. A #28 külön fejlesztői bootstrap ellenőrzés, nem az M1 csomagpróba.
+- ⏳ A magyar hangbenchmark (#21/#10) jóváhagyott, annotált hangforrásra vár;
+  teljesítmény- vagy pontosságállítás nem készült.
+
+A #25 és az M1 kapu (#10) maradjon nyitva, amíg a terjesztési/licencátvétel és a
+M1 többi elfogadási feltétele nem teljesül.
+
+
+## 🧾 Legfrissebb Windows artifact · 2026-11-27
+
+A javított Start/Stop átmeneti állapotú UI-val készített offline ZIP SHA-256 értéke `7c066f60e55163ab5f193dfc3e762f9e8ab1b493232376c9bb616761eec37301`. A ZIP statikus leltára 1 427 fájl/bejegyzés, 108 DLL, 3 EXE és 0 modellsúly; mind a 174 Qt licenc/notice fájl, 76 attribution dokumentum és a 33 Qt runtime DLL/PYD lock hash+méret értéke egyezik. A csomagolt `RoboAssist.exe --help` és `RoboAssistModels.exe --help` exit 0.
+
+A [Windows CI #107](https://github.com/tnyari/RoboAssist/actions/runs/45994614436) sikeres a [92b07d05d4ef](https://github.com/tnyari/RoboAssist/commit/92b07d05d4ef41f9358c06cdee021a7d50ff6c03) headen; helyi UI-tesztek **6 passed**, Ruff lint/format és mypy **35 source files** sikeres. Ez nem clean-Windows telepítési próba vagy beszédbenchmark. Az M1 kapu nyitva marad a #21/#23/#24 és a #25/#47/#54 fennmaradó feltételei miatt.
+
+
+## 🧾 #56 – CPython runtime / OpenSSL DLL zár · 2026-11-27
+
+- `runtime-lock.json` rögzíti a CPython 3.11.18 / python-build-standalone
+  20261124 Windows x64 install-only artifact kiadási hashét, a csomagolt
+  `python311.dll` hashét, a CPython licencet és az OpenSSL 3.5.9 DLL/license
+  hash-eket.
+- A build `sys.base_prefix` alapján ellenőrzi a Python-verziót, buildmarkert,
+  CPython licencet, OpenSSL-verziót, DLL-méreteket és hash-eket. Eltérésnél
+  leáll; a manifestben külön rögzíti a Pythonból jövő 3.5.9-es, illetve az
+  `av.libs`-ben zárt 3.6.5-ös OpenSSL példányt.
+- Az offline `scripts/build-app.ps1 -Offline` újraépült. ZIP SHA-256:
+  `d0e929fd48f6ba78edd9edfba4ae1f8407edc5a9220959ed8eb721320d299580`;
+  1 430 bejegyzés, 108 DLL, 3 EXE, model weights nélkül. ZIP-ből ellenőrizve a
+  CPython/OpenSSL manifest, a három interpreter/OpenSSL DLL mérete/hash-e és a
+  CPython/OpenSSL licencek hash-e. A csomagolt `RoboAssistModels.exe --help`
+  exit 0.
+- Helyi Ruff lint és format ellenőrzés sikeres. Az új célzott pytest két
+  futtatási kísérlete a sandbox WinError 5 hibájával állt le: a pytest nem tudta
+  létrehozni a teszt fixture könyvtárait. A GitHub Windows CI [#113](https://github.com/tnyari/RoboAssist/actions/runs/46005810284)
+  sikeres a [d729276](https://github.com/tnyari/RoboAssist/commit/d7292760d40fe732dd22a0c8e12017dcc7ff8718)
+  headen; lint, formázás, strict mypy, teljes tesztkészlet, config entrypoint
+  és native offline smoke zöld. Az első CI futásban a GitHub fájlfeltöltés egy
+  extra záró sort tett a tesztbe; a feltöltés javítva lett az újraindított CI
+  előtt.
+- Részletes feltételek és bizonyíték: [#56](https://github.com/tnyari/RoboAssist/issues/56).
+  A lokális fájllock és az OpenSSL licencszöveg nem zárja le az M1 többi
+  clean-Windows, hangbenchmark és licencátvételi feltételét; #10 Open marad.
+
+## 🧾 #56 – offline ZIP forráscsomag és hash-ellenőrzés · 2026-11-27
+
+A korábban rögzített #56 csomagpróba után a build most mind a 10 rögzített upstream
+forrás-/buildarchívumot tartalmazza az `_internal/licenses/upstream-sources/`
+könyvtárban. Ezek közé tartozik a CPython 3.11.18 forrás, a pontos
+python-build-standalone buildforrás, a 20261124 Windows runtime disztribúció,
+az OpenSSL 3.5.9 forrás, valamint a négy PySide/Qt archívum; a PyAV és FFmpeg
+forrásarchívumok is megmaradtak. Mind a tíz csomagolt fájl mérete és SHA-256
+egyezik az ellenőrzött staging fájllal. A ZIP-ben lévő runtime manifest által
+hivatkozott négy Python/OpenSSL artifact, a `python311.dll`, a két Pythonból
+származó OpenSSL DLL és mindkét license fájl hash-/méretellenőrzése sikeres.
+
+A legfrissebb offline build ZIP SHA-256 értéke
+`52bb4f6d07b2683ef9c060ce1725eed136bb467bce442899e32076fb8d521c00`; a sidecar
+hash egyezik. Statikus leltára 1 434 bejegyzés, 108 DLL és 3 EXE. A csomagolt
+`RoboAssistModels.exe --help` exit 0. Nem indítottam el a RoboAssist GUI-t;
+felhasználói felületet, mikrofont, telepítést, eltávolítást, hangbenchmarkot és
+valós/szintetikus beszédfelvételt ez az ellenőrzés nem vizsgált. Tiszta Windows
+10/11 tesztkörnyezet most nem áll rendelkezésre.
+
+A korábbi, ugyanezen a napon készült ZIP hash-ek és darabszámok az előző
+csomagverziók pillanatfelvételei; ez a bejegyzés a #56 legfrissebb helyi offline
+buildjét rögzíti. A source-csomagolási és fixture-módosításokat a Windows CI
+[#125](https://github.com/tnyari/RoboAssist/actions/runs/46010839872) teljesen
+ellenőrizte a [4f5eb47](https://github.com/tnyari/RoboAssist/commit/4f5eb47d1e90ed7ea4bc081693d8920a32a0724e)
+headen: lint, format, strict typecheck, teljes tesztkészlet, config entrypoint
+és native offline smoke zöld. A korábbi CI #124 egy teszt-fixture-ből hiányzó
+`source_archives` / `source_archive` mezőn bukott el (225 teszt sikeres, 1 hibás);
+a [#57 aljegy](https://github.com/tnyari/RoboAssist/issues/57) frissítette a
+fixture-t és a manifest-átvételi állításokat. Helyi Ruff lint/format zöld; a
+pytest helyi futtatását a sandbox teszt-fixture könyvtárra adott WinError 5
+hibája miatt nem tudtam végrehajtani. A Qt LGPLv3 binary provenance/relink/
+telepítési útja és az M1 hangbenchmark ettől még nyitott.
+
+
+## 🧾 #54 – csomagolt Qt runtime fájllock és csereút · 2026-11-27
+
+A Qt runtime 33 DLL/PYD fájlos hash-zárja a ZIP-be is bekerül
+`_internal/licenses/qt/qt-runtime-file-lock.json` néven. A kiadási README
+előzetes műszaki leírást ad az azonos relatív útvonalon történő, ABI-kompatibilis
+Qt/PySide fájlcseréhez és a `Start-RoboAssist.cmd` indításához. A jelenlegi
+csomagindító nem hash-ellenőrzi a Qt/PySide DLL/PYD fájlokat; a fájllock az
+eredeti csomagállapotot jelöli.
+
+Az új offline ZIP SHA-256 értéke
+`bb94a58ea48d6919d65c674e423c2b1c36d52ac66bffdcd029cf619d2c4d3dc1`;
+statikus leltára 1 435 bejegyzés, 108 DLL és 3 EXE, modellsúly nélkül. A Qt
+fájllock 33/33 méret/hash, a Qt licencek/notices 174/174 méret/hash és a 76
+source attribution hash egyezett. Mind a 10 upstream forrás-/buildarchívum,
+a CPython/OpenSSL manifest referenciák, 3 runtime DLL és 2 licenc hash-e is
+ellenőrizve. `RoboAssistModels.exe --help` exit 0.
+
+A módosított Qt/PySide DLL/PYD-val történő futtatás nem történt meg. A tiszta
+Windows 10/11 környezet továbbra sem érhető el; nincs GUI-indítás, mikrofon,
+hangfelvétel vagy benchmark. A binary provenance, GPL-only closure, third-party
+linkelés, MSVC terjesztési jogcím és a licencút végleges elfogadása nyitva marad
+a [#54](https://github.com/tnyari/RoboAssist/issues/54) és [#25](https://github.com/tnyari/RoboAssist/issues/25)
+jegyen. A teljes [Windows CI #132](https://github.com/tnyari/RoboAssist/actions/runs/46013882644)
+sikeres a [3da2a5f](https://github.com/tnyari/RoboAssist/commit/3da2a5fe639fc22d907f5fd52fc6be38561c3f5e)
+headen: lint, format, strict typecheck, teljes tesztkészlet, config entrypoint és
+native offline smoke zöld. Ez a csomag és a statikus lock-ellenőrzés eredménye;
+módosított Qt/PySide DLL/PYD-val futtatás nem történt.

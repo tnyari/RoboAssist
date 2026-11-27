@@ -217,6 +217,7 @@ def test_real_sdk_boundary_uses_local_directory_cpu_int8_and_fixed_decode_option
     constructed = []
     transcribed = []
     unloaded = []
+    runtime_initializations = []
 
     class Model:
         def __init__(self, path, **kwargs):
@@ -233,7 +234,12 @@ def test_real_sdk_boundary_uses_local_directory_cpu_int8_and_fixed_decode_option
             return iter([SimpleNamespace(start=0.0, end=0.02, text="fixture")]), object()
 
     monkeypatch.setitem(sys.modules, "faster_whisper", SimpleNamespace(WhisperModel=Model))
+    monkeypatch.setattr(
+        "offline_stt.engines.whisper.initialize_av_runtime",
+        lambda: runtime_initializations.append("av"),
+    )
     decoder = WhisperDecoder(model_bundle.store.verify("base-multilingual"), 2)
+    assert runtime_initializations == ["av"]
     assert list(decoder.decode(np.zeros(320, dtype="float32"), "hu", 16))[0].text == "fixture"
     assert constructed[0][0] == str(model_bundle.directory)
     assert constructed[0][1] == {
