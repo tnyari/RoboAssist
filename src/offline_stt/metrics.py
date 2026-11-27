@@ -371,7 +371,7 @@ def percentile_summary(values: Sequence[float]) -> Distribution:
 
 
 def summarize_pipeline(stats: PipelineStats, *, sample_rate: int = 16_000) -> PipelineSummary:
-    """Derive replay-normalized RTF and report repeated work/backlog separately."""
+    """Derive RTF from all observed source audio and report losses separately."""
     if sample_rate <= 0:
         raise ValueError("Sample rate must be positive")
     nonnegative = (
@@ -399,7 +399,8 @@ def summarize_pipeline(stats: PipelineStats, *, sample_rate: int = 16_000) -> Pi
     )
     if any(not math.isfinite(float(value)) or value < 0 for value in nonnegative):
         raise ValueError("Pipeline counters must be finite and nonnegative")
-    audio_seconds = stats.audio_samples / sample_rate if stats.audio_samples else None
+    source_samples = stats.audio_samples + stats.dropped_samples
+    audio_seconds = source_samples / sample_rate if source_samples else None
     decode_seconds = stats.partial_decode_seconds + stats.final_decode_seconds
     decoded_audio_seconds = stats.decoded_audio_samples / sample_rate
     repeated_decode_seconds = stats.repeated_decode_samples / sample_rate

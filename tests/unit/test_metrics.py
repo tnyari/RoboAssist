@@ -83,9 +83,9 @@ def test_pipeline_summary_counts_repeated_decode_work_without_hiding_it_in_rtf()
             final_jobs_rejected=0,
         )
     )
-    assert summary.audio_seconds == 1
+    assert summary.audio_seconds == pytest.approx(1.03)
     assert summary.decode_seconds == 1.5
-    assert summary.rtf == 1.5
+    assert summary.rtf == pytest.approx(1.5 / 1.03)
     assert summary.decoded_audio_seconds == 3
     assert summary.repeated_decode_seconds == 1
     assert summary.repeated_decode_fraction == pytest.approx(1 / 3)
