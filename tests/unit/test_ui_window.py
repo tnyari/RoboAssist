@@ -17,6 +17,13 @@ def qt_app():
     app.quit()
 
 
+def _primary_background(window, app):
+    window.show()
+    app.processEvents()
+    image = window._start_button.grab().toImage()
+    return image.pixelColor(image.width() - 8, image.height() // 2).name()
+
+
 def test_window_exposes_session_controls_and_renders_partial_and_final(qt_app, monkeypatch):
     device = InputDevice(0, "Teszt mikrofon", "WASAPI", 1, 48000.0, True)
     settings = type(
@@ -37,6 +44,7 @@ def test_window_exposes_session_controls_and_renders_partial_and_final(qt_app, m
     )
     try:
         assert window._start_button.isEnabled()
+        assert _primary_background(window, qt_app) == "#1769d2"
         assert not window._stop_button.isEnabled()
         assert window._device_combo.currentData() == 0
         assert window._model_combo.currentData() == "base-multilingual"
@@ -50,6 +58,36 @@ def test_window_exposes_session_controls_and_renders_partial_and_final(qt_app, m
         assert window._transcript.toPlainText() == "Jó napot"
         assert window._copy_button.isEnabled()
         assert window._export_button.isEnabled()
+    finally:
+        window._poller.stop()
+        window._thread.quit()
+        assert window._thread.wait(2000)
+        window._allow_close = True
+        window.close()
+        qt_app.processEvents()
+
+
+def test_start_button_looks_disabled_without_a_local_model(qt_app, monkeypatch):
+    device = InputDevice(0, "Teszt mikrofon", "WASAPI", 1, 48000.0, True)
+    settings = type(
+        "MemorySettings",
+        (),
+        {
+            "value": lambda self, _key, default=None, *_args: default,
+            "setValue": lambda self, _key, _value: None,
+        },
+    )()
+    monkeypatch.setattr(window_module, "input_devices", lambda: [device])
+    monkeypatch.setattr(window_module.MainWindow, "_settings", property(lambda _self: settings))
+    window = MainWindow(
+        Config(),
+        Path("models/manifest.json"),
+        Path("models/cache"),
+        (),
+    )
+    try:
+        assert not window._start_button.isEnabled()
+        assert _primary_background(window, qt_app) == "#f0f2f5"
     finally:
         window._poller.stop()
         window._thread.quit()
