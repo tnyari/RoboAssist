@@ -18,6 +18,7 @@ AV_PACKAGE = SITE_PACKAGES / "av"
 AV_LICENSES = ROOT / ".tools" / "av-vendor" / "av-runtime"
 UPSTREAM_SOURCE_ARCHIVES = ROOT / ".tools" / "av-vendor" / "upstream-sources"
 PYTHON_LICENSES = ROOT / ".tools" / "python-license-bundle"
+QT_LICENSES = ROOT / ".tools" / "qt-license-bundle"
 VC_RUNTIME_MANIFEST = ROOT / "docs" / "package" / "vc-runtime.json"
 with VC_RUNTIME_MANIFEST.open("r", encoding="utf-8") as stream:
     vc_runtime = json.load(stream)
@@ -29,6 +30,7 @@ for required in (
     AV_LICENSES,
     UPSTREAM_SOURCE_ARCHIVES,
     PYTHON_LICENSES,
+    QT_LICENSES,
     VC_RUNTIME_INSTALLER.parent,
 ):
     if not required.is_dir():
@@ -96,6 +98,7 @@ datas += tree_data(AV_LICENSES, "licenses/av-runtime")
 datas += tree_data(UPSTREAM_SOURCE_ARCHIVES, "licenses/upstream-sources")
 datas += [(str(ROOT / "docs" / "package" / "upstream-sources" / "README.md"), "licenses/upstream-sources")]
 datas += tree_data(PYTHON_LICENSES, "licenses/python")
+datas += tree_data(QT_LICENSES, "licenses/qt")
 datas += [
     (str(VC_RUNTIME_INSTALLER), "runtime"),
     (str(VC_RUNTIME_MANIFEST), "runtime"),
@@ -211,4 +214,3 @@ coll = COLLECT(
     upx=False,
     name="RoboAssist",
 )
-
