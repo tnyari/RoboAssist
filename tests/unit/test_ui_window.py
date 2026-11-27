@@ -43,12 +43,10 @@ def test_window_exposes_session_controls_and_renders_partial_and_final(qt_app, m
         (("Base", "base-multilingual"),),
     )
     try:
-        help_menu = next(
-            action.menu()
-            for action in window.menuBar().actions()
-            if action.text() == "Súgó"
-        )
-        about_action = next(action for action in help_menu.actions() if action.text() == "Névjegy")
+        help_menu = window.menuBar().actions()[0].menu()
+        assert help_menu.title() == "Súgó"
+        about_action = help_menu.actions()[0]
+        assert about_action.text() == "Névjegy"
         about_dialogs = []
         monkeypatch.setattr(
             window_module.QMessageBox,
