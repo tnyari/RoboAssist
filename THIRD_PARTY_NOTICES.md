@@ -76,7 +76,9 @@ relink/futtatás feltétel teljesítését. A Qt LGPLv3 út a Qt könyvtárak te
 source átadását vagy ellenőrzött írásos forrásajánlatot, relinkelési és
 telepítési információt, teljes licencszöveget és jól látható tájékoztatást
 igényel a [Qt hivatalos útmutatója](https://www.qt.io/development/open-source-lgpl-obligations)
-szerint. A Qt 6.12 GPL-only moduljai és a pluginok harmadik fél kódjai a
+szerint. A ZIP már tartalmazza a 33 fájlos runtime lockot és az előzetes technikai
+fájlcsere-leírást a README-ben; a tényleges módosított DLL/PYD-vel való indítást
+és a binary provenance-t még nem igazoltuk. A Qt 6.12 GPL-only moduljai és a pluginok harmadik fél kódjai a
 [#54 auditban](https://github.com/tnyari/RoboAssist/issues/54) maradnak
 ellenőrzés alatt.
 
