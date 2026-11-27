@@ -5,8 +5,10 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 from dataclasses import asdict
+from pathlib import Path
 
 import numpy as np
 
@@ -21,9 +23,15 @@ from offline_stt.engines import (
 
 
 def main() -> int:
+    resource_root = Path(getattr(sys, "_MEIPASS", Path.cwd()))
+    if getattr(sys, "_MEIPASS", None):
+        local_app_data = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
+        default_model_root = local_app_data / "RoboAssist" / "OfflineSTT" / "models" / "cache"
+    else:
+        default_model_root = resource_root / "models" / "cache"
     parser = argparse.ArgumentParser(description="RoboAssist helyi CPU INT8 modellek")
-    parser.add_argument("--catalog", default="models/manifest.json")
-    parser.add_argument("--root", default="models/cache")
+    parser.add_argument("--catalog", default=str(resource_root / "models" / "manifest.json"))
+    parser.add_argument("--root", default=str(default_model_root))
     commands = parser.add_subparsers(dest="command", required=True)
     verify = commands.add_parser(
         "verify", help="Helyi fájlok/hash-ek; nincs hálózat vagy modellbetöltés"

@@ -24,6 +24,9 @@ try {
     Invoke-Checked $uvExe @('pip', 'sync', 'requirements.lock', '--python', $venvPython,
         '--require-hashes', '--only-binary', ':all:', '--default-index', 'https://pypi.org/simple',
         '--cache-dir', $UvCache, '--no-python-downloads')
+    # Replace the transitively resolved PyPI PyAV/FFmpeg build with the exact LGPL conda-forge lock.
+    Invoke-Checked 'powershell.exe' @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
+        (Join-Path $PSScriptRoot 'setup-av-runtime.ps1'), '-Python', $venvPython)
     # Build backend and all its dependencies are already hash-locked above.
     Invoke-Checked $uvExe @('pip', 'install', '--python', $venvPython, '--no-deps',
         '--no-build-isolation', '--offline', '--cache-dir', $UvCache, '-e', '.')

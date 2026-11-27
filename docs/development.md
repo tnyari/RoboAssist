@@ -30,13 +30,19 @@ Ez a parancs explicit, hálózatos **fejlesztői telepítés**:
    A telepítéshez a PyPI/pythonhosted és a standalone Python kiadási tárhelye elérhető kell legyen.
 3. Létrehozza a `.venv/` környezetet, majd a teljes `requirements.lock` alapján
    `--require-hashes --only-binary :all:` módban szinkronizálja a függőségeket.
-4. A helyi projektet editable módban, **offline**, `--no-deps --no-build-isolation`
+4. A `conda-av-win64.lock` explicit, SHA-256-tal rögzített conda-forge zárja alapján
+   PyAV 17.1.0 + FFmpeg 8.1.2 LGPL runtime-ot készít, és a zár pontos PyAV
+   csomagját, DLL-függőségi láncát, licencfájljait és build receptjeit `.tools/`
+   alatt stage-eli. A micromamba 2.10.0 projektlokális bootstrap csomagjának
+   hash-e ellenőrzött; semmi nem települ globálisan.
+5. A helyi projektet editable módban, **offline**, `--no-deps --no-build-isolation`
    opciókkal telepíti. A build backend, az `editables` és tranzitív függőségeik is a lockban vannak.
-5. Függőségellenőrzést és konfigurációvalidálást futtat. Meglévő venvnél ellenőrzi
+6. Függőségellenőrzést és konfigurációvalidálást futtat. Meglévő venvnél ellenőrzi
    az interpreter pontos verzióját és a 64 bites architektúrát; nem törli a környezetet.
 
-Az újbóli futtatás ugyanazt a lockot használja, nem frissít csomagverziót. A sync
-eltávolítja a lockon kívüli telepített csomagokat; a helyi projektet utána újratelepíti.
+Az újbóli futtatás ugyanazt a Python- és conda lockot használja, nem frissít
+csomagverziót. A sync eltávolítja a lockon kívüli Python csomagokat; a helyi
+projektet utána újratelepíti.
 Másik tiszta virtuális környezethez:
 
 ```powershell
@@ -48,8 +54,9 @@ nem indít alkalmazást, mikrofont, modelltelepítőt vagy modellletöltést.
 
 ## 🪟 Windows alkalmazás indítása
 
-Előbb telepíts egy modellt külön az [útmutató](../models/README.md) szerint; a
-GUI nem kezdeményez hálózati letöltést. Ezután a repó gyökeréből:
+Fejlesztői módban előbb telepíts vagy offline importálj egy modellt a
+[modellútmutató](../models/README.md) szerint; a GUI nem kezdeményez hálózati
+letöltést. Ezután a repó gyökeréből:
 
 ```powershell
 .\.venv\Scripts\roboassist.exe
@@ -59,6 +66,35 @@ Vagy futtasd modulból: `python -m offline_stt.ui`. Saját beállításfájlhoz 
 a `--config <útvonal>` kapcsolót. A GUI a helyi modellek között csak a telepített
 modelleket kínálja fel. A Windows felület használatáról és adatkezeléséről a
 [felhasználói útmutató](user-guide.md) szól.
+
+## 📦 Hordozható Windows csomag építése
+
+Online build és hiányzó buildfüggőségek előkészítése:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-app.ps1
+```
+
+Már előkészített `.venv`, PyInstaller, micromamba és pontos conda csomagcache
+esetén a build offline is futtatható:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-app.ps1 -Offline
+```
+
+A script verziózott, PyInstaller one-directory könyvtárat és ZIP-et készít a
+`dist/` alá, továbbá SHA-256 fájlt ad a ZIP mellé. A ZIP nem tartalmaz modell-
+súlyokat. A felhasználó a modellútmutató szerint külön, ellenőrzött bundle-ből
+importálhatja a modellt. Modelltelepítésen kívül az app nem igényel futás közbeni
+hálózatot. A csomag `licenses/` könyvtára megőrzi a Python wheelek és a natív
+PyAV/FFmpeg DLL-zár licencszövegeit, hash-eit és forrás/build receptjeit.
+
+Az offline buildhez a letöltött Python wheel cache mellett a pontos 98
+conda-forge artifactot tartalmazó micromamba cache is szükséges. A `-Offline`
+kapcsoló a conda runtime előkészítését hálózat nélkül végzi, és hiányzó csomagnál
+hibával leáll. A friss buildet a [#24 csomagolási jegy](https://github.com/tnyari/RoboAssist/issues/24)
+követi; tiszta Windows 10/11 telepítési próba és kiadási/licencátvétel még
+nincs kész eredményként rögzítve.
 
 ## 📌 Függőségek és lock frissítése
 
@@ -150,6 +186,7 @@ Nincs részleges konfiguráció csendes alapértékpótlással.
 A loader csak olvas. Az engine és a későbbi export/UI köteles a validált szabályokat
 érvényesíteni; a beállítások létezése nem igazol kész STT/export funkciót.
 
-A projektlicenc nincs kiválasztva; a [harmadik fél jegyzék](../THIRD_PARTY_NOTICES.md)
-metadataalapú kiindulópont, a végleges ellenőrzés [#25](https://github.com/tnyari/RoboAssist/issues/25).
-
+A RoboAssist saját forráskódjának licence a tulajdonos döntése alapján MIT;
+a [harmadik fél jegyzék](../THIRD_PARTY_NOTICES.md) és a részletes
+[#25 audit](reports/issue-25-license-audit.md) követi a függőségek és a csomag
+terjesztési feltételeit.

@@ -4,7 +4,7 @@
 
 A cél helyi, CPU-n is futó, közel valós idejű feliratozás. **M1:** mikrofon → Windows feliratablak. **M2:** kiválasztott Chrome/Edge fül → ugyanaz a helyi STT core → böngészős felirat.
 
-Elkészült a Python 3.11 x64 fejlesztői setup, a verzió- és hash-rögzített dependency lock, a konfigurációbetöltő és validáló CLI, valamint a PySide6 Windows feliratablak első változata. A [Windows CI workflow](docs/ci.md) futtatja az automatizált ellenőrzéseket; a csomagolás és a benchmark még hátravan.
+Elkészült a Python 3.11 x64 fejlesztői setup, a verzió- és hash-rögzített Python és natív függőségzár, a PySide6 feliratablak, valamint az első verziózott PyInstaller onedir ZIP. A csomagba modellkezelő CLI és a függőségek licencfájljai is kerülnek; a tiszta gépes átvétel és a hangbenchmark még nyitott.
 
 A [mikrofon capture, állapottartó resampling és időzített WAV replay](docs/audio.md) közös 16 kHz mono float32 audioforrást ad. Eszközlistázás és explicit, hangmentés nélküli mikrofonpróba a fejlesztői parancssorból indítható.
 
@@ -55,4 +55,3 @@ A modell előzetes telepítése után az STT internet nélkül működjön, clou
 A [PROJECT_PLAN.md](PROJECT_PLAN.md) a kapott `OFFLINE_STT_PROJECT_PLAN.md` változatlan tartalmú másolata. Tervezési bemenet; technológiai javaslatai és hivatkozásai implementációkor ellenőrzendők. A munkarendet a felhasználói kérés és a repó szabályai határozzák meg.
 
 A RoboAssist saját forráskódjának választott licence az [MIT](LICENSE). Ez nem írja felül a külön csomagolt függőségek és modellek feltételeit. A [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) és a [#25 licencaudit-riport](docs/reports/issue-25-license-audit.md) a ténylegesen vizsgált verziókat és a még nyitott terjesztési kérdéseket rögzíti; az audit és az M1 kapu még nincs lezárva.
-

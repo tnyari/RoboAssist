@@ -2,12 +2,42 @@
 
 ## Első indítás
 
+### Fejlesztői futtatás
+
 1. Futtasd a fejlesztői setupot a [fejlesztői útmutató](development.md) szerint.
-2. Telepítsd a `base-multilingual` vagy `small-multilingual` modellt a
-   [modellútmutató](../models/README.md) szerint. A modelltelepítés külön, explicit
-   lépés; az alkalmazás futás közben nem tölt le semmit.
+2. Telepítsd vagy importáld a `base-multilingual` vagy `small-multilingual` modellt a
+   [modellútmutató](../models/README.md) szerint.
 3. Indítsd a `roboassist.exe` parancsot a repó gyökeréből.
+
+### Hordozható Windows csomag
+
+1. Csomagold ki a verziózott ZIP-et egy olyan mappába, ahová a felhasználód írhat.
+2. Indítsd a `RoboAssist.exe` fájlt. A modellkönyvtár nincs a ZIP-be építve.
+3. Nyiss PowerShellt a kicsomagolt mappában, és importáld a külön, hash-ellenőrzött
+   modellkönyvtárat a mellékelt modellkezelővel:
+
+   ```powershell
+   .\RoboAssistModels.exe install base-multilingual --from-directory C:\Models\faster-whisper-base
+   .\RoboAssistModels.exe verify base-multilingual
+   ```
+
+   A `small-multilingual` modellhez cseréld ki a modellazonosítót és a könyvtárat.
+   A telepítő a fájlokat ellenőrzi, majd az alkalmazás helyi adatkönyvtárába másolja.
 4. Válassz mikrofont, helyi modellt és nyelvet, majd kattints az **Indítás** gombra.
+
+Hálózati letöltés külön, felhasználó által indított műveletként érhető el:
+
+```powershell
+.\RoboAssistModels.exe install base-multilingual --allow-network
+```
+
+Az alkalmazás és a GUI indítása nem tölt le modellt.
+
+A csomag onedir elrendezésű, nem végez rendszerszintű telepítést. Eltávolításhoz
+zárd be az alkalmazást és töröld a kicsomagolt mappát. Az alkalmazás helyi
+adatkönyvtárában tárolt modellek külön maradnak; csak akkor töröld őket, ha már
+nincs rájuk szükséged. A tiszta Windows 10/11 próba a [#24](https://github.com/tnyari/RoboAssist/issues/24)
+része, és még nem igazolt.
 
 ## Használat
 
@@ -43,4 +73,3 @@
 Rögzítés csak **Indítás** után történik. Audio és átirat alapból memóriában marad;
 hangfájlt az ablak nem készít. Nincs cloud STT, telemetry vagy futásidejű
 modellletöltés. A másolás és a TXT export a felhasználó által indított művelet.
-

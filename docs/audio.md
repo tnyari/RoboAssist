@@ -70,7 +70,7 @@ benchmark teljes metrikarendszere (#8).
 
 ## 🟦 Resampling és PCM16
 
-Az `AudioNormalizer` a már lockolt **PyAV 18.1.1 / libswresample** állapottartó
+Az `AudioNormalizer` a már lockolt **PyAV 17.1.0 / libswresample** állapottartó
 szűrőjét használja. PyAV most közvetlen függőség is; új csomagverzió nincs.
 Stereo esetén a downmix a két csatorna számtani átlaga. Nem frame-enként újrainduló
 szűrőt vagy mintavétel-eldobásos decimálást használunk. A feldolgozás a `read()`
@@ -129,4 +129,4 @@ A tiszta Windows-próba továbbra is halasztott [#28](https://github.com/tnyari/
 
 Források: [sounddevice callback-szerződés](https://python-sounddevice.readthedocs.io/en/latest/api/streams.html),
 [PyAV audio/resampler API](https://pyav.basswood.io/docs/stable/api/audio.html).
-A konkrét PyAV 18.1.1 viselkedését a lockból telepített csomagon is ellenőriztük.
+A konkrét PyAV 17.1.0 viselkedését a lockból telepített csomagon is ellenőriztük.

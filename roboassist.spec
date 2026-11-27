@@ -1,0 +1,102 @@
+# -*- mode: python ; coding: utf-8 -*-
+
+from pathlib import Path
+import sys
+
+ROOT = Path(SPECPATH).resolve()
+sys.path.insert(0, str(ROOT / "src"))
+from offline_stt.native_deps import configure_av_dll_search
+
+configure_av_dll_search()
+
+SITE_PACKAGES = Path(sys.prefix) / "Lib" / "site-packages"
+AV_DLLS = SITE_PACKAGES / "av.libs"
+AV_LICENSES = ROOT / ".tools" / "av-vendor" / "av-runtime"
+PYTHON_LICENSES = ROOT / ".tools" / "python-license-bundle"
+for required in (AV_DLLS, AV_LICENSES, PYTHON_LICENSES):
+    if not required.is_dir():
+        raise SystemExit(f"Required staged build input is missing: {required}")
+
+
+def tree_data(source: Path, destination: str) -> list[tuple[str, str]]:
+    return [
+        (str(path), str(Path(destination) / path.relative_to(source).parent))
+        for path in sorted(source.rglob("*"))
+        if path.is_file()
+    ]
+
+datas = [
+    (str(ROOT / "configs" / "default.toml"), "configs"),
+    (str(ROOT / "models" / "manifest.json"), "models"),
+    (str(ROOT / "models" / "WHISPER_LICENSE.txt"), "models"),
+    (str(ROOT / "LICENSE"), "licenses/RoboAssist"),
+    (str(ROOT / "THIRD_PARTY_NOTICES.md"), "."),
+    (str(ROOT / "README.md"), "docs"),
+    (str(ROOT / "docs" / "user-guide.md"), "docs"),
+]
+datas += tree_data(AV_LICENSES, "licenses/av-runtime")
+datas += tree_data(PYTHON_LICENSES, "licenses/python")
+binaries = [(str(path), "av.libs") for path in sorted(AV_DLLS.glob("*.dll"))]
+if not binaries:
+    raise SystemExit("No staged PyAV/FFmpeg DLLs were found")
+
+hiddenimports = ["av", "faster_whisper", "ctranslate2"]
+common_analysis = {
+    "pathex": [str(ROOT / "src")],
+    "binaries": binaries,
+    "datas": datas,
+    "hiddenimports": hiddenimports,
+    "hookspath": [],
+    "hooksconfig": {},
+    "runtime_hooks": [],
+    "excludes": ["pytest", "ruff", "mypy"],
+    "noarchive": False,
+    "optimize": 0,
+}
+
+ui = Analysis(
+    [str(ROOT / "src" / "offline_stt" / "ui" / "main.py")],
+    **common_analysis,
+)
+manager = Analysis(
+    [str(ROOT / "src" / "offline_stt" / "engines" / "__main__.py")],
+    **common_analysis,
+)
+ui_pyz = PYZ(ui.pure)
+manager_pyz = PYZ(manager.pure)
+ui_exe = EXE(
+    ui_pyz,
+    ui.scripts,
+    [],
+    exclude_binaries=True,
+    name="RoboAssist",
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    console=False,
+    disable_windowed_traceback=False,
+)
+manager_exe = EXE(
+    manager_pyz,
+    manager.scripts,
+    [],
+    exclude_binaries=True,
+    name="RoboAssistModels",
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    console=True,
+)
+coll = COLLECT(
+    ui_exe,
+    manager_exe,
+    ui.binaries,
+    manager.binaries,
+    ui.datas,
+    manager.datas,
+    strip=False,
+    upx=False,
+    name="RoboAssist",
+)

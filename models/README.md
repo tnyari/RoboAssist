@@ -50,6 +50,21 @@ hangot/átiratot, és nem pontosságmérés vagy benchmark. A CLI maga nem telep
 hálózati tűzfalat; a [#5 riport](../docs/reports/issue-5-engine.md) külön DNS/TCP-tiltással
 futtatott próbát is dokumentál.
 
+## Csomagolt Windows alkalmazás
+
+A `RoboAssistModels.exe` a hordozható csomagban ugyanazt az ellenőrző/telepítő CLI-t
+adja. Az alapértelmezett katalógus a csomag manifestje, a célkönyvtár pedig
+`%LOCALAPPDATA%\RoboAssist\OfflineSTT\models\cache`; ez megegyezik a GUI modellhelyével.
+Import offline, teljes fájlhash-ellenőrzéssel:
+
+```powershell
+.\RoboAssistModels.exe install base-multilingual --from-directory C:\Models\faster-whisper-base
+.\RoboAssistModels.exe verify base-multilingual
+```
+
+Hálózati letöltés csak a `--allow-network` kapcsoló explicit megadásával indul.
+Modellsúly nem része az alkalmazás ZIP-jének.
+
 ## Licenc és Git
 
 A két rögzített modellkártya MIT licencet jelöl. A [Whisper licencszöveg](WHISPER_LICENSE.txt)
@@ -60,4 +75,3 @@ független modell- és függőségfeltételeket, illetve a még nyitott csomagol
 a [#25 licencaudit](../docs/reports/issue-25-license-audit.md) követi.
 
 Súly, cache és letöltés nem kerül Gitbe. Futás közben nincs automatikus letöltés.
-

@@ -43,4 +43,3 @@ metódusát; UI/capture callback nem dekódolhat. A session időalap monoton; a 
 final esemény nem módosulhat és nem duplikálódhat.
 
 A modellek, függőségek és böngésző API-k aktuális változatait implementációkor kell ellenőrizni; ez az ábra a terv szerinti irány.
-
