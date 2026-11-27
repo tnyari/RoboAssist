@@ -61,6 +61,27 @@ miatt. A hiba javítását a [PyAV 18.1.1 kiadási jegyzete](https://github.com/
 rögzíti. Az aktuális csomag a conda-forge PyAV 17.1.0 LGPL FFmpeg buildjére
 állt át; nem használja a korábbi PyAV wheelt.
 
+### PyAV 17.1.0 forrás és recipe
+
+A Windows artifact `av-17.1.0-py311h06a8702_0` SHA-256 értéke
+`978c663178d010a4d5bc2c76976abb96b132e8533c9e4d258f400e77935d619a`. A recept az
+[av 17.1.0 source archive](https://pypi.org/packages/source/a/av/av-17.1.0.tar.gz)
+fájlt használja (`SHA-256: 7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3`),
+a conda-forge `av-feedstock` receptcommitja `9fa9dab2c392eee688738ed9ecc47eb9fbfd87c5`.
+A rögzített `recipe/meta.yaml` szerint a build host FFmpeg 8.1.1 LGPL
+(`lgpl_h914209b_804`), míg az artifact futásidejű függősége `ffmpeg >=8.1.1,<9`;
+a RoboAssist ZIP-ben lévő runtime FFmpeg 8.1.2 LGPL.
+
+Ugyanennek a receptnek a külön tesztkörnyezet `ffmpeg * gpl*` függőséget kér,
+és az x264/x265 kodekek jelenlétét ellenőrzi. Ez a recept tesztkörnyezetére
+vonatkozó adat; önmagában nem bizonyítja, hogy az elkészült PyAV artifact GPL
+kodeket linkelt. A tényleges csomag 65 DLL-es zárában nincs x264/x265 DLL, és a
+csomagolt FFmpeg 8.1.2 `-buildconf` kimenete `--disable-gpl`-t mutat. A ZIP az
+av conda recept `meta.yaml` fájlját és a BSD-3-Clause `LICENSE.txt`-t tartalmazza,
+az upstream PyAV forrásarchívumot nem. E bizonyítékok mellett is nyitva marad a
+pontos PyAV/FFmpeg licencút és a corresponding-source átadása; ez nem jogi
+minősítés.
+
 ## 🐍 Python disztribúciók és ismert sérülékenységek
 
 A csomag **51 Python-disztribúció** licenc- és közleményfájlját, valamint a
@@ -102,4 +123,3 @@ A fő közvetlen komponensek licenceit és nyitott terjesztési kérdéseit a
 
 A #25 és az M1 kapu (#10) maradjon nyitva, amíg a terjesztési/licencátvétel és a
 M1 többi elfogadási feltétele nem teljesül.
-
