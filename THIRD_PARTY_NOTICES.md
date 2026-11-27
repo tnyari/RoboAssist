@@ -43,6 +43,9 @@ Apache-2.0 licencszövege is bekerül az
 `_internal/licenses/python/python-runtime/` alá. A pontos DLL-méretek,
 SHA-256-ok, forrásverziók és licencfájl-hash-ek a csomag
 `_internal/licenses/python/python-runtime.json` manifestjében vannak.
+Az OpenSSL 3.5.9 forrásarchívumot, a CPython 3.11.18 forrást, a
+python-build-standalone buildforrást és a pontos CPython runtime-disztribúciót
+a ZIP hash-ellenőrzötten az `_internal/licenses/upstream-sources/` is tartalmazza.
 
 Ez külön runtime a PyAV/FFmpeg zár `av.libs` könyvtárában lévő OpenSSL 3.6.5
 DLL-ektől; a két OpenSSL-példány hash-e és eredete külön szerepel. A pontos
