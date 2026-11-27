@@ -43,6 +43,18 @@ def test_window_exposes_session_controls_and_renders_partial_and_final(qt_app, m
         (("Base", "base-multilingual"),),
     )
     try:
+        help_menu = next(action.menu() for action in window.menuBar().actions() if action.text() == "Súgó")
+        about_action = next(action for action in help_menu.actions() if action.text() == "Névjegy")
+        about_dialogs = []
+        monkeypatch.setattr(
+            window_module.QMessageBox,
+            "about",
+            lambda _parent, title, text: about_dialogs.append((title, text)),
+        )
+        about_action.trigger()
+        assert about_dialogs[0][0] == "Névjegy – RoboAssist"
+        assert "FFmpeg" in about_dialogs[0][1] and "LGPLv2.1" in about_dialogs[0][1]
+        assert "_internal/licenses/upstream-sources" in about_dialogs[0][1]
         assert window._start_button.isEnabled()
         assert _primary_background(window, qt_app) == "#1769d2"
         assert not window._stop_button.isEnabled()
