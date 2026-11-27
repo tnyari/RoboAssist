@@ -32,6 +32,12 @@ FFmpeg/PyAV forrásarchívumok és a buildrecept az
 `_internal/licenses/av-runtime/` könyvtárban találhatók; a felületen a
 **Súgó → Névjegy** ablak is megadja ezeket az útvonalakat.
 
+A CPython 3.11.18 / OpenSSL 3.5.9 runtime eredetét, DLL-zárját és licencútját
+az `_internal/licenses/python/python-runtime.json` rögzíti. A hozzá tartozó
+CPython forrásarchívum, python-build-standalone buildforrás és runtime-archívum,
+valamint az OpenSSL forrásarchívum az
+`_internal/licenses/upstream-sources/` alatt, hash-ellenőrzötten kerül a ZIP-be.
+
 A Qt/PySide közlemények és az upstream licencszövegek az
 `_internal/licenses/qt/` mappában találhatók; az eredeti Qt/PySide
 forrásarchívumok mellettük vannak az `_internal/licenses/upstream-sources/`
