@@ -263,3 +263,10 @@ követi. Ez a rész nem jogi minősítés.
 
 A #25 és az M1 kapu (#10) maradjon nyitva, amíg a terjesztési/licencátvétel és a
 M1 többi elfogadási feltétele nem teljesül.
+
+
+## 🧾 Legfrissebb Windows artifact · 2026-11-27
+
+A javított Start/Stop átmeneti állapotú UI-val készített offline ZIP SHA-256 értéke `7c066f60e55163ab5f193dfc3e762f9e8ab1b493232376c9bb616761eec37301`. A ZIP statikus leltára 1 427 fájl/bejegyzés, 108 DLL, 3 EXE és 0 modellsúly; mind a 174 Qt licenc/notice fájl, 76 attribution dokumentum és a 33 Qt runtime DLL/PYD lock hash+méret értéke egyezik. A csomagolt `RoboAssist.exe --help` és `RoboAssistModels.exe --help` exit 0.
+
+A [Windows CI #107](https://github.com/tnyari/RoboAssist/actions/runs/45994614436) sikeres a [92b07d05d4ef](https://github.com/tnyari/RoboAssist/commit/92b07d05d4ef41f9358c06cdee021a7d50ff6c03) headen; helyi UI-tesztek **6 passed**, Ruff lint/format és mypy **35 source files** sikeres. Ez nem clean-Windows telepítési próba vagy beszédbenchmark. Az M1 kapu nyitva marad a #21/#23/#24 és a #25/#47/#54 fennmaradó feltételei miatt.
