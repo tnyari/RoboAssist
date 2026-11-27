@@ -138,4 +138,3 @@ def test_prepare_rejects_runtime_dll_drift_before_replacing_output(scratch_direc
         )
 
     assert marker.read_text(encoding="utf-8") == "keep on validation failure"
-

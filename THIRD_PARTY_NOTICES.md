@@ -190,4 +190,3 @@ Az aktuális csomagpróba a `.tools/python-license-bundle` és
 mappát másolja a kiadási onedir könyvtárba. A külön hash-ellenőrzött source
 tarballokat a `licenses/upstream-sources/` tartalmazza. A végleges terjesztési ellenőrzés,
 a tiszta Windows próba és az M1 hangbenchmark még nem teljesült.
-

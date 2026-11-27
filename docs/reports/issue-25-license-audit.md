@@ -342,4 +342,3 @@ A [Windows CI #107](https://github.com/tnyari/RoboAssist/actions/runs/4599461443
 - Részletes feltételek és bizonyíték: [#56](https://github.com/tnyari/RoboAssist/issues/56).
   A lokális fájllock és az OpenSSL licencszöveg nem zárja le az M1 többi
   clean-Windows, hangbenchmark és licencátvételi feltételét; #10 Open marad.
-
