@@ -65,7 +65,11 @@ class WavReplaySource:
             self._started = self._clock()
             self.state = SourceState.RUNNING
         except Exception as exc:
-            self._fail("A WAV fájl nem nyitható meg támogatott helyi PCM hangként", exc)
+            self._fail(
+                f"A WAV fájl nem nyitható meg támogatott helyi PCM hangként "
+                f"({type(exc).__name__}{_errno_suffix(exc)})",
+                exc,
+            )
 
     def _close_file(self) -> None:
         stream, self._file = self._file, None
@@ -110,7 +114,11 @@ class WavReplaySource:
                 try:
                     self._feed()
                 except Exception as exc:
-                    self._fail("WAV olvasási vagy átalakítási hiba", exc)
+                    self._fail(
+                        f"WAV olvasási vagy átalakítási hiba "
+                        f"({type(exc).__name__}{_errno_suffix(exc)})",
+                        exc,
+                    )
                 continue
             due = self._started + self._pending[0].end_sample / OUTPUT_RATE
             now = self._clock()
@@ -147,3 +155,9 @@ class WavReplaySource:
             output_frames=self._output_frames,
             output_samples=self._output_samples,
         )
+
+
+def _errno_suffix(exc: Exception) -> str:
+    """Expose safe OS error codes without putting local paths in UI/IPC errors."""
+    code = getattr(exc, "errno", None)
+    return f", errno={code}" if isinstance(code, int) else ""
