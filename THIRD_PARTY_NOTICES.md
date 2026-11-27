@@ -50,10 +50,23 @@ szerint. A Qt 6.12 GPL-only moduljai és a pluginok harmadik fél kódjai a
 [#54 auditban](https://github.com/tnyari/RoboAssist/issues/54) maradnak
 ellenőrzés alatt.
 
-A Qt 6.12.0 qtbase forrásarchívum upstream elérhető (49 MB, SHA-256
-**a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307**), de
-jelenleg nem része a ZIP-nek. A QtSvg és a használt image-format pluginek
-forrásai külön modulok. A hivatalos `v6.12.0` source tagek feloldott commitjai:
+Az offline Windows csomag hash-ellenőrzött Qt/PySide source archívumokat hordoz
+az `_internal/licenses/upstream-sources/` könyvtárban:
+
+- QtBase 6.12.0 — SHA-256 `a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307`
+- QtSvg 6.12.0 — SHA-256 `e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331`
+- Qt Image Formats 6.12.0 — SHA-256 `0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762`
+- PySide / Qt for Python 6.12.0 — SHA-256 `dce2a944b34320e51a0ec8100cb983956399b97dec386f0fbe39e1b52571a336`
+
+A csomagban 20 plugin DLL van; ezek között `qjpeg.dll`, `qtiff.dll` és
+`qwebp.dll` is szerepel. A Qt 6.12 modul dokumentációja a JPEG plugint
+libjpeg-turbo, a TIFF és WebP plugineket libtiff/libwebp kóddal kapcsolja össze;
+a forrásarchívumok ezeket a modulforrásokat is tartalmazzák. A tényleges vendor
+buildkonfiguráció és a binary provenance továbbra sincs igazolva, ezért az exact
+linked third-party closure nincs lezárva. Források: [Qt GUI attributions](https://doc.qt.io/qt-6.12/qtgui-index.html),
+[Qt Image Formats attributions](https://doc.qt.io/qt-6.12/qtimageformats-index.html).
+
+A hivatalos `v6.12.0` source tagek feloldott commitjai:
 [pyside-setup](https://github.com/pyside/pyside-setup/tree/f50facb83fc3dc5f3240c854668c7a6dd93871b2)
 `f50facb83fc3dc5f3240c854668c7a6dd93871b2`,
 [qtbase](https://github.com/qt/qtbase/tree/025bdad181de241e81bf853c8a2d7bf3d19261a9)
@@ -63,7 +76,7 @@ forrásai külön modulok. A hivatalos `v6.12.0` source tagek feloldott commitja
 [qtimageformats](https://github.com/qt/qtimageformats/tree/dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e)
 `dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e`. A tagek unsigned állapotúak;
 ezek traceability-referenciák, nem a csomagolt binárisok build-provenance
-bizonyítékai. A forrástree-k és buildlánc jelenleg nem részei a ZIP-nek.
+bizonyítékai. A source archívumok a csomagban vannak, de a vendor buildlánc nincs.
 A [PyPI PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/)
 release oldala csak wheel fájlokat és provenance nélküli artefaktumokat listáz.
 
