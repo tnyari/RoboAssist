@@ -299,17 +299,20 @@ def test_controls_states_copy_export_and_stop_clear_are_explicit(qt_app, monkeyp
     )
     destination = Path("átirat.txt")
     try:
+        start_requests = []
+        window.start_requested.connect(lambda *args: start_requests.append(args))
         assert window._language_combo.currentData() == "hu"
         assert window._device_combo.currentData() == 0
         assert window._model_combo.currentData() == "base-multilingual"
         assert window._start_button.isEnabled()
         assert not window._stop_button.isEnabled()
         assert not window._clear_button.isEnabled()
+        assert window._capture_state == "idle"
+        assert window._controller.snapshot()[2] == "idle"
+        assert start_requests == []
         assert window._controller.thread() is window._thread
 
-        start_requests = []
         window.start_requested.disconnect(window._controller.start)
-        window.start_requested.connect(lambda *args: start_requests.append(args))
         window._device_combo.setCurrentIndex(1)
         window._model_combo.setCurrentIndex(1)
         window._language_combo.setCurrentIndex(window._language_combo.findData("en"))
