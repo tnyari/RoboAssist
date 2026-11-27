@@ -171,7 +171,7 @@ verziója legalább olyan friss legyen, mint az alkalmazáshoz használt Build T
 és a Redistributable terjesztése licencelt Visual Studio felhasználókra, illetve
 a Visual Studio licencfeltételeire korlátozott.
 
-Az új offline ZIP (`96a03b6596ed4a57e986eedc4cfa21b1fceea8fa80e7fc41b86fd0028d253a0c`)
+Az új offline ZIP (`1b9522deec6168d68f21068c22038bee0159f4f38f4df7d31ddb6f0151ddf43b`)
 ezért a Microsoft hivatalos `https://aka.ms/vc14/vc_redist.x64.exe` útvonalán
 letöltött, 14.52.37029.0 x64 telepítőt tartalmazza
 (`_internal/runtime/vc_redist.x64.exe`; SHA-256

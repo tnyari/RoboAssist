@@ -39,8 +39,9 @@ csomagnál csak a Qt Commercial licenc-referenciafájl található. A teljes
 Community LGPL/GPL licencszöveg és a tényleges source/build átadási út nincs
 lezárva.
 
-A csomagban 5 Qt6 DLL, 20 Qt plug-in DLL, 4 PySide kötésmodul, shiboken
-modulok és MSVC runtime DLL-ek vannak. A különálló Qt DLL-ek dinamikus
+A csomagban 5 Qt6 DLL, 20 Qt plug-in DLL, 4 PySide kötésmodul és shiboken
+modulok vannak; az MSVC runtime-ot a hivatalos VC Redistributable telepítő
+adja, app-local MSVC/UCRT runtime DLL-ek nincsenek a ZIP-ben. A különálló Qt DLL-ek dinamikus
 elrendezést mutatnak, de ez önmagában nem bizonyítja a felhasználói
 relink/futtatás feltétel teljesítését. A Qt LGPLv3 út a Qt könyvtárak teljes
 source átadását vagy ellenőrzött írásos forrásajánlatot, relinkelési és
