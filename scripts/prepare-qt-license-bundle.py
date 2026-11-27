@@ -110,6 +110,12 @@ def should_extract(relative_path: PurePosixPath, source: SourceArchive) -> bool:
     parts = relative_path.parts
     if parts and parts[0].casefold() == "licenses":
         return True
+    if (
+        relative_path.name.casefold() == "qt_attribution.json"
+        and parts
+        and parts[0].casefold() == "src"
+    ):
+        return True
     if relative_path.as_posix() in REQUIRED_SOURCE_PATHS[source.project]:
         return True
     if source.project in {"qtbase", "qtimageformats"}:
@@ -213,6 +219,21 @@ def prepare_bundle(source_dir: Path, output: Path) -> dict[str, object]:
         ),
         "source_archives": archive_rows,
         "files": extracted,
+        "source_attribution_documents": [
+            {
+                "project": row["project"],
+                "archive": row["archive"],
+                "source_path": row["source_path"],
+                "output_path": row["output_path"],
+                "sha256": row["sha256"],
+                "evidence_limit": (
+                    "Upstream source attribution; the vendor binary's build options "
+                    "and linked components are not proven."
+                ),
+            }
+            for row in extracted
+            if str(row["source_path"]).endswith("qt_attribution.json")
+        ],
         "candidate_plugin_notices": [
             {
                 "plugin": "qjpeg.dll",
@@ -295,7 +316,8 @@ def main() -> int:
     args = parser.parse_args()
     manifest = prepare_bundle(args.source_dir, args.output)
     print(
-        f"Qt license bundle staged: {len(manifest['files'])} source license/notice files "
+        f"Qt license bundle staged: {len(manifest['files'])} source license/notice/attribution "
+        "files "
         f"from {len(manifest['source_archives'])} hash-verified archives."
     )
     return 0
@@ -303,3 +325,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
