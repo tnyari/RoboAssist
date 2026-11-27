@@ -133,6 +133,19 @@ binary chain. Források: [QtBase 6.12.0 source archive](https://download.qt.io/a
 [PyPI artifactlista](https://pypi.org/project/PySide6-Essentials/6.12.0/),
 [Qt for Python buildútmutató](https://doc.qt.io/qtforpython-6/building_from_source/index.html).
 
+A hivatalos forrásrepók pontos 6.12.0 tagjei is azonosíthatók: a
+[pyside-setup v6.12.0](https://github.com/pyside/pyside-setup/tree/f50facb83fc3dc5f3240c854668c7a6dd93871b2)
+commitja `f50facb83fc3dc5f3240c854668c7a6dd93871b2`, a
+[qtbase](https://github.com/qt/qtbase/tree/025bdad181de241e81bf853c8a2d7bf3d19261a9)
+commitja `025bdad181de241e81bf853c8a2d7bf3d19261a9`, a
+[qtsvg](https://github.com/qt/qtsvg/tree/883a58532078d003cefef0a549bfe9f885ce41f5)
+commitja `883a58532078d003cefef0a549bfe9f885ce41f5`, a
+[qtimageformats](https://github.com/qt/qtimageformats/tree/dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e)
+commitja `dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e`. A GitHub API ezeket
+annotált, unsigned tagekhez rendeli; ez pontos source ref, de nem bizonyíték arra,
+hogy a csomagolt wheelek/binarisok ezekből a fájlokból készültek. A forrástree-k,
+build konfiguráció, toolchain és binary provenance továbbra sincs a ZIP-ben.
+
 A PySide6 és shiboken6 csomagmappákban Microsoft-signed MSVCP140*.dll és
 VCRUNTIME140*.dll fájlok szerepelnek 14.44.35211.0 verzióval. A Qt Windows
 deployment útmutatója a gépről másolt egyedi MSVC runtime DLL-ek helyett a
