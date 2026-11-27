@@ -56,6 +56,13 @@ része, és még nem igazolt.
   majd törli a felirat memóriabeli tartalmát. Ha szükséged van az átiratra, exportáld
   vagy másold ki a leállítás előtt.
 
+## Benchmark reprodukció
+
+A helyi WAV replay futtatása, az annotációs JSONL séma, a 2/4/8 szálas mátrix és
+az adatvédelmi beállítások a [benchmark útmutatóban](benchmark-metrics.md) vannak.
+A runner fejlesztői környezetből fut; jóváhagyott hangforrás nélkül nincs valós
+beszédbenchmark vagy teljesítményállítás.
+
 ## Hibaelhárítás
 
 - **Nincs telepített modell:** kövesd a modellek útmutatóját. A modell telepítése
