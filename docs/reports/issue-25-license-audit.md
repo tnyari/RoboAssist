@@ -337,8 +337,12 @@ A [Windows CI #107](https://github.com/tnyari/RoboAssist/actions/runs/4599461443
   exit 0.
 - Helyi Ruff lint és format ellenőrzés sikeres. Az új célzott pytest két
   futtatási kísérlete a sandbox WinError 5 hibájával állt le: a pytest nem tudta
-  létrehozni a teszt fixture könyvtárait; ezt a tesztet Windows CI-ben is
-  ellenőrizni kell.
+  létrehozni a teszt fixture könyvtárait. A GitHub Windows CI [#113](https://github.com/tnyari/RoboAssist/actions/runs/46005810284)
+  sikeres a [d729276](https://github.com/tnyari/RoboAssist/commit/d7292760d40fe732dd22a0c8e12017dcc7ff8718)
+  headen; lint, formázás, strict mypy, teljes tesztkészlet, config entrypoint
+  és native offline smoke zöld. Az első CI futásban a GitHub fájlfeltöltés egy
+  extra záró sort tett a tesztbe; a feltöltés javítva lett az újraindított CI
+  előtt.
 - Részletes feltételek és bizonyíték: [#56](https://github.com/tnyari/RoboAssist/issues/56).
   A lokális fájllock és az OpenSSL licencszöveg nem zárja le az M1 többi
   clean-Windows, hangbenchmark és licencátvételi feltételét; #10 Open marad.
