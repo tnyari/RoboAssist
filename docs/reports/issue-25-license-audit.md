@@ -346,3 +346,29 @@ A [Windows CI #107](https://github.com/tnyari/RoboAssist/actions/runs/4599461443
 - Részletes feltételek és bizonyíték: [#56](https://github.com/tnyari/RoboAssist/issues/56).
   A lokális fájllock és az OpenSSL licencszöveg nem zárja le az M1 többi
   clean-Windows, hangbenchmark és licencátvételi feltételét; #10 Open marad.
+
+## 🧾 #56 – offline ZIP forráscsomag és hash-ellenőrzés · 2026-11-27
+
+A korábban rögzített #56 csomagpróba után a build most mind a 10 rögzített upstream
+forrás-/buildarchívumot tartalmazza az `_internal/licenses/upstream-sources/`
+könyvtárban. Ezek közé tartozik a CPython 3.11.18 forrás, a pontos
+python-build-standalone buildforrás, a 20261124 Windows runtime disztribúció,
+az OpenSSL 3.5.9 forrás, valamint a négy PySide/Qt archívum; a PyAV és FFmpeg
+forrásarchívumok is megmaradtak. Mind a tíz csomagolt fájl mérete és SHA-256
+egyezik az ellenőrzött staging fájllal. A ZIP-ben lévő runtime manifest által
+hivatkozott négy Python/OpenSSL artifact, a `python311.dll`, a két Pythonból
+származó OpenSSL DLL és mindkét license fájl hash-/méretellenőrzése sikeres.
+
+A legfrissebb offline build ZIP SHA-256 értéke
+`52bb4f6d07b2683ef9c060ce1725eed136bb467bce442899e32076fb8d521c00`; a sidecar
+hash egyezik. Statikus leltára 1 434 bejegyzés, 108 DLL és 3 EXE. A csomagolt
+`RoboAssistModels.exe --help` exit 0. Nem indítottam el a RoboAssist GUI-t;
+felhasználói felületet, mikrofont, telepítést, eltávolítást, hangbenchmarkot és
+valós/szintetikus beszédfelvételt ez az ellenőrzés nem vizsgált. Tiszta Windows
+10/11 tesztkörnyezet most nem áll rendelkezésre.
+
+A korábbi, ugyanezen a napon készült ZIP hash-ek és darabszámok az előző
+csomagverziók pillanatfelvételei; ez a bejegyzés a #56 legfrissebb helyi offline
+buildjét rögzíti. A legutóbbi forráscsomagolási módosításokra Windows GitHub CI
+még nem futott; a CI eredményét a PR új headjén kell rögzíteni. A Qt LGPLv3
+binary provenance/relink/telepítési útja és az M1 hangbenchmark ettől még nyitott.
