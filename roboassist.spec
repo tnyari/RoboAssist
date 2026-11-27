@@ -14,18 +14,22 @@ SITE_PACKAGES = Path(sys.prefix) / "Lib" / "site-packages"
 AV_DLLS = SITE_PACKAGES / "av.libs"
 AV_PACKAGE = SITE_PACKAGES / "av"
 AV_LICENSES = ROOT / ".tools" / "av-vendor" / "av-runtime"
-AV_SOURCE_ARCHIVES = ROOT / ".tools" / "av-vendor" / "upstream-sources"
+UPSTREAM_SOURCE_ARCHIVES = ROOT / ".tools" / "av-vendor" / "upstream-sources"
 PYTHON_LICENSES = ROOT / ".tools" / "python-license-bundle"
-for required in (AV_DLLS, AV_PACKAGE, AV_LICENSES, AV_SOURCE_ARCHIVES, PYTHON_LICENSES):
+for required in (AV_DLLS, AV_PACKAGE, AV_LICENSES, UPSTREAM_SOURCE_ARCHIVES, PYTHON_LICENSES):
     if not required.is_dir():
         raise SystemExit(f"Required staged build input is missing: {required}")
 
 SOURCE_ARCHIVE_HASHES = {
     "av-17.1.0.tar.gz": "7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3",
     "ffmpeg-8.1.2.tar.gz": "32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22",
+    "qtbase-everywhere-src-6.12.0.tar.xz": "a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307",
+    "qtsvg-everywhere-src-6.12.0.tar.xz": "e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331",
+    "qtimageformats-everywhere-src-6.12.0.tar.xz": "0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762",
+    "pyside-setup-v6.12.0.tar.gz": "dce2a944b34320e51a0ec8100cb983956399b97dec386f0fbe39e1b52571a336",
 }
 for filename, expected_hash in SOURCE_ARCHIVE_HASHES.items():
-    source_archive = AV_SOURCE_ARCHIVES / filename
+    source_archive = UPSTREAM_SOURCE_ARCHIVES / filename
     if not source_archive.is_file():
         raise SystemExit(f"Required upstream source archive is missing: {source_archive}")
     actual_hash = sha256(source_archive.read_bytes()).hexdigest()
@@ -70,7 +74,7 @@ datas = [
     (str(ROOT / "docs" / "benchmark-metrics.md"), "docs"),
 ]
 datas += tree_data(AV_LICENSES, "licenses/av-runtime")
-datas += tree_data(AV_SOURCE_ARCHIVES, "licenses/upstream-sources")
+datas += tree_data(UPSTREAM_SOURCE_ARCHIVES, "licenses/upstream-sources")
 datas += [(str(ROOT / "docs" / "package" / "upstream-sources" / "README.md"), "licenses/upstream-sources")]
 datas += tree_data(PYTHON_LICENSES, "licenses/python")
 binaries = [(str(path), "av.libs") for path in sorted(AV_DLLS.glob("*.dll"))]
@@ -141,3 +145,4 @@ coll = COLLECT(
     upx=False,
     name="RoboAssist",
 )
+
