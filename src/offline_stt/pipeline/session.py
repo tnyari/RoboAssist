@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 import multiprocessing as mp
+import pickle
 import time
 import uuid
 from collections import deque
@@ -12,7 +13,7 @@ from multiprocessing.connection import Connection
 from multiprocessing.process import BaseProcess
 from multiprocessing.synchronize import Event as ProcessEvent
 from threading import Event, RLock, Thread
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from offline_stt.audio.replay import WavReplaySource
 from offline_stt.config import Config
@@ -23,7 +24,10 @@ from offline_stt.pipeline.types import (
     SessionState,
     TranscriptEvent,
 )
-from offline_stt.pipeline.worker import EngineFactory, SourceFactory, run_session
+from offline_stt.worker_bootstrap import run_session_bootstrap
+
+if TYPE_CHECKING:
+    from offline_stt.pipeline.worker import EngineFactory, SourceFactory
 
 
 @dataclass(frozen=True)
@@ -178,19 +182,16 @@ class Session:
         receiver, sender = context.Pipe(duplex=False)
         self._stop = context.Event()
         self._connection = cast(Connection, receiver)
-        self._process = context.Process(
-            target=run_session,
-            args=(
-                self.session_id,
-                self.config,
-                self.source_factory,
-                self.engine_factory,
-                self._stop,
-                sender,
-            ),
-            name="RoboAssist session",
-        )
         try:
+            payload = pickle.dumps(
+                (self.session_id, self.config, self.source_factory, self.engine_factory),
+                protocol=pickle.HIGHEST_PROTOCOL,
+            )
+            self._process = context.Process(
+                target=run_session_bootstrap,
+                args=(payload, self._stop, sender),
+                name="RoboAssist session",
+            )
             self._process.start()
         except Exception as exc:
             sender.close()
