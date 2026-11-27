@@ -111,7 +111,7 @@ common_analysis = {
     "binaries": binaries,
     "datas": datas,
     "hiddenimports": hiddenimports,
-    "hookspath": [],
+    "hookspath": [str(ROOT / "hooks")],
     "hooksconfig": {},
     "runtime_hooks": [],
     "excludes": ["pytest", "ruff", "mypy"],

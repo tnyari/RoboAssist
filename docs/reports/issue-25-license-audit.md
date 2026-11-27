@@ -166,7 +166,7 @@ verziója legalább olyan friss legyen, mint az alkalmazáshoz használt Build T
 és a Redistributable terjesztése licencelt Visual Studio felhasználókra, illetve
 a Visual Studio licencfeltételeire korlátozott.
 
-Az új offline ZIP (`08547a6fdf1ac426835b8e4867341f06506270965f2632f099581ac6816c967d`)
+Az új offline ZIP (`e739a487586b71551bde22fe0be5a4c1a3ae77271b3ba7e99da329229fd40cff`)
 ezért a Microsoft hivatalos `https://aka.ms/vc14/vc_redist.x64.exe` útvonalán
 letöltött, 14.52.37029.0 x64 telepítőt tartalmazza
 (`_internal/runtime/vc_redist.x64.exe`; SHA-256
@@ -175,8 +175,9 @@ Microsoft Authenticode aláírás). A PyInstaller build a szokásos MSVCP/VCRUNT
 `concrt140`, `vccorlib140` és UCRT runtime DLL-neveket kiszűri; root
 `Start-RoboAssist.cmd` / `Prepare-RoboAssist.ps1` ellenőrzi a registry runtime
 verziót, hash-t és aláírást, majd csak hiányzó/régebbi futtatókörnyezetnél kér
-UAC-jóváhagyást. A csomag statikus leltára 1 230 bejegyzés, 108 DLL, egy
-Redistributable telepítő és két EXE; app-local szabványos MSVC/UCRT DLL és
+UAC-jóváhagyást. A csomag statikus leltára 1 230 bejegyzés, 108 DLL, két
+alkalmazás-EXE és egy VC Redistributable telepítő (összesen három `.exe` fájl);
+app-local szabványos MSVC/UCRT DLL és
 Windows API-set contract fájl nincs benne; a modell-súlyok hiányoznak.
 
 A Microsoft telepítő helyi verziója 14.52.37029.0, aláírása érvényes; hash-e
