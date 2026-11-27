@@ -294,4 +294,3 @@ def test_model_verify_cli_uses_no_weights_backend_or_network(model_bundle):
     )
     assert result.returncode == 2 and "allow-network" in result.stderr
     assert not missing.root.exists()
-
