@@ -103,6 +103,50 @@ A fő közvetlen komponensek licenceit és nyitott terjesztési kérdéseit a
 - A két rögzített Whisper modell külön, manifestben rögzített modellrevision és
   SHA-256 mellett kerül importálásra; a csomag nem terjeszti a modell súlyait.
 
+### PySide6/Qt 6.12 közösségi LGPLv3 út vizsgálata
+
+A tulajdonos a közösségi LGPLv3 út vizsgálatát kérte; ez nem végleges licencválasztás.
+A próbacsomag PySide6_Essentials és shiboken6 6.12.0 metadata LGPL/GPL
+alternatívákat jelez, a két licencmappában viszont csak
+LicenseRef-Qt-Commercial.txt található. A csomagolt fájllista 5 Qt6 DLL-t,
+20 plug-in DLL-t, 4 PySide .pyd modult és shiboken bindingfájlokat tartalmaz.
+Az 5 Qt runtime DLL hashét és az MSVC runtime leltárt a [#54 aljegy](https://github.com/tnyari/RoboAssist/issues/54)
+rögzíti.
+
+A PySide .pyd modulok és Qt Qt6*.dll fájlok különállóak, így a csomag
+dinamikus elrendezésű; ez önmagában nem bizonyítja a felhasználói relinkelést
+vagy az LGPL feltételek teljesítését. A Qt hivatalos tájékoztatója corresponding
+source átadást vagy írásos forrásajánlatot, módosított könyvtárral relinkelési
+és futtatási lehetőséget, telepítési információt, teljes LGPL szöveget és
+jól látható tájékoztatást ír le. A Qt Company nem ad jogi tanácsot a megfelelőség
+egyedi minősítéséről. Forrás: [Qt LGPLv3 kötelezettségek](https://www.qt.io/development/open-source-lgpl-obligations),
+[Qt licensing FAQ](https://www.qt.io/faq/qt-open-source-licensing).
+
+Az exact Qt 6.12.0 qtbase forrásarchívum upstream elérhető (49 MB,
+SHA-256 a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307),
+de jelenleg nincs a ZIP-ben; a QtSvg és a használt image-format pluginek
+forrásláncát is rögzíteni kell. A PyPI PySide6-Essentials 6.12.0 release-oldalán
+öt wheel szerepel, source distribution és provenance attesztáció nélkül. A Qt
+for Python buildútmutató a pyside-setup forrásrepót és azonos verziójú Qt
+telepítést használja; a jelenlegi wheel-hashből nem áll elő forrásból buildelt
+binary chain. Források: [QtBase 6.12.0 source archive](https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz),
+[PyPI artifactlista](https://pypi.org/project/PySide6-Essentials/6.12.0/),
+[Qt for Python buildútmutató](https://doc.qt.io/qtforpython-6/building_from_source/index.html).
+
+A PySide6 és shiboken6 csomagmappákban Microsoft-signed MSVCP140*.dll és
+VCRUNTIME140*.dll fájlok szerepelnek 14.44.35211.0 verzióval. A Qt Windows
+deployment útmutatója a gépről másolt egyedi MSVC runtime DLL-ek helyett a
+hivatalos VC Redistributable csomagot javasolja; az érvényes Authenticode
+aláírás nem bizonyítja a RoboAssist csomag terjesztési jogát. A Microsoft
+redisztribúciós feltételek és a csomag forrása ellenőrzendő. Forrás:
+[Qt Windows deployment](https://doc.qt.io/qt-6.12/windows-deployment.html),
+[Microsoft VC fájlok terjesztése](https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files).
+
+A Qt DLL-ek, pluginek, PySide corresponding source/buildlánc, a tényleges
+relink/telepítési út és az MSVC runtime átadása továbbra sincs lezárva; a
+vizsgálatot a [#54 aljegy](https://github.com/tnyari/RoboAssist/issues/54)
+követi. Ez a rész nem jogi minősítés.
+
 ## ✅ Ellenőrzések és korlátok
 
 - ✅ A `requirements.lock` SHA-256-tal rögzíti a Python wheel artefaktumokat.
@@ -115,11 +159,12 @@ A fő közvetlen komponensek licenceit és nyitott terjesztési kérdéseit a
 - ✅ A `uv audit` 51 Python csomagra ismert sérülékenységet vagy kedvezőtlen
   projektstátuszt nem jelzett; a natív conda closure nem tartozott a vizsgálatba.
 - ⏳ A ZIP-ben található Qt, ONNX Runtime, PortAudio és minden tranzitív notice
-  tényleges átvétele a #24 csomagolási jegyben marad nyitva.
-- ⏳ A #28 tiszta Windows gépen telepítési és indítási próbája külön jóváhagyott
-  későbbi feladat; a tulajdonos ezt elhalasztotta.
+  tényleges átvétele a #24/#54 csomagolási és licencjegyekben marad nyitva.
+- ⏳ A #24 tiszta Windows 10/11 gépes install/start/stop/uninstall próbája nem
+  történt meg. A #28 külön fejlesztői bootstrap ellenőrzés, nem az M1 csomagpróba.
 - ⏳ A magyar hangbenchmark (#21/#10) jóváhagyott, annotált hangforrásra vár;
   teljesítmény- vagy pontosságállítás nem készült.
 
 A #25 és az M1 kapu (#10) maradjon nyitva, amíg a terjesztési/licencátvétel és a
 M1 többi elfogadási feltétele nem teljesül.
+
