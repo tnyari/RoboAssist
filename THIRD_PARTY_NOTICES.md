@@ -30,6 +30,27 @@ forrása és telepített licencmetaadata a [#25 auditriportban](docs/reports/iss
 szerepel. A metaadat nem helyettesíti a wheelben vagy natív DLL-ben szállított
 kódok licencének ellenőrzését.
 
+## A CPython runtime-ból átvett OpenSSL DLL-ek
+
+A Windows alkalmazás a rögzített CPython 3.11.18 runtime-ot használja
+(`python-build-standalone` 20261124, uv 0.13.10). A release-bejegyzés a Windows
+x64 `install_only` archive nevét, méretét és SHA-256 értékét rögzíti; a
+csomagolt `python311.dll` fájl is méret/hash szerint zárt. A Python runtime saját
+`LICENSE.txt` fájlja PSF-2.0 licencként bekerül a csomagba. Ugyanebből a Python
+runtime-ból a PyInstaller két OpenSSL 3.5.9 DLL-t tesz a csomagba:
+`libcrypto-3-x64.dll` és `libssl-3-x64.dll`. Ezekhez az OpenSSL upstream
+Apache-2.0 licencszövege is bekerül az
+`_internal/licenses/python/python-runtime/` alá. A pontos DLL-méretek,
+SHA-256-ok, forrásverziók és licencfájl-hash-ek a csomag
+`_internal/licenses/python/python-runtime.json` manifestjében vannak.
+
+Ez külön runtime a PyAV/FFmpeg zár `av.libs` könyvtárában lévő OpenSSL 3.6.5
+DLL-ektől; a két OpenSSL-példány hash-e és eredete külön szerepel. A pontos
+Python és OpenSSL runtime fájlzár a
+`third_party_licenses/python-runtime/runtime-lock.json` állományban van. A rögzített
+adatok a jelenlegi CPython inputot és csomagolt DLL-eket azonosítják, de nem
+helyettesítik a CPython runtime teljes forrás/buildláncának kiadási átvételét.
+
 ## Qt for Python és MSVC runtime: LGPLv3 közösségi út vizsgálata
 
 A tulajdonos az LGPLv3 közösségi út további vizsgálatát kérte; ez nem végleges

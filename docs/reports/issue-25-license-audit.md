@@ -103,6 +103,50 @@ A fő közvetlen komponensek licenceit és nyitott terjesztési kérdéseit a
 - A két rögzített Whisper modell külön, manifestben rögzített modellrevision és
   SHA-256 mellett kerül importálásra; a csomag nem terjeszti a modell súlyait.
 
+### CPython runtime és OpenSSL DLL-ek
+
+A PyInstaller a Python interpreter által használt OpenSSL DLL-eket is a
+csomagba másolja. Az aktuális runtime a CPython 3.11.18, az Astral
+`python-build-standalone` 20261124 buildje, amelyet uv 0.13.10 telepített. A
+runtime gyökér `LICENSE.txt` fájlját PSF-2.0 licencként másoljuk a csomagba.
+Az input licenc SHA-256 értéke
+`886a0ead2d89030ee62dbff52b04e47ab91998341295bb9c56fb952b4e081c7a`.
+Hivatalos [python-build-standalone 20261124 release](https://github.com/astral-sh/python-build-standalone/releases/tag/20261124)
+Windows x64 artifactja `cpython-3.11.18+20261124-x86_64-pc-windows-msvc-install_only.tar.gz`
+(49,096,635 bájt; release API SHA-256
+`3e4a35e3c238e5090d36bf95c041d9052bc82d6e298cb912ba7f70f6c66cf81a`). A
+telepített runtime `BUILD` jelölője `20261124`; az archive hash upstream
+release-metaadat, míg a build a telepített DLL-ek tartalmát a fájlzárral
+külön ellenőrzi.
+
+PyInstaller által csomagolt interpreter DLL:
+
+| DLL | Méret | SHA-256 |
+|---|---:|---|
+| `python311.dll` | 5,844,992 bájt | `9d220475b4e442cbdee671791cd3a84ae89331d429d7fef419f8b7b0c58b4200` |
+
+A Pythonból származó OpenSSL 3.5.9 DLL-ek zárja:
+
+| DLL | Méret | SHA-256 |
+|---|---:|---|
+| `DLLs/libcrypto-3-x64.dll` | 7,861,248 bájt | `0b1a6f4504716e48b8ae5ce5dd894d6fa10ef79e78f8c3bcaac8a8160187441b` |
+| `DLLs/libssl-3-x64.dll` | 1,571,840 bájt | `72af62e08814444c408f5544a3729320b2b6dd37dc5cba81dd92b770856a8f7a` |
+
+Az OpenSSL 3.x Apache-2.0 licencszövege a rögzített
+[3.5.9 forrásrefből](https://github.com/openssl/openssl/blob/openssl-3.5.9/LICENSE.txt)
+származik; licencfájl SHA-256: `7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a`.
+A forráskiadás URL-je: `https://www.openssl-library.org/source/openssl-3.5.9.tar.gz`.
+A Python runtime DLL-jei nem azonosak a PyAV runtime `av.libs` könyvtárában
+lévő OpenSSL 3.6.5 DLL-ekkel. A csomagbuild verziót, buildmarkert, licenc- és
+DLL-hash-eket ellenőriz, eltérésnél leáll; a ZIP leltára a
+`licenses/python/python-runtime.json` alatt rögzíti az aktuális adatokat.
+Ez a zár nem bizonyítja a teljes Python runtime forrásból történő
+újraépíthetőségét. A nyitott eredet- és licencfeltételt a
+[#56 aljegy](https://github.com/tnyari/RoboAssist/issues/56) követi.
+Az inputzár a
+[`runtime-lock.json`](../../third_party_licenses/python-runtime/runtime-lock.json)
+fájlban található.
+
 ### PySide6/Qt 6.12 közösségi LGPLv3 út vizsgálata
 
 A tulajdonos a közösségi LGPLv3 út vizsgálatát kérte; ez nem végleges licencválasztás.
@@ -233,6 +277,9 @@ követi. Ez a rész nem jogi minősítés.
 ## ✅ Ellenőrzések és korlátok
 
 - ✅ A `requirements.lock` SHA-256-tal rögzíti a Python wheel artefaktumokat.
+- ✅ A CPython 3.11.18 / python-build-standalone 20261124 input, a CPython
+  licencszöveg, valamint a Pythonból származó OpenSSL 3.5.9 DLL-ek hash-zárja
+  géppel ellenőrzött; a csomagmanifest külön leltározza őket.
 - ✅ A `conda-av-win64.lock` 98 explicit artifact URL-t és SHA-256-ot rögzít.
 - ✅ A stage manifest az FFmpeg 8.1.2 buildjét LGPL-2.1-or-laterként jelöli, és
   rögzíti a DLL-zárat; x264/x265 DLL nincs benne.
@@ -270,3 +317,29 @@ M1 többi elfogadási feltétele nem teljesül.
 A javított Start/Stop átmeneti állapotú UI-val készített offline ZIP SHA-256 értéke `7c066f60e55163ab5f193dfc3e762f9e8ab1b493232376c9bb616761eec37301`. A ZIP statikus leltára 1 427 fájl/bejegyzés, 108 DLL, 3 EXE és 0 modellsúly; mind a 174 Qt licenc/notice fájl, 76 attribution dokumentum és a 33 Qt runtime DLL/PYD lock hash+méret értéke egyezik. A csomagolt `RoboAssist.exe --help` és `RoboAssistModels.exe --help` exit 0.
 
 A [Windows CI #107](https://github.com/tnyari/RoboAssist/actions/runs/45994614436) sikeres a [92b07d05d4ef](https://github.com/tnyari/RoboAssist/commit/92b07d05d4ef41f9358c06cdee021a7d50ff6c03) headen; helyi UI-tesztek **6 passed**, Ruff lint/format és mypy **35 source files** sikeres. Ez nem clean-Windows telepítési próba vagy beszédbenchmark. Az M1 kapu nyitva marad a #21/#23/#24 és a #25/#47/#54 fennmaradó feltételei miatt.
+
+
+## 🧾 #56 – CPython runtime / OpenSSL DLL zár · 2026-11-27
+
+- `runtime-lock.json` rögzíti a CPython 3.11.18 / python-build-standalone
+  20261124 Windows x64 install-only artifact kiadási hashét, a csomagolt
+  `python311.dll` hashét, a CPython licencet és az OpenSSL 3.5.9 DLL/license
+  hash-eket.
+- A build `sys.base_prefix` alapján ellenőrzi a Python-verziót, buildmarkert,
+  CPython licencet, OpenSSL-verziót, DLL-méreteket és hash-eket. Eltérésnél
+  leáll; a manifestben külön rögzíti a Pythonból jövő 3.5.9-es, illetve az
+  `av.libs`-ben zárt 3.6.5-ös OpenSSL példányt.
+- Az offline `scripts/build-app.ps1 -Offline` újraépült. ZIP SHA-256:
+  `d0e929fd48f6ba78edd9edfba4ae1f8407edc5a9220959ed8eb721320d299580`;
+  1 430 bejegyzés, 108 DLL, 3 EXE, model weights nélkül. ZIP-ből ellenőrizve a
+  CPython/OpenSSL manifest, a három interpreter/OpenSSL DLL mérete/hash-e és a
+  CPython/OpenSSL licencek hash-e. A csomagolt `RoboAssistModels.exe --help`
+  exit 0.
+- Helyi Ruff lint és format ellenőrzés sikeres. Az új célzott pytest két
+  futtatási kísérlete a sandbox WinError 5 hibájával állt le: a pytest nem tudta
+  létrehozni a teszt fixture könyvtárait; ezt a tesztet Windows CI-ben is
+  ellenőrizni kell.
+- Részletes feltételek és bizonyíték: [#56](https://github.com/tnyari/RoboAssist/issues/56).
+  A lokális fájllock és az OpenSSL licencszöveg nem zárja le az M1 többi
+  clean-Windows, hangbenchmark és licencátvételi feltételét; #10 Open marad.
+

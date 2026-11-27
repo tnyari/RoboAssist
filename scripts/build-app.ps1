@@ -58,8 +58,14 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'The locked PyAV/FFmpeg runtime could not be staged.' }
 
     $sitePackages = Join-Path (Split-Path -Parent (Split-Path -Parent $Python)) 'Lib/site-packages'
+    $pythonRoot = & $Python -c "import sys; print(sys.base_prefix)"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($pythonRoot)) {
+        throw 'The locked Python base runtime could not be identified.'
+    }
+    $pythonRoot = $pythonRoot.Trim()
     $licenseOutput = Join-Path (Join-Path $RepoRoot '.tools') 'python-license-bundle'
-    & $Python (Join-Path $PSScriptRoot 'prepare-python-licenses.py') --site-packages $sitePackages --output $licenseOutput
+    & $Python (Join-Path $PSScriptRoot 'prepare-python-licenses.py') `
+        --site-packages $sitePackages --python-root $pythonRoot --output $licenseOutput
     if ($LASTEXITCODE -ne 0) { throw 'Python license bundle preparation failed.' }
 
     $numpyStage = Join-Path (Join-Path $RepoRoot '.tools') 'numpy-system-msvc'
@@ -120,3 +126,4 @@ try {
 } finally {
     Pop-Location
 }
+
