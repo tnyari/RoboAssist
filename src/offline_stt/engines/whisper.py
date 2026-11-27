@@ -24,6 +24,7 @@ from offline_stt.engines.types import (
     EngineState,
     EngineStats,
 )
+from offline_stt.native_deps import initialize_av_runtime
 
 
 @dataclass(frozen=True)
@@ -50,6 +51,10 @@ class WhisperDecoder:
     def __init__(self, verified: VerifiedModel, cpu_threads: int) -> None:
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+        # faster-whisper imports PyAV while loading its SDK. Register and load
+        # the bundled FFmpeg runtime first so frozen Windows builds can resolve
+        # PyAV's native DLLs through the restricted DLL search path.
+        initialize_av_runtime()
         from faster_whisper import WhisperModel  # type: ignore[import-untyped]
 
         self._model = WhisperModel(
@@ -303,3 +308,4 @@ class FasterWhisperEngine:
             self._count,
             self._session_samples,
         )
+
