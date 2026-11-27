@@ -80,3 +80,13 @@ nem jogi minősítés.
 - A csomagolt `RoboAssistModels.exe --help` kilépési kódja **0**.
 - Tiszta Windows gépes telepítés/eltávolítás: nem futott, mert a felhasználó
   jelezte, hogy jelenleg nincs elérhető tesztgép vagy VM.
+
+
+## 🧭 Kiegészítő hivatalos licencforrás-ellenőrzés · 2026-11-27
+
+- A Qt for Python dokumentációja a közösségi disztribúciót LGPLv3/GPLv3 licencútként, a Commercial változatot külön kiadásként írja le. A PySide6-Essentials projekt PyPI-oldala azt jelzi, hogy a PyPI a telepítés ajánlott forrása, és a wheel-tartalom mindkét licencelési esetre használható. Ez alátámasztja, hogy a wheelben található Commercial hivatkozás önmagában nem bizonyít Commercial-only licencet.
+- A PyPI 6.12.0 release oldalán a Windows x86-64 wheel szerepel, a release-hez provenance attesztáció nincs; az oldalon source distribution sem szerepel. Így a kiadott wheel eredetének és buildbeállításainak kriptográfiai bizonyítéka továbbra sem áll rendelkezésre.
+- A Qt hivatalos LGPL útmutatója teljes corresponding source vagy írásos forrásajánlatot, dinamikus linkelési/relinkelési lehetőséget, a módosított könyvtár futtatásához szükséges eszközöket és telepítési információt, teljes licencszöveget és jól látható tájékoztatást sorol fel. Ezek kiadási feltételek; Qt útmutatója maga is egyedi jogi minősítést nem vállal.
+- **Értékelés:** az LGPLv3/GPLv3 Community licencút elérhető a Qt for Python termékhez, de a jelen csomagolt PySide/Qt binary closure, az esetleges GPL-only komponensek, a wheel–source build megfeleltetése, valamint a felhasználói relink/install eljárás nincs igazolva. A #54 checklist nyitva marad.
+
+Források: [Qt for Python – Commercial Use / Community Edition](https://doc.qt.io/qtforpython-6/commercial/index.html), [PySide6-Essentials 6.12.0 release és licensing metaadat](https://pypi.org/project/PySide6-Essentials/6.12.0/), [Qt – LGPL/GPL kötelezettségek](https://www.qt.io/development/open-source-lgpl-obligations), [Qt Open Source Licensing FAQ](https://www.qt.io/faq/qt-open-source-licensing).
