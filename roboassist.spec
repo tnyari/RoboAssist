@@ -12,6 +12,7 @@ from offline_stt.native_deps import configure_av_dll_search
 configure_av_dll_search()
 
 SITE_PACKAGES = Path(sys.prefix) / "Lib" / "site-packages"
+NUMPY_STAGE = ROOT / ".tools" / "numpy-system-msvc"
 AV_DLLS = SITE_PACKAGES / "av.libs"
 AV_PACKAGE = SITE_PACKAGES / "av"
 AV_LICENSES = ROOT / ".tools" / "av-vendor" / "av-runtime"
@@ -22,6 +23,7 @@ with VC_RUNTIME_MANIFEST.open("r", encoding="utf-8") as stream:
     vc_runtime = json.load(stream)
 VC_RUNTIME_INSTALLER = ROOT / ".tools" / vc_runtime["filename"]
 for required in (
+    NUMPY_STAGE,
     AV_DLLS,
     AV_PACKAGE,
     AV_LICENSES,
@@ -31,6 +33,7 @@ for required in (
 ):
     if not required.is_dir():
         raise SystemExit(f"Required staged build input is missing: {required}")
+sys.path.insert(0, str(NUMPY_STAGE))
 
 SOURCE_ARCHIVE_HASHES = {
     "av-17.1.0.tar.gz": "7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3",
@@ -107,7 +110,7 @@ hiddenimports = [
     *package_modules("av", AV_PACKAGE),
 ]
 common_analysis = {
-    "pathex": [str(ROOT / "src")],
+    "pathex": [str(NUMPY_STAGE), str(ROOT / "src")],
     "binaries": binaries,
     "datas": datas,
     "hiddenimports": hiddenimports,
@@ -143,6 +146,7 @@ SYSTEM_RUNTIME_DLLS = {
     "vcruntime140_1.dll",
     "vcruntime140_threads.dll",
 }
+NUMPY_PRIVATE_CRT_DLL = "msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll"
 
 
 def without_system_runtime_dlls(entries: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]:
@@ -152,7 +156,11 @@ def without_system_runtime_dlls(entries: list[tuple[str, str, str]]) -> list[tup
         # Windows 10/11 resolves these API-set contract names through the OS
         # schema; they are not app-local DLL dependencies.
         is_api_set_contract = filename.startswith(("api-ms-win-", "ext-ms-win-"))
-        if filename not in SYSTEM_RUNTIME_DLLS and not is_api_set_contract:
+        if (
+            filename not in SYSTEM_RUNTIME_DLLS
+            and filename != NUMPY_PRIVATE_CRT_DLL
+            and not is_api_set_contract
+        ):
             filtered.append(entry)
     return filtered
 

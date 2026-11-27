@@ -58,6 +58,10 @@ try {
     & $Python (Join-Path $PSScriptRoot 'prepare-python-licenses.py') --site-packages $sitePackages --output $licenseOutput
     if ($LASTEXITCODE -ne 0) { throw 'Python license bundle preparation failed.' }
 
+    $numpyStage = Join-Path (Join-Path $RepoRoot '.tools') 'numpy-system-msvc'
+    & $Python (Join-Path $PSScriptRoot 'prepare_numpy_msvc.py') --site-packages $sitePackages --output $numpyStage
+    if ($LASTEXITCODE -ne 0) { throw 'NumPy system MSVC runtime staging failed.' }
+
     $versionLine = Get-Content -LiteralPath (Join-Path $RepoRoot 'pyproject.toml') |
         Select-String -Pattern '^version = "(\d+\.\d+\.\d+)"' | Select-Object -First 1
     $version = $versionLine.Matches.Groups[1].Value

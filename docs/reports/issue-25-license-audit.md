@@ -156,8 +156,13 @@ wheel pedig `numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` néven
 14.40.33810.0 runtime-példányt hordoz. Ezek a fejlesztői inputok fájlverzió és
 aláíró alapján kerültek leltárba; az aláírás önmagában nem terjesztési engedély.
 A NumPy wheel `DELVEWHEEL` és `RECORD` állománya igazolja, hogy a hash-elt
-MSVCP DLL a wheel része, és a két NumPy `.pyd` importálja; ez a DLL megmarad a
-csomagban, külön Microsoft licencátvételi ellenőrzést igényel.
+MSVCP DLL a wheel része, és a két NumPy `.pyd` importálja. A build most egy
+reprodukálható, csak `.tools/` alatti NumPy overlay-t készít: az ellenőrzött
+2.4.6 wheel két érintett `.pyd` importnevében a privát, hash-elt DLL nevét a
+szokásos `msvcp140.dll` névre cseréli, frissíti az overlay `RECORD`-ját, és a
+privát DLL-t kihagyja. Az eredeti wheel és a fejlesztői virtuális környezet
+változatlan marad. Ez technikai csomagolási megoldás; a Microsoft runtime
+terjesztési feltételeinek átvételét nem zárja le.
 
 A Qt 6.12 Windows deployment útmutatója a hivatalos Microsoft VC Redistributable
 telepítőt várja release alkalmazásnál; a fordító gépéről átmásolt egyedi runtime
@@ -166,7 +171,7 @@ verziója legalább olyan friss legyen, mint az alkalmazáshoz használt Build T
 és a Redistributable terjesztése licencelt Visual Studio felhasználókra, illetve
 a Visual Studio licencfeltételeire korlátozott.
 
-Az új offline ZIP (`e739a487586b71551bde22fe0be5a4c1a3ae77271b3ba7e99da329229fd40cff`)
+Az új offline ZIP (`96a03b6596ed4a57e986eedc4cfa21b1fceea8fa80e7fc41b86fd0028d253a0c`)
 ezért a Microsoft hivatalos `https://aka.ms/vc14/vc_redist.x64.exe` útvonalán
 letöltött, 14.52.37029.0 x64 telepítőt tartalmazza
 (`_internal/runtime/vc_redist.x64.exe`; SHA-256
@@ -175,7 +180,10 @@ Microsoft Authenticode aláírás). A PyInstaller build a szokásos MSVCP/VCRUNT
 `concrt140`, `vccorlib140` és UCRT runtime DLL-neveket kiszűri; root
 `Start-RoboAssist.cmd` / `Prepare-RoboAssist.ps1` ellenőrzi a registry runtime
 verziót, hash-t és aláírást, majd csak hiányzó/régebbi futtatókörnyezetnél kér
-UAC-jóváhagyást. A csomag statikus leltára 1 230 bejegyzés, 108 DLL, két
+UAC-jóváhagyást. A ZIP-ből a NumPy privát, hash-elt runtime DLL hiányzik; a
+csomagolt `RoboAssistModels.exe --help` parancs sikeresen lefutott ezzel a
+NumPy builddel, de ez nem helyettesíti tiszta gépes ellenőrzést. A csomag
+statikus leltára 1 230 bejegyzés, 108 DLL, két
 alkalmazás-EXE és egy VC Redistributable telepítő (összesen három `.exe` fájl);
 app-local szabványos MSVC/UCRT DLL és
 Windows API-set contract fájl nincs benne; a modell-súlyok hiányoznak.
@@ -184,7 +192,8 @@ A Microsoft telepítő helyi verziója 14.52.37029.0, aláírása érvényes; ha
 egyezik a ZIP-be csomagolt fájllal. A fejlesztői gép registry runtime-ja viszont
 14.51.36247.0, tehát a csomag UAC útvonala ezen a gépen telepítene. A friss
 `RoboAssist.exe` nem indult el újra, és tiszta Windows teszt nem történt; a
-lokális runtime megléte nem helyettesíti a #24 clean-install próbáját.
+lokális runtime megléte nem helyettesíti a #24 clean-install próbáját. A
+tesztkörnyezetben jelenleg nincs elérhető tiszta Windows gép vagy VM.
 
 Források: [Qt Windows deployment](https://doc.qt.io/qt-6.12/windows-deployment.html),
 [Microsoft VC fájlok terjesztése](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files),
@@ -207,8 +216,10 @@ követi. Ez a rész nem jogi minősítés.
   `-buildconf` egyezése ellenőrizve; a licencút teljes átvétele nyitott.
 - ✅ A ZIP Microsoft VC Redistributable 14.52.37029.0 installerének Authenticode,
   verzió-, SHA-256- és csomaghash-ellenőrzése sikeres; a gyakori app-local
-  MSVC/UCRT DLL-ek buildből kiszűrve. A redisztribúciós jogosultság, a NumPy
-  wheel hash-elt runtime fájlja és tiszta gépes indítás még nincs lezárva.
+  MSVC/UCRT DLL-ek és a NumPy privát hash-elt runtime DLL-je kiszűrve. A build
+  NumPy overlay importnév-módosítása és a csomagolt modell-CLI `--help`
+  ellenőrzése sikeres. A Redistributable terjesztési jogosultsága és a tiszta
+  gépes indítás továbbra sincs lezárva.
 - ✅ A `uv audit` 51 Python csomagra ismert sérülékenységet vagy kedvezőtlen
   projektstátuszt nem jelzett; a natív conda closure nem tartozott a vizsgálatba.
 - ⏳ A ZIP-ben található Qt, ONNX Runtime, PortAudio és minden tranzitív notice

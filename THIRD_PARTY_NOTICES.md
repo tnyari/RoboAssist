@@ -87,9 +87,12 @@ Authenticode aláírás érvényes, a signer Microsoft Corporation. A
 `Start-RoboAssist.cmd` ellenőrzi a telepített runtime verzióját; hiány vagy
 14.52.37029.0-nál régebbi runtime esetén a csomagolt telepítőt indítja, amelyhez
 a Windows UAC-jóváhagyást kérhet. A szokásos MSVCP/VCRUNTIME/UCRT nevű DLL-eket a
-PyInstaller csomagból kiszűri. A NumPy wheel külön hash-elt
-`numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` fájlja (14.40.33810.0)
-megmarad, mert a NumPy bővítmények ezen a konkrét néven importálják.
+PyInstaller csomagból kiszűri. A lockolt NumPy 2.4.6 wheel tartalmazza a hash-elt
+`numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` fájlt
+(14.40.33810.0); a build ellenőrzi a wheel hashét és `RECORD`-ját, majd a két
+érintett `.pyd` importnevét a rendszer `msvcp140.dll` fájljára állítja egy külön,
+csak build idején használt overlay-ben. Az eredeti wheel nem módosul, a hash-elt
+DLL pedig kimarad a ZIP-ből. A csomagolt modell-CLI `--help` ellenőrzése sikeres.
 
 A [Qt Windows telepítési útmutatója](https://doc.qt.io/qt-6.12/windows-deployment.html)
 release buildhez a hivatalos Microsoft Redistributable telepítőt írja elő, és
@@ -97,8 +100,8 @@ az egyedi compiler runtime DLL-ek közvetlen szállítása ellen figyelmeztet. A
 [Microsoft redisztribúciós dokumentációja](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files)
 szerint a runtime telepítő/Redistributable terjesztése csak licencelt Visual
 Studio felhasználóknak, a Visual Studio licencfeltételei szerint engedélyezett.
-Ezért a telepítő útja műszakilag be van építve, de a terjesztési jogcím és a
-NumPy privát runtime külön licencátvétele a #54 auditban továbbra is nyitott.
+Ezért a telepítő útja műszakilag be van építve, de a hivatalos Redistributable
+terjesztési jogcíme a #54 auditban továbbra is nyitott.
 Ez technikai leltár és nyitott licencvizsgálat, nem jogi minősítés.
 
 ## FFmpeg 8.1.2 forrás és buildbeállítás
