@@ -95,6 +95,7 @@ datas = [
     (str(ROOT / "LICENSE"), "."),
     (str(ROOT / "LICENSE"), "licenses/RoboAssist"),
     (str(ROOT / "THIRD_PARTY_NOTICES.md"), "."),
+    (str(ROOT / "docs" / "reports" / "qt-runtime-file-lock.json"), "licenses/qt"),
     (str(ROOT / "docs" / "user-guide.md"), "docs"),
     (str(ROOT / "docs" / "benchmark-metrics.md"), "docs"),
 ]
