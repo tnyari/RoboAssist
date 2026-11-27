@@ -26,6 +26,7 @@ a Stop timeout és a túlterhelés látható hiba. [Tényleges ellenőrzések](d
 - [Munkakövetési szabályok](docs/github-workflow.md)
 - [Hozzájárulás](CONTRIBUTING.md) · [Agent szabályok](AGENTS.md)
 - [Architektúra és repo struktúra](docs/architecture.md)
+- [Benchmark reprodukció, annotációs séma és riport](docs/benchmark-metrics.md)
 
 Fejlesztői setup a repó gyökeréből: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-dev.ps1`. [Parancsok és előfeltételek](docs/development.md), [tényleges ellenőrzési riport](docs/reports/issue-16-environment.md).
 
