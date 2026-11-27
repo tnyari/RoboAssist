@@ -12,8 +12,12 @@
 ### Hordozható Windows csomag
 
 1. Csomagold ki a verziózott ZIP-et egy olyan mappába, ahová a felhasználód írhat.
-2. Indítsd a `RoboAssist.exe` fájlt. A modellkönyvtár nincs a ZIP-be építve.
-3. Nyiss PowerShellt a kicsomagolt mappában, és importáld a külön, hash-ellenőrzött
+2. Indítsd a `Start-RoboAssist.cmd` fájlt. Ez ellenőrzi a Microsoft Visual C++
+   x64 futtatókörnyezetet, és hiányzó vagy 14.52.37029.0-nál régebbi verzió
+   esetén elindítja a csomagolt Microsoft telepítőt. A Windows UAC-jóváhagyást
+   kérhet. Az alkalmazás futásához nem kell rendszergazdai jog.
+3. A modellkönyvtár nincs a ZIP-be építve. Nyiss PowerShellt a kicsomagolt
+   mappában, és importáld a külön, hash-ellenőrzött
    modellkönyvtárat a mellékelt modellkezelővel:
 
    ```powershell
@@ -23,6 +27,8 @@
 
    A `small-multilingual` modellhez cseréld ki a modellazonosítót és a könyvtárat.
    A telepítő a fájlokat ellenőrzi, majd az alkalmazás helyi adatkönyvtárába másolja.
+   A parancssori modellkezelő első használata előtt a `Prepare-RoboAssist.ps1`
+   önmagában is futtatható a runtime ellenőrzéséhez.
 4. Válassz mikrofont, helyi modellt és nyelvet, majd kattints az **Indítás** gombra.
 
 Hálózati letöltés külön, felhasználó által indított műveletként érhető el:
@@ -82,3 +88,4 @@ beszédbenchmark vagy teljesítményállítás.
 Rögzítés csak **Indítás** után történik. Audio és átirat alapból memóriában marad;
 hangfájlt az ablak nem készít. Nincs cloud STT, telemetry vagy futásidejű
 modellletöltés. A másolás és a TXT export a felhasználó által indított művelet.
+

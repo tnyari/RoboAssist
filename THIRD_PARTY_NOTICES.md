@@ -80,12 +80,25 @@ bizonyítékai. A source archívumok a csomagban vannak, de a vendor buildlánc 
 A [PyPI PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/)
 release oldala csak wheel fájlokat és provenance nélküli artefaktumokat listáz.
 
-A PySide6 és shiboken6 mappák MSVCP140/VCRUNTIME140 DLL-jei
-14.44.35211.0 verziójúak és Microsoft Authenticode-aláírásuk érvényes. Ez nem
-bizonyítja az adott fájlok RoboAssist általi terjesztési jogát. A
-[Qt Windows telepítési útmutatója](https://doc.qt.io/qt-6.12/windows-deployment.html)
-a gépről másolt egyedi MSVC runtime DLL-ek helyett a hivatalos VC Redistributable
-csomagot javasolja; a Microsoft redisztribúciós feltételeit is teljesíteni kell.
+A kiadási ZIP a Microsoft hivatalos x64 VC Redistributable 14.52.37029.0
+telepítőjét tartalmazza az `_internal/runtime/` mappában. SHA-256:
+`9c02c9ed120f671b900e6b9471d890e3b2414117a7e53f4ae2e855466fa2b7c9`; az
+Authenticode aláírás érvényes, a signer Microsoft Corporation. A
+`Start-RoboAssist.cmd` ellenőrzi a telepített runtime verzióját; hiány vagy
+14.52.37029.0-nál régebbi runtime esetén a csomagolt telepítőt indítja, amelyhez
+a Windows UAC-jóváhagyást kérhet. A szokásos MSVCP/VCRUNTIME/UCRT nevű DLL-eket a
+PyInstaller csomagból kiszűri. A NumPy wheel külön hash-elt
+`numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll` fájlja (14.40.33810.0)
+megmarad, mert a NumPy bővítmények ezen a konkrét néven importálják.
+
+A [Qt Windows telepítési útmutatója](https://doc.qt.io/qt-6.12/windows-deployment.html)
+release buildhez a hivatalos Microsoft Redistributable telepítőt írja elő, és
+az egyedi compiler runtime DLL-ek közvetlen szállítása ellen figyelmeztet. A
+[Microsoft redisztribúciós dokumentációja](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files)
+szerint a runtime telepítő/Redistributable terjesztése csak licencelt Visual
+Studio felhasználóknak, a Visual Studio licencfeltételei szerint engedélyezett.
+Ezért a telepítő útja műszakilag be van építve, de a terjesztési jogcím és a
+NumPy privát runtime külön licencátvétele a #54 auditban továbbra is nyitott.
 Ez technikai leltár és nyitott licencvizsgálat, nem jogi minősítés.
 
 ## FFmpeg 8.1.2 forrás és buildbeállítás

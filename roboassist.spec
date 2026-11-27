@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 from hashlib import sha256
+import json
 from pathlib import Path
 import sys
 
@@ -16,7 +17,18 @@ AV_PACKAGE = SITE_PACKAGES / "av"
 AV_LICENSES = ROOT / ".tools" / "av-vendor" / "av-runtime"
 UPSTREAM_SOURCE_ARCHIVES = ROOT / ".tools" / "av-vendor" / "upstream-sources"
 PYTHON_LICENSES = ROOT / ".tools" / "python-license-bundle"
-for required in (AV_DLLS, AV_PACKAGE, AV_LICENSES, UPSTREAM_SOURCE_ARCHIVES, PYTHON_LICENSES):
+VC_RUNTIME_MANIFEST = ROOT / "docs" / "package" / "vc-runtime.json"
+with VC_RUNTIME_MANIFEST.open("r", encoding="utf-8") as stream:
+    vc_runtime = json.load(stream)
+VC_RUNTIME_INSTALLER = ROOT / ".tools" / vc_runtime["filename"]
+for required in (
+    AV_DLLS,
+    AV_PACKAGE,
+    AV_LICENSES,
+    UPSTREAM_SOURCE_ARCHIVES,
+    PYTHON_LICENSES,
+    VC_RUNTIME_INSTALLER.parent,
+):
     if not required.is_dir():
         raise SystemExit(f"Required staged build input is missing: {required}")
 
@@ -35,6 +47,10 @@ for filename, expected_hash in SOURCE_ARCHIVE_HASHES.items():
     actual_hash = sha256(source_archive.read_bytes()).hexdigest()
     if actual_hash != expected_hash:
         raise SystemExit(f"Upstream source hash mismatch for {source_archive}: {actual_hash}")
+
+actual_vc_runtime_hash = sha256(VC_RUNTIME_INSTALLER.read_bytes()).hexdigest()
+if actual_vc_runtime_hash != vc_runtime["sha256"]:
+    raise SystemExit(f"VC Redistributable hash mismatch: {actual_vc_runtime_hash}")
 
 
 def tree_data(source: Path, destination: str) -> list[tuple[str, str]]:
@@ -77,6 +93,10 @@ datas += tree_data(AV_LICENSES, "licenses/av-runtime")
 datas += tree_data(UPSTREAM_SOURCE_ARCHIVES, "licenses/upstream-sources")
 datas += [(str(ROOT / "docs" / "package" / "upstream-sources" / "README.md"), "licenses/upstream-sources")]
 datas += tree_data(PYTHON_LICENSES, "licenses/python")
+datas += [
+    (str(VC_RUNTIME_INSTALLER), "runtime"),
+    (str(VC_RUNTIME_MANIFEST), "runtime"),
+]
 binaries = [(str(path), "av.libs") for path in sorted(AV_DLLS.glob("*.dll"))]
 if not binaries:
     raise SystemExit("No staged PyAV/FFmpeg DLLs were found")
@@ -107,6 +127,44 @@ manager = Analysis(
     [str(ROOT / "src" / "offline_stt" / "engines" / "__main__.py")],
     **common_analysis,
 )
+
+# The official, hash-locked VC Redistributable is installed once through the
+# package launcher. Do not ship duplicate app-local MSVC/UCRT runtime DLLs.
+SYSTEM_RUNTIME_DLLS = {
+    "concrt140.dll",
+    "msvcp140.dll",
+    "msvcp140_1.dll",
+    "msvcp140_2.dll",
+    "msvcp140_atomic_wait.dll",
+    "msvcp140_codecvt_ids.dll",
+    "ucrtbase.dll",
+    "vccorlib140.dll",
+    "vcruntime140.dll",
+    "vcruntime140_1.dll",
+    "vcruntime140_threads.dll",
+}
+
+
+def without_system_runtime_dlls(entries: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]:
+    filtered = []
+    for entry in entries:
+        filename = Path(entry[0]).name.casefold()
+        # Windows 10/11 resolves these API-set contract names through the OS
+        # schema; they are not app-local DLL dependencies.
+        is_api_set_contract = filename.startswith(("api-ms-win-", "ext-ms-win-"))
+        if filename not in SYSTEM_RUNTIME_DLLS and not is_api_set_contract:
+            filtered.append(entry)
+    return filtered
+
+
+ui_binaries = without_system_runtime_dlls(ui.binaries)
+manager_binaries = without_system_runtime_dlls(manager.binaries)
+remaining_runtime_dlls = {
+    Path(entry[0]).name.casefold() for entry in (*ui_binaries, *manager_binaries)
+} & SYSTEM_RUNTIME_DLLS
+if remaining_runtime_dlls:
+    raise SystemExit(f"App-local system runtime DLLs remain: {sorted(remaining_runtime_dlls)}")
+
 ui_pyz = PYZ(ui.pure)
 manager_pyz = PYZ(manager.pure)
 ui_exe = EXE(
@@ -137,8 +195,8 @@ manager_exe = EXE(
 coll = COLLECT(
     ui_exe,
     manager_exe,
-    ui.binaries,
-    manager.binaries,
+    ui_binaries,
+    manager_binaries,
     ui.datas,
     manager.datas,
     strip=False,

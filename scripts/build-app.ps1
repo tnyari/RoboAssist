@@ -42,6 +42,11 @@ try {
         if ($sourceHash -ne $entry.Value) { throw "Upstream source hash mismatch: $($entry.Key)" }
     }
 
+    $stageRuntime = Join-Path $PSScriptRoot 'stage-vc-redist.ps1'
+    $runtimeArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $stageRuntime, '-Offline')
+    & powershell.exe @runtimeArgs
+    if ($LASTEXITCODE -ne 0) { throw 'The locked Microsoft VC Redistributable could not be verified.' }
+
     $setupAv = Join-Path $PSScriptRoot 'setup-av-runtime.ps1'
     $avArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $setupAv, '-Python', $Python)
     if ($Offline) { $avArgs += '-Offline' }
@@ -95,6 +100,8 @@ try {
     }
     Copy-Item -LiteralPath (Join-Path $buildDist 'RoboAssist') -Destination $packagePath -Recurse
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'docs/package/README.md') -Destination (Join-Path $packagePath 'README.md')
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Prepare-RoboAssist.ps1') -Destination $packagePath
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Start-RoboAssist.cmd') -Destination $packagePath
     Compress-Archive -LiteralPath $packagePath -DestinationPath $zipPath -CompressionLevel Fastest
     $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
     "$hash *$packageName.zip" | Set-Content -LiteralPath $hashPath -Encoding ascii
