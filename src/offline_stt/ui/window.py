@@ -514,4 +514,3 @@ class MainWindow(QMainWindow):
         self._thread.wait(6500)
         self._allow_close = True
         self.close()
-
