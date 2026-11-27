@@ -18,6 +18,12 @@ benchmark és annak annotációs sémája a
 [benchmark útmutatóban](_internal/docs/benchmark-metrics.md)
 van; valós méréshez jóváhagyott, annotált hangforrás szükséges.
 
+A RoboAssist FFmpeg könyvtárakat használ LGPLv2.1 licenc alatt. A megfelelő
+FFmpeg/PyAV forrásarchívumok és a buildrecept az
+`_internal/licenses/upstream-sources/` és
+`_internal/licenses/av-runtime/` könyvtárban találhatók; a felületen a
+**Súgó → Névjegy** ablak is megadja ezeket az útvonalakat.
+
 ## Leállítás és eltávolítás
 
 Állítsd le a felvételt az alkalmazásban, zárd be az ablakot, majd töröld a
