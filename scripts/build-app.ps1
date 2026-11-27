@@ -41,6 +41,10 @@ try {
         $sourceHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($sourceHash -ne $entry.Value) { throw "Upstream source hash mismatch: $($entry.Key)" }
     }
+    $qtLicenseOutput = Join-Path (Join-Path $RepoRoot '.tools') 'qt-license-bundle'
+    & $Python (Join-Path $PSScriptRoot 'prepare-qt-license-bundle.py') `
+        --source-dir $sourceDir --output $qtLicenseOutput
+    if ($LASTEXITCODE -ne 0) { throw 'Qt/PySide license bundle preparation failed.' }
 
     $stageRuntime = Join-Path $PSScriptRoot 'stage-vc-redist.ps1'
     $runtimeArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $stageRuntime, '-Offline')
@@ -116,4 +120,3 @@ try {
 } finally {
     Pop-Location
 }
-
