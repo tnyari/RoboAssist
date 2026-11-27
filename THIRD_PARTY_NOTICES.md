@@ -36,8 +36,13 @@ A tulajdonos az LGPLv3 közösségi út további vizsgálatát kérte; ez nem v�
 licencválasztás. A PySide6_Essentials és shiboken6 6.12.0 csomagmetaadata
 LGPL/GPL alternatívákat jelez, de a ZIP Python licencbundle-jében mindkét
 csomagnál csak a Qt Commercial licenc-referenciafájl található. A teljes
-Community LGPL/GPL licencszöveg és a tényleges source/build átadási út nincs
-lezárva.
+Az offline ZIP külön `_internal/licenses/qt/` közleménycsomagja a négy
+hash-zárt Qt/PySide 6.12.0 source archive-ból 101 licenc-, notice- és
+attribution-fájlt tesz
+elérhetővé, köztük a Community LGPL/GPL licencszövegeket. A manifest megadja az
+eredeti archívumútvonalakat és a fájlhash-eket. Ez részben pótolja a hiányzó,
+disztribúció-specifikus license textet, de a tényleges binary provenance,
+licencválasztás és source/relink/telepítési út nincs lezárva.
 
 A csomagban 5 Qt6 DLL, 20 Qt plug-in DLL, 4 PySide kötésmodul és shiboken
 modulok vannak; az MSVC runtime-ot a hivatalos VC Redistributable telepítő
@@ -59,13 +64,19 @@ az `_internal/licenses/upstream-sources/` könyvtárban:
 - Qt Image Formats 6.12.0 — SHA-256 `0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762`
 - PySide / Qt for Python 6.12.0 — SHA-256 `dce2a944b34320e51a0ec8100cb983956399b97dec386f0fbe39e1b52571a336`
 
+A licencbundle külön `_internal/licenses/qt/README.md` fájlja leírja az
+útvonalakat és a bizonyíték korlátját; a ZIP hashét és az összes manifestelt
+fájl ellenőrzését a #25 auditriport rögzíti.
+
 A csomagban 20 plugin DLL van; ezek között `qjpeg.dll`, `qtiff.dll` és
-`qwebp.dll` is szerepel. A Qt 6.12 modul dokumentációja a JPEG plugint
-libjpeg-turbo, a TIFF és WebP plugineket libtiff/libwebp kóddal kapcsolja össze;
-a forrásarchívumok ezeket a modulforrásokat is tartalmazzák. A tényleges vendor
-buildkonfiguráció és a binary provenance továbbra sincs igazolva, ezért az exact
-linked third-party closure nincs lezárva. Források: [Qt GUI attributions](https://doc.qt.io/qt-6.12/qtgui-index.html),
-[Qt Image Formats attributions](https://doc.qt.io/qt-6.12/qtimageformats-index.html).
+`qwebp.dll` is szerepel. A Qt 6.12 source `qt_attribution.json` fájljai
+libjpeg-turbo 3.2.0-at kapcsolnak a qjpeg-hez, ha nincs `-system-libjpeg`;
+libtiff 4.7.2-t és libwebp 1.6.0-t jelölnek a qtiff/qwebp pluginhoz, ha nincs
+system library. Ezek a verzióhoz tartozó upstream, feltételes source attributionök;
+a PyPI vendor binary konkrét build opcióit és linkelt third-party closure-t nem
+igazolják. Források: [Qt GUI attributions](https://doc.qt.io/qt-6.12/qtgui-index.html),
+[Qt Image Formats attributions](https://doc.qt.io/qt-6.12/qtimageformats-index.html),
+[Qt licensebundle audit](docs/reports/qt-license-bundle.md).
 
 A hivatalos `v6.12.0` source tagek feloldott commitjai:
 [pyside-setup](https://github.com/pyside/pyside-setup/tree/f50facb83fc3dc5f3240c854668c7a6dd93871b2)
@@ -158,4 +169,3 @@ Az aktuális csomagpróba a `.tools/python-license-bundle` és
 mappát másolja a kiadási onedir könyvtárba. A külön hash-ellenőrzött source
 tarballokat a `licenses/upstream-sources/` tartalmazza. A végleges terjesztési ellenőrzés,
 a tiszta Windows próba és az M1 hangbenchmark még nem teljesült.
-
