@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import html
+import math
 import time
+from collections import deque
 from collections.abc import Callable
 from pathlib import Path
 
@@ -30,7 +32,13 @@ from PySide6.QtWidgets import (
 
 from offline_stt.audio.microphone import InputDevice, input_devices
 from offline_stt.config import Config
+from offline_stt.metrics import percentile_summary, summarize_pipeline
 from offline_stt.pipeline.types import PipelineStats, TranscriptEvent
+from offline_stt.system_metrics import (
+    ProcessTreeSampler,
+    ProcessUsageSample,
+    ProcessUsageSummary,
+)
 from offline_stt.ui.controller import SessionController
 from offline_stt.ui.transcript import TranscriptBuffer
 
@@ -75,6 +83,24 @@ class TranscriptView(QTextBrowser):
             scroll_bar.setValue(min(old_scroll, scroll_bar.maximum()))
 
 
+class _ProcessMetricsThread(QThread):
+    sample_ready = Signal(object, object)
+    sample_failed = Signal(str)
+
+    def run(self) -> None:
+        try:
+            sampler = ProcessTreeSampler()
+            while not self.isInterruptionRequested():
+                sample = sampler.sample()
+                self.sample_ready.emit(sample, sampler.summary)
+                for _ in range(20):
+                    if self.isInterruptionRequested():
+                        return
+                    self.msleep(50)
+        except (OSError, RuntimeError, ValueError) as exc:
+            self.sample_failed.emit(type(exc).__name__)
+
+
 class MainWindow(QMainWindow):
     start_requested = Signal(int, int, str, str)
     stop_requested = Signal()
@@ -99,6 +125,16 @@ class MainWindow(QMainWindow):
         self._presentation_callback = presentation_callback
         self._stats_callback = stats_callback
         self._pending_presentations: dict[str, TranscriptEvent] = {}
+        self._last_stats = PipelineStats()
+        self._partial_latency_samples: deque[float] = deque(maxlen=512)
+        self._final_latency_samples: deque[float] = deque(maxlen=512)
+        self._partial_latency_segments: deque[str] = deque(maxlen=512)
+        self._final_latency_segments: deque[str] = deque(maxlen=512)
+        self._partial_latency_ids: set[str] = set()
+        self._final_latency_ids: set[str] = set()
+        self._process_metrics_sample: ProcessUsageSample | None = None
+        self._process_metrics_summary: ProcessUsageSummary | None = None
+        self._process_metrics_error: str | None = None
         self._accept_events = False
         self._capture_state = "idle"
         self._closing = False
@@ -133,6 +169,10 @@ class MainWindow(QMainWindow):
         self._poller.setInterval(100)
         self._poller.timeout.connect(self._poll_session)
         self._poller.start()
+        self._process_metrics_thread = _ProcessMetricsThread(self)
+        self._process_metrics_thread.sample_ready.connect(self._on_process_metrics_sample)
+        self._process_metrics_thread.sample_failed.connect(self._on_process_metrics_error)
+        self._process_metrics_thread.start()
 
     def _build_ui(self) -> None:
         self.setStyleSheet(
@@ -293,9 +333,37 @@ class MainWindow(QMainWindow):
 
         stats_box = QGroupBox("Élő feldolgozás")
         stats = QGridLayout(stats_box)
-        self._queue_value = self._metric(stats, 0, "Várakozó munka")
-        self._dropped_value = self._metric(stats, 1, "Eldobott audio frame")
-        self._decode_value = self._metric(stats, 2, "Dekódolások · részleges / végleges")
+        stats.setHorizontalSpacing(18)
+        stats.setVerticalSpacing(8)
+        self._cpu_value = self._metric(stats, 0, 0, "CPU · aktuális, teljes gép")
+        self._ram_value = self._metric(stats, 0, 1, "RAM csúcs · folyamatfa")
+        self._rtf_value = self._metric(stats, 0, 2, "RTF · legutóbbi munkamenet")
+        self._partial_latency_value = self._metric(stats, 1, 0, "Részleges · p50 / p95 / p99 ms")
+        self._final_latency_value = self._metric(stats, 1, 1, "Végleges · p50 / p95 / p99 ms")
+        self._queue_value = self._metric(stats, 1, 2, "Frame / STT-sor · most / csúcs")
+        self._dropped_value = self._metric(stats, 2, 0, "Eldobott audio frame")
+        self._decode_value = self._metric(stats, 2, 1, "Dekódolások · részleges / végleges")
+        self._dropped_jobs_value = self._metric(stats, 2, 2, "Eldobott STT-munka")
+        for value in (
+            self._cpu_value,
+            self._ram_value,
+            self._rtf_value,
+            self._partial_latency_value,
+            self._final_latency_value,
+        ):
+            value.setText("—")
+        self._cpu_value.setToolTip(
+            "A RoboAssist folyamatfájának használata a teljes logikai gépkapacitás százalékában."
+        )
+        self._ram_value.setToolTip(
+            "A RoboAssist folyamatfájának indulás óta mért legnagyobb working set értéke."
+        )
+        self._rtf_value.setToolTip(
+            "Kumulatív dekódolási idő osztva a munkamenet összes forrás-hangidejével."
+        )
+        self._metrics_status = QLabel("Folyamatmérés indítása…")
+        self._metrics_status.setStyleSheet("color: #697586; font-size: 10px;")
+        stats.addWidget(self._metrics_status, 3, 0, 1, 3)
         layout.addWidget(stats_box)
 
         self._model_help = QLabel()
@@ -321,15 +389,17 @@ class MainWindow(QMainWindow):
         )
 
     @staticmethod
-    def _metric(grid: QGridLayout, column: int, title: str) -> QLabel:
+    def _metric(grid: QGridLayout, row: int, column: int, title: str) -> QLabel:
         cell = QVBoxLayout()
         label = QLabel(title)
         label.setProperty("class", "metric")
+        label.setWordWrap(True)
         value = QLabel("0")
         value.setProperty("class", "metricValue")
+        value.setWordWrap(True)
         cell.addWidget(label)
         cell.addWidget(value)
-        grid.addLayout(cell, 0, column)
+        grid.addLayout(cell, row, column)
         return value
 
     def _load_devices(self) -> None:
@@ -405,6 +475,13 @@ class MainWindow(QMainWindow):
         rate = int(round(item.default_sample_rate))
         self._buffer.begin_session()
         self._pending_presentations.clear()
+        self._last_stats = PipelineStats()
+        self._partial_latency_samples.clear()
+        self._final_latency_samples.clear()
+        self._partial_latency_segments.clear()
+        self._final_latency_segments.clear()
+        self._partial_latency_ids.clear()
+        self._final_latency_ids.clear()
         self._accept_events = True
         self._render_transcript()
         self._set_status("loading", "Helyi modell betöltése…")
@@ -477,13 +554,15 @@ class MainWindow(QMainWindow):
     @Slot()
     def _poll_session(self) -> None:
         events, stats, session_state, session_error = self._controller.snapshot()
+        if stats.source_started_monotonic_ns is not None:
+            self._last_stats = stats
         if self._stats_callback is not None:
             self._stats_callback(stats)
         changed = False
         if self._accept_events:
             for event in events:
                 accepted = self._buffer.accept(event)
-                if accepted and self._presentation_callback is not None:
+                if accepted:
                     self._pending_presentations[event.segment_id] = event
                 changed = accepted or changed
         if self._capture_state == "running" and session_state in ("error", "stopped"):
@@ -494,17 +573,60 @@ class MainWindow(QMainWindow):
         if changed:
             self._render_transcript()
             self._refresh_actions()
-        self._render_stats(stats)
+        self._render_stats(
+            stats if stats.source_started_monotonic_ns is not None else self._last_stats
+        )
+        self._render_process_metrics()
 
     @Slot(object)
     def _on_transcript_painted(self, displayed_monotonic_ns: int) -> None:
         """Record only the newest revision that is still visible after painting."""
-        if self._presentation_callback is None or not self._pending_presentations:
+        if not self._pending_presentations:
             return
         pending, self._pending_presentations = self._pending_presentations, {}
         for segment_id, event in pending.items():
             if self._buffer.current_revision(segment_id) == event.revision:
-                self._presentation_callback(event, displayed_monotonic_ns)
+                self._record_live_latency(event, displayed_monotonic_ns)
+                if self._presentation_callback is not None:
+                    self._presentation_callback(event, displayed_monotonic_ns)
+
+    def _record_live_latency(self, event: TranscriptEvent, displayed_monotonic_ns: int) -> None:
+        source_start_ns = self._last_stats.source_started_monotonic_ns
+        if source_start_ns is None:
+            return
+        if event.type == "partial":
+            seen = self._partial_latency_ids
+            order = self._partial_latency_segments
+            samples = self._partial_latency_samples
+            audio_time_ms = event.audio_start_ms
+        else:
+            seen = self._final_latency_ids
+            order = self._final_latency_segments
+            samples = self._final_latency_samples
+            audio_time_ms = event.audio_end_ms
+        if event.segment_id in seen:
+            return
+        if len(order) == order.maxlen:
+            seen.discard(order[0])
+        order.append(event.segment_id)
+        seen.add(event.segment_id)
+        latency_ms = (displayed_monotonic_ns - source_start_ns) / 1_000_000 - audio_time_ms
+        if math.isfinite(latency_ms):
+            samples.append(latency_ms)
+        self._render_latency_metrics()
+
+    def _render_latency_metrics(self) -> None:
+        for label, samples in (
+            (self._partial_latency_value, self._partial_latency_samples),
+            (self._final_latency_value, self._final_latency_samples),
+        ):
+            distribution = percentile_summary(tuple(samples))
+            if distribution.count == 0:
+                label.setText("—")
+            else:
+                label.setText(
+                    f"{distribution.p50:.0f} / {distribution.p95:.0f} / {distribution.p99:.0f}"
+                )
 
     def _render_transcript(self) -> None:
         self._transcript.render_buffer(self._buffer)
@@ -514,14 +636,72 @@ class MainWindow(QMainWindow):
         dbfs = max(-60.0, min(0.0, stats.input_level_dbfs))
         self._level_bar.setValue(int((dbfs + 60.0) / 60.0 * 100))
         self._level_db.setText("−∞ dBFS" if dbfs <= -59.9 else f"{dbfs:.0f} dBFS")
-        self._queue_value.setText(str(stats.frame_backlog + stats.job_backlog))
+        self._queue_value.setText(
+            f"Frame {stats.frame_backlog}/{stats.max_frame_backlog} · "
+            f"STT {stats.job_backlog}/{stats.max_job_backlog}"
+        )
         self._dropped_value.setText(str(stats.dropped_frames))
         self._decode_value.setText(f"{stats.partial_decodes} / {stats.final_decodes}")
+        self._dropped_jobs_value.setText(
+            str(stats.partial_jobs_dropped + stats.final_jobs_rejected)
+        )
+        try:
+            rtf = summarize_pipeline(stats).rtf
+        except ValueError:
+            rtf = None
+        self._rtf_value.setText("—" if rtf is None else f"{rtf:.2f}")
+        self._render_latency_metrics()
         if self._capture_state == "running":
             if stats.decoder_busy or stats.job_backlog:
                 self._set_status("processing", "Beszéd feldolgozása")
             elif self._status_label.text() != "Mikrofon figyel":
                 self._set_status("running", "Mikrofon figyel")
+
+    @Slot(object, object)
+    def _on_process_metrics_sample(
+        self, sample: ProcessUsageSample, summary: ProcessUsageSummary
+    ) -> None:
+        self._process_metrics_sample = sample
+        self._process_metrics_summary = summary
+        self._process_metrics_error = None
+        self._render_process_metrics()
+
+    @Slot(str)
+    def _on_process_metrics_error(self, error_type: str) -> None:
+        self._process_metrics_sample = None
+        self._process_metrics_summary = None
+        self._process_metrics_error = error_type
+        self._render_process_metrics()
+
+    def _render_process_metrics(self) -> None:
+        sample = self._process_metrics_sample
+        summary = self._process_metrics_summary
+        if self._process_metrics_error is not None:
+            self._clear_process_metrics()
+            self._metrics_status.setText(
+                f"Folyamatmérés nem érhető el ({self._process_metrics_error})"
+            )
+            return
+        if sample is None or summary is None:
+            self._clear_process_metrics()
+            self._metrics_status.setText("Folyamatmérés indítása…")
+            return
+        age_ns = time.monotonic_ns() - sample.monotonic_ns
+        if age_ns < 0 or age_ns > 2_500_000_000:
+            self._clear_process_metrics()
+            self._metrics_status.setText("Elavult folyamatmérés · új adat nem érhető el")
+            return
+        cpu = sample.cpu_percent
+        self._cpu_value.setText("—" if cpu is None else f"{cpu:.1f}%")
+        memory = summary.peak_working_set_bytes
+        self._ram_value.setText("—" if memory is None else f"{memory / 1_048_576:.0f} MB")
+        self._metrics_status.setText(
+            f"Friss · {sample.process_count} folyamat · {age_ns / 1_000_000_000:.1f} s"
+        )
+
+    def _clear_process_metrics(self) -> None:
+        self._cpu_value.setText("—")
+        self._ram_value.setText("—")
 
     def _set_status(self, state: str, message: str) -> None:
         colors = {
@@ -553,6 +733,9 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent) -> None:
         if self._allow_close:
+            self._process_metrics_thread.requestInterruption()
+            if self._process_metrics_thread.isRunning():
+                self._process_metrics_thread.wait(2000)
             self._settings.setValue("geometry", self.saveGeometry())
             event.accept()
             return
