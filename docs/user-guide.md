@@ -4,7 +4,7 @@
 
 ### Fejlesztői futtatás
 
-1. Futtasd a fejlesztői setupot a [fejlesztői útmutató](development.md) szerint.
+1. Futtasd a fejlesztői setupot a [fejlesztői útmutató](https://github.com/tnyari/RoboAssist/blob/main/docs/development.md) szerint.
 2. Telepítsd vagy importáld a `base-multilingual` vagy `small-multilingual` modellt a
    [modellútmutató](../models/README.md) szerint.
 3. Indítsd a `roboassist.exe` parancsot a repó gyökeréből.
