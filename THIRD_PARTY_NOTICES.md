@@ -30,6 +30,41 @@ forrása és telepített licencmetaadata a [#25 auditriportban](docs/reports/iss
 szerepel. A metaadat nem helyettesíti a wheelben vagy natív DLL-ben szállított
 kódok licencének ellenőrzését.
 
+## Qt for Python és MSVC runtime: LGPLv3 közösségi út vizsgálata
+
+A tulajdonos az LGPLv3 közösségi út további vizsgálatát kérte; ez nem végleges
+licencválasztás. A PySide6_Essentials és shiboken6 6.12.0 csomagmetaadata
+LGPL/GPL alternatívákat jelez, de a ZIP Python licencbundle-jében mindkét
+csomagnál csak a Qt Commercial licenc-referenciafájl található. A teljes
+Community LGPL/GPL licencszöveg és a tényleges source/build átadási út nincs
+lezárva.
+
+A csomagban 5 Qt6 DLL, 20 Qt plug-in DLL, 4 PySide kötésmodul, shiboken
+modulok és MSVC runtime DLL-ek vannak. A különálló Qt DLL-ek dinamikus
+elrendezést mutatnak, de ez önmagában nem bizonyítja a felhasználói
+relink/futtatás feltétel teljesítését. A Qt LGPLv3 út a Qt könyvtárak teljes
+source átadását vagy ellenőrzött írásos forrásajánlatot, relinkelési és
+telepítési információt, teljes licencszöveget és jól látható tájékoztatást
+igényel a [Qt hivatalos útmutatója](https://www.qt.io/development/open-source-lgpl-obligations)
+szerint. A Qt 6.12 GPL-only moduljai és a pluginok harmadik fél kódjai a
+[#54 auditban](https://github.com/tnyari/RoboAssist/issues/54) maradnak
+ellenőrzés alatt.
+
+A Qt 6.12.0 qtbase forrásarchívum upstream elérhető (49 MB, SHA-256
+**a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307**), de
+jelenleg nem része a ZIP-nek. A QtSvg és a használt image-format pluginek
+forrásait, a PySide pyside-setup forrásrefet és a corresponding buildláncot
+még rögzíteni kell. A [PyPI PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/)
+release oldala csak wheel fájlokat és provenance nélküli artefaktumokat listáz.
+
+A PySide6 és shiboken6 mappák MSVCP140/VCRUNTIME140 DLL-jei
+14.44.35211.0 verziójúak és Microsoft Authenticode-aláírásuk érvényes. Ez nem
+bizonyítja az adott fájlok RoboAssist általi terjesztési jogát. A
+[Qt Windows telepítési útmutatója](https://doc.qt.io/qt-6.12/windows-deployment.html)
+a gépről másolt egyedi MSVC runtime DLL-ek helyett a hivatalos VC Redistributable
+csomagot javasolja; a Microsoft redisztribúciós feltételeit is teljesíteni kell.
+Ez technikai leltár és nyitott licencvizsgálat, nem jogi minősítés.
+
 ## FFmpeg 8.1.2 forrás és buildbeállítás
 
 A Windows x64 csomag az `ffmpeg-8.1.2-lgpl_haba0ffa_812` conda-forge artifactot
@@ -65,6 +100,9 @@ helyezi a telepített modell mellé. A súlyok nem kerülnek ebbe a Git repóba.
 
 ## Windows terjesztési próba állapota
 
+- [ ] A [#54](https://github.com/tnyari/RoboAssist/issues/54) pontosítja a Qt
+  Community LGPLv3 feltételeket, corresponding source/relink útját, plugin- és
+  MSVC runtime terjesztési alapját.
 - [ ] A #42 az exact PyAV/FFmpeg artefaktumok forrás- és receptláncát, licencszövegeit,
   hash-eit és DLL-zárát rögzíti; az x264/x265 GPL-only DLL nincs a staged runtime-ban.
 - [ ] A #24 tényleges PyInstaller csomagjának Qt/ONNX Runtime/PortAudio függőségi
@@ -80,3 +118,4 @@ Az aktuális csomagpróba a `.tools/python-license-bundle` és
 mappát másolja a kiadási onedir könyvtárba. A külön hash-ellenőrzött source
 tarballokat a `licenses/upstream-sources/` tartalmazza. A végleges terjesztési ellenőrzés,
 a tiszta Windows próba és az M1 hangbenchmark még nem teljesült.
+
