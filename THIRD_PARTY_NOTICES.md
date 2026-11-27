@@ -35,12 +35,12 @@ kódok licencének ellenőrzését.
 A tulajdonos az LGPLv3 közösségi út további vizsgálatát kérte; ez nem végleges
 licencválasztás. A PySide6_Essentials és shiboken6 6.12.0 csomagmetaadata
 LGPL/GPL alternatívákat jelez, de a ZIP Python licencbundle-jében mindkét
-csomagnál csak a Qt Commercial licenc-referenciafájl található. A teljes
-Az offline ZIP külön `_internal/licenses/qt/` közleménycsomagja a négy
-hash-zárt Qt/PySide 6.12.0 source archive-ból 101 licenc-, notice- és
-attribution-fájlt tesz
-elérhetővé, köztük a Community LGPL/GPL licencszövegeket. A manifest megadja az
-eredeti archívumútvonalakat és a fájlhash-eket. Ez részben pótolja a hiányzó,
+csomagnál csak a Qt Commercial licenc-referenciafájl található. Az offline ZIP
+külön `_internal/licenses/qt/` közleménycsomagja a négy
+hash-zárt Qt/PySide 6.12.0 source archive-ból 174 licenc-, notice- és
+attribution-fájlt tesz elérhetővé, köztük 76 `qt_attribution.json`
+source-dokumentumot és a Community LGPL/GPL licencszövegeket. A manifest megadja
+az eredeti archívumútvonalakat és a fájlhash-eket. Ez részben pótolja a hiányzó,
 disztribúció-specifikus license textet, de a tényleges binary provenance,
 licencválasztás és source/relink/telepítési út nincs lezárva.
 
@@ -169,3 +169,4 @@ Az aktuális csomagpróba a `.tools/python-license-bundle` és
 mappát másolja a kiadási onedir könyvtárba. A külön hash-ellenőrzött source
 tarballokat a `licenses/upstream-sources/` tartalmazza. A végleges terjesztési ellenőrzés,
 a tiszta Windows próba és az M1 hangbenchmark még nem teljesült.
+
