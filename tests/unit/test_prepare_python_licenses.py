@@ -46,6 +46,7 @@ def _runtime_fixture(root: Path) -> tuple[Path, Path, Path, dict[str, object]]:
     openssl_license = root / "openssl" / "LICENSE.txt"
     openssl_license.parent.mkdir()
     openssl_license.write_text("fixture Apache license\n", encoding="utf-8")
+    upstream_sources_path = "_internal/licenses/upstream-sources/"
     lock = {
         "python": {
             "version": "3.11.18",
@@ -55,6 +56,15 @@ def _runtime_fixture(root: Path) -> tuple[Path, Path, Path, dict[str, object]]:
             "installed_by": "fixture installer",
             "build_marker": "fixture-build",
             "source_url": "https://example.invalid/python",
+            "source_archives": [
+                {
+                    "name": "fixture-python-source.tar.gz",
+                    "url": "https://example.invalid/python-source.tar.gz",
+                    "size": 1,
+                    "sha256": "1" * 64,
+                    "package_path": upstream_sources_path + "fixture-python-source.tar.gz",
+                }
+            ],
             "distribution_artifact": {
                 "name": "fixture-python.tar.gz",
                 "url": "https://example.invalid/python.tar.gz",
@@ -75,6 +85,13 @@ def _runtime_fixture(root: Path) -> tuple[Path, Path, Path, dict[str, object]]:
             "version": "3.5.9",
             "license_expression": "Apache-2.0",
             "source_url": "https://example.invalid/openssl.tar.gz",
+            "source_archive": {
+                "name": "fixture-openssl-source.tar.gz",
+                "url": "https://example.invalid/openssl-source.tar.gz",
+                "size": 1,
+                "sha256": "2" * 64,
+                "package_path": upstream_sources_path + "fixture-openssl-source.tar.gz",
+            },
             "license_source_url": "https://example.invalid/openssl-license",
             "license_sha256": _sha256(openssl_license),
             "runtime_dlls": dlls,
@@ -105,7 +122,9 @@ def test_prepare_copies_runtime_licenses_and_records_locked_dlls(scratch_directo
 
     runtime = manifest["python_runtime"]
     assert runtime["python"]["provider_release"] == "fixture-release"
+    assert runtime["python"]["source_archives"] == lock["python"]["source_archives"]
     assert runtime["python"]["runtime_dll"]["sha256"] == lock["python"]["runtime_dll"]["sha256"]
+    assert runtime["openssl"]["source_archive"] == lock["openssl"]["source_archive"]
     assert runtime["openssl"]["runtime_dlls"] == lock["openssl"]["runtime_dlls"]
     assert (output / "python-runtime" / "CPython-LICENSE.txt").is_file()
     assert (output / "python-runtime" / "openssl-3.5.9" / "LICENSE.txt").read_bytes() == (
