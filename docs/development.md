@@ -69,6 +69,12 @@ modelleket kínálja fel. A Windows felület használatáról és adatkezelésé
 
 ## 📦 Hordozható Windows csomag építése
 
+Az LGPL forrásarchívumok explicit előkészítése (hálózati művelet, hash-ellenőrzéssel):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stage-license-sources.ps1
+```
+
 Online build és hiányzó buildfüggőségek előkészítése:
 
 ```powershell
@@ -83,11 +89,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-app.ps1 -Offli
 ```
 
 A script verziózott, PyInstaller one-directory könyvtárat és ZIP-et készít a
-`dist/` alá, továbbá SHA-256 fájlt ad a ZIP mellé. A ZIP nem tartalmaz modell-
-súlyokat. A felhasználó a modellútmutató szerint külön, ellenőrzött bundle-ből
-importálhatja a modellt. Modelltelepítésen kívül az app nem igényel futás közbeni
-hálózatot. A csomag `licenses/` könyvtára megőrzi a Python wheelek és a natív
-PyAV/FFmpeg DLL-zár licencszövegeit, hash-eit és forrás/build receptjeit.
+`dist/` alá, továbbá SHA-256 fájlt ad a ZIP mellé. A licencforrások stagingje
+után az offline build a PyAV/FFmpeg upstream source tarballokat is hash-ellenőrzi
+és becsomagolja. A ZIP nem tartalmaz modellsúlyokat. A felhasználó a modellútmutató
+szerint külön, ellenőrzött bundle-ből importálhatja a modellt. Modelltelepítésen
+kívül az app nem igényel futás közbeni hálózatot. A csomag `licenses/` könyvtára
+megőrzi a Python wheelek és a natív PyAV/FFmpeg DLL-zár licencszövegeit, hash-eit
+és forrás/build receptjeit.
 
 Az offline buildhez a letöltött Python wheel cache mellett a pontos 98
 conda-forge artifactot tartalmazó micromamba cache is szükséges. A `-Offline`
