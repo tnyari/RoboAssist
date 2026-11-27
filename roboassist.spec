@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from hashlib import sha256
 from pathlib import Path
 import sys
 
@@ -13,10 +14,23 @@ SITE_PACKAGES = Path(sys.prefix) / "Lib" / "site-packages"
 AV_DLLS = SITE_PACKAGES / "av.libs"
 AV_PACKAGE = SITE_PACKAGES / "av"
 AV_LICENSES = ROOT / ".tools" / "av-vendor" / "av-runtime"
+AV_SOURCE_ARCHIVES = ROOT / ".tools" / "av-vendor" / "upstream-sources"
 PYTHON_LICENSES = ROOT / ".tools" / "python-license-bundle"
-for required in (AV_DLLS, AV_PACKAGE, AV_LICENSES, PYTHON_LICENSES):
+for required in (AV_DLLS, AV_PACKAGE, AV_LICENSES, AV_SOURCE_ARCHIVES, PYTHON_LICENSES):
     if not required.is_dir():
         raise SystemExit(f"Required staged build input is missing: {required}")
+
+SOURCE_ARCHIVE_HASHES = {
+    "av-17.1.0.tar.gz": "7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3",
+    "ffmpeg-8.1.2.tar.gz": "32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22",
+}
+for filename, expected_hash in SOURCE_ARCHIVE_HASHES.items():
+    source_archive = AV_SOURCE_ARCHIVES / filename
+    if not source_archive.is_file():
+        raise SystemExit(f"Required upstream source archive is missing: {source_archive}")
+    actual_hash = sha256(source_archive.read_bytes()).hexdigest()
+    if actual_hash != expected_hash:
+        raise SystemExit(f"Upstream source hash mismatch for {source_archive}: {actual_hash}")
 
 
 def tree_data(source: Path, destination: str) -> list[tuple[str, str]]:
@@ -56,6 +70,8 @@ datas = [
     (str(ROOT / "docs" / "benchmark-metrics.md"), "docs"),
 ]
 datas += tree_data(AV_LICENSES, "licenses/av-runtime")
+datas += tree_data(AV_SOURCE_ARCHIVES, "licenses/upstream-sources")
+datas += [(str(ROOT / "docs" / "package" / "upstream-sources" / "README.md"), "licenses/upstream-sources")]
 datas += tree_data(PYTHON_LICENSES, "licenses/python")
 binaries = [(str(path), "av.libs") for path in sorted(AV_DLLS.glob("*.dll"))]
 if not binaries:
