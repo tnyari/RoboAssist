@@ -122,14 +122,15 @@ jól látható tájékoztatást ír le. A Qt Company nem ad jogi tanácsot a meg
 egyedi minősítéséről. Forrás: [Qt LGPLv3 kötelezettségek](https://www.qt.io/development/open-source-lgpl-obligations),
 [Qt licensing FAQ](https://www.qt.io/faq/qt-open-source-licensing).
 
-Az exact Qt 6.12.0 qtbase forrásarchívum upstream elérhető (49 MB,
-SHA-256 a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307),
-de jelenleg nincs a ZIP-ben; a QtSvg és a használt image-format pluginek
-forrásláncát is rögzíteni kell. A PyPI PySide6-Essentials 6.12.0 release-oldalán
-öt wheel szerepel, source distribution és provenance attesztáció nélkül. A Qt
-for Python buildútmutató a pyside-setup forrásrepót és azonos verziójú Qt
-telepítést használja; a jelenlegi wheel-hashből nem áll elő forrásból buildelt
-binary chain. Források: [QtBase 6.12.0 source archive](https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz),
+Az exact QtBase, QtSvg, Qt Image Formats és PySide 6.12.0 upstream
+source archive-ok letöltve és hash-ellenőrizve; az offline csomagbuild
+mind a négyet az `_internal/licenses/upstream-sources/` könyvtárba teszi.
+A PySide forrásarchívum tartalmazza a teljes `LICENSES/LGPL-3.0-only.txt`
+licencszöveget. A PyPI PySide6-Essentials 6.12.0 release-oldalán öt wheel
+szerepel, source distribution és provenance attesztáció nélkül. A Qt for Python
+buildútmutató a pyside-setup forrásrepót és azonos verziójú Qt telepítést
+használja; a jelenlegi wheel-hashből nem áll elő forrásból buildelt binary
+chain. Források: [QtBase 6.12.0 source archive](https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz),
 [PyPI artifactlista](https://pypi.org/project/PySide6-Essentials/6.12.0/),
 [Qt for Python buildútmutató](https://doc.qt.io/qtforpython-6/building_from_source/index.html).
 
@@ -143,8 +144,9 @@ commitja `883a58532078d003cefef0a549bfe9f885ce41f5`, a
 [qtimageformats](https://github.com/qt/qtimageformats/tree/dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e)
 commitja `dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e`. A GitHub API ezeket
 annotált, unsigned tagekhez rendeli; ez pontos source ref, de nem bizonyíték arra,
-hogy a csomagolt wheelek/binarisok ezekből a fájlokból készültek. A forrástree-k,
-build konfiguráció, toolchain és binary provenance továbbra sincs a ZIP-ben.
+hogy a csomagolt wheelek/binarisok ezekből a fájlokból készültek. A source tree-k
+archívumai a ZIP-be kerülnek; a vendor build konfiguráció, toolchain és binary
+provenance továbbra sincs a ZIP-ben.
 
 A PySide6 és shiboken6 csomagmappákban Microsoft-signed MSVCP140*.dll és
 VCRUNTIME140*.dll fájlok szerepelnek 14.44.35211.0 verzióval. A Qt Windows
