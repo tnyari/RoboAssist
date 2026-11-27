@@ -17,7 +17,7 @@ csomagra.
 
 | Csomag / pontos verzió | Telepített metaadat | Terjesztési megjegyzés |
 |---|---|---|
-| [av 17.1.0](https://pypi.org/project/av/17.1.0/) | BSD-3-Clause | A Windows build a rögzített conda-forge PyAV 17.1.0 + FFmpeg 8.1.2 LGPL artefaktumot használja; pontos artifact hash, DLL-zár és receptek a csomag licencmappájában. A kiadási/licencátvétel a #42/#25-ben még nyitott. |
+| [av 17.1.0](https://pypi.org/project/av/17.1.0/) | BSD-3-Clause | Artifact `py311h06a8702_0`, SHA-256 `978c663178d010a4d5bc2c76976abb96b132e8533c9e4d258f400e77935d619a`; source SHA-256 `7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3`, recipe commit `9fa9dab2c392eee688738ed9ecc47eb9fbfd87c5`. A recept hostja FFmpeg 8.1.1 LGPL, a külön tesztkörnyezet GPL FFmpeg-et és x264/x265-t kér; ez önmagában nem bizonyítja, hogy a kiadott PyAV artifact tartalmazza ezeket. A ZIP receptet és LICENSE.txt-t tartalmaz, a source archívumot nem. A pontos licencút/#47 átvétele nyitott. |
 | [faster-whisper 1.2.1](https://pypi.org/project/faster-whisper/1.2.1/) | MIT | A PyAV külön tranzitív/bundled függőség. |
 | [CTranslate2 4.9.1](https://pypi.org/project/ctranslate2/4.9.1/) | MIT | A teljes tranzitív verziólista a riportban van. |
 | [NumPy 2.4.6](https://pypi.org/project/numpy/2.4.6/) | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | Az adott wheel saját license fájljai is megőrzendők. |
@@ -40,6 +40,13 @@ a conda-forge recept commitja `f639462076b7d4d708c8b0b5a447be6776ecf9cf`.
 A recept nem-GPL ága `--disable-gpl` kapcsolót használ, a közös konfiguráció
 pedig `--enable-version3`-at; a csomagolt FFmpeg bináris `-buildconf` kimenete
 ezeket mutatta. A ZIP tartalmazza a receptet és az LGPLv2.1/LGPLv3 szövegeket.
+
+A PyAV 17.1.0 rögzített conda-receptjének build hostja FFmpeg 8.1.1 LGPL,
+viszont a recept külön tesztkörnyezete GPL FFmpeg-et és x264/x265 teszteket kér.
+Ezek csak a recipe tesztkonfigurációját írják le; a tényleges Windows artifact
+65 DLL-es leltárában x264/x265 DLL nincs, és a csomagolt FFmpeg bináris
+`--disable-gpl` konfigurációt jelentett. A forrásrecept, artifact- és forráshash
+a #25 riportban szerepel; a pontos licencút és source-átadás továbbra is nyitott.
 
 A forrásarchívum nincs a jelenlegi ZIP-ben, ezért ez a hivatkozás és hash nem
 bizonyítja a corresponding source kiadással együtt történő átadását vagy a teljes
@@ -69,4 +76,3 @@ Az aktuális csomagpróba a `.tools/python-license-bundle` és
 `.tools/av-vendor/av-runtime` leltárából készül; ezekből a spec a `licenses/`
 mappát másolja a kiadási onedir könyvtárba. A végleges terjesztési ellenőrzés,
 a tiszta Windows próba és az M1 hangbenchmark még nem teljesült.
-
