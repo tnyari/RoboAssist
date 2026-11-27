@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 
 import pytest
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
 from offline_stt.audio.microphone import InputDevice
@@ -10,7 +11,7 @@ from offline_stt.config import Config
 from offline_stt.pipeline.types import PipelineStats, TranscriptEvent
 from offline_stt.system_metrics import ProcessUsageSample, ProcessUsageSummary
 from offline_stt.ui import window as window_module
-from offline_stt.ui.window import MainWindow
+from offline_stt.ui.window import MainWindow, TranscriptView
 
 
 @pytest.fixture(scope="module")
@@ -267,3 +268,206 @@ def test_performance_panel_shows_session_and_process_metrics(qt_app, monkeypatch
         window._allow_close = True
         window.close()
         qt_app.processEvents()
+
+
+def test_controls_states_copy_export_and_stop_clear_are_explicit(qt_app, monkeypatch):
+    device = InputDevice(0, "Teszt mikrofon", "WASAPI", 1, 48000.0, True)
+    second_device = InputDevice(1, "Második mikrofon", "WASAPI", 1, 44100.0, False)
+    values = {}
+    settings = type(
+        "MemorySettings",
+        (),
+        {
+            "value": lambda self, key, default=None, *_args: values.get(key, default),
+            "setValue": lambda self, key, value: values.__setitem__(key, value),
+        },
+    )()
+    monkeypatch.setattr(window_module, "input_devices", lambda: [device, second_device])
+    monkeypatch.setattr(window_module.MainWindow, "_settings", property(lambda _self: settings))
+    writes = []
+
+    def track_write(path, data, *args, **kwargs):
+        writes.append((path, data, kwargs))
+
+    monkeypatch.setattr(Path, "write_text", track_write)
+    window = MainWindow(
+        Config(),
+        Path("models/manifest.json"),
+        Path("models/cache"),
+        (("Base", "base-multilingual"), ("Small", "small-multilingual")),
+    )
+    destination = Path("átirat.txt")
+    try:
+        assert window._language_combo.currentData() == "hu"
+        assert window._device_combo.currentData() == 0
+        assert window._model_combo.currentData() == "base-multilingual"
+        assert window._start_button.isEnabled()
+        assert not window._stop_button.isEnabled()
+        assert not window._clear_button.isEnabled()
+        assert window._controller.thread() is window._thread
+
+        start_requests = []
+        window.start_requested.disconnect(window._controller.start)
+        window.start_requested.connect(lambda *args: start_requests.append(args))
+        window._device_combo.setCurrentIndex(1)
+        window._model_combo.setCurrentIndex(1)
+        window._language_combo.setCurrentIndex(window._language_combo.findData("en"))
+        window._start_button.click()
+        assert start_requests == [(1, 44100, "small-multilingual", "en")]
+        assert window._capture_state == "loading"
+        assert not window._start_button.isEnabled()
+        assert not window._device_combo.isEnabled()
+        assert not window._model_combo.isEnabled()
+        assert not window._language_combo.isEnabled()
+        window._start_button.click()
+        assert len(start_requests) == 1
+
+        topmost = Qt.WindowType.WindowStaysOnTopHint
+        window._always_on_top.setChecked(True)
+        assert window.windowFlags() & topmost
+        assert values["always_on_top"] is True
+        window._always_on_top.setChecked(False)
+        assert not window.windowFlags() & topmost
+
+        window._on_state_changed("loading", "Helyi modell betöltése…")
+        assert not window._start_button.isEnabled()
+        assert not window._stop_button.isEnabled()
+        window._on_state_changed("running", "Mikrofon figyel")
+        assert window._stop_button.isEnabled()
+        window._render_stats(PipelineStats(input_level_dbfs=-18.0, decoder_busy=True))
+        assert window._level_bar.value() == 70
+        assert window._level_db.text() == "-18 dBFS"
+        assert window._status_label.text() == "Beszéd feldolgozása"
+
+        stop_requests = []
+        window.stop_requested.disconnect(window._controller.stop)
+        window.stop_requested.connect(lambda: stop_requests.append(True))
+        window._stop_button.click()
+        assert stop_requests == [True]
+        assert window._capture_state == "stopping"
+        assert not window._stop_button.isEnabled()
+        window._stop_button.click()
+        assert len(stop_requests) == 1
+
+        event = TranscriptEvent(
+            1, "session", "segment", 1, "microphone", "hu", "final", 0, 1000, "Jó napot", 1
+        )
+        assert window._buffer.accept(event)
+        window._render_transcript()
+        assert window._copy_button.isEnabled()
+        assert window._export_button.isEnabled()
+        assert writes == []
+        window._copy_transcript()
+        assert QApplication.clipboard().text() == "Jó napot"
+
+        monkeypatch.setattr(
+            window_module.QFileDialog,
+            "getSaveFileName",
+            lambda *_args, **_kwargs: (str(destination), "Szövegfájl (*.txt)"),
+        )
+        window._export_transcript()
+        assert writes == [(destination, "Jó napot\n", {"encoding": "utf-8"})]
+
+        window._clear_button.click()
+        assert window._buffer.is_empty
+        assert not window._copy_button.isEnabled()
+        assert not window._export_button.isEnabled()
+        next_event = TranscriptEvent(
+            1, "session", "segment-2", 1, "microphone", "hu", "final", 1000, 2000, "Köszönöm", 2
+        )
+        assert window._buffer.accept(next_event)
+        window._render_transcript()
+        window._on_state_changed("idle", "Leállítva")
+        window._on_session_stopped("")
+        assert window._buffer.is_empty
+        assert window._transcript.toPlainText() == ""
+        assert window._status_label.text() == "Leállítva · munkamenet törölve"
+        assert not window._stop_button.isEnabled()
+
+        assert window._buffer.accept(event)
+        window._on_state_changed("error", "Mikrofonhiba")
+        assert window._buffer.is_empty
+        assert window._status_label.text() == "Mikrofonhiba"
+        assert writes == [(destination, "Jó napot\n", {"encoding": "utf-8"})]
+    finally:
+        window._poller.stop()
+        window._thread.quit()
+        assert window._thread.wait(2000)
+        window._allow_close = True
+        window.close()
+        qt_app.processEvents()
+
+
+def test_transcript_auto_scroll_and_partial_final_styles(qt_app):
+    view = TranscriptView()
+    view.resize(240, 100)
+    view.show()
+    qt_app.processEvents()
+    buffer = window_module.TranscriptBuffer()
+    for index in range(60):
+        buffer.accept(
+            TranscriptEvent(
+                1,
+                "session",
+                f"segment-{index}",
+                1,
+                "microphone",
+                "hu",
+                "partial" if index == 0 else "final",
+                float(index * 1000),
+                float((index + 1) * 1000),
+                "Hosszú magyar próbamondat " * 8,
+                float(index),
+            )
+        )
+    view.render_buffer(buffer)
+    qt_app.processEvents()
+    scroll = view.verticalScrollBar()
+    assert scroll.maximum() > 28
+    assert scroll.maximum() - scroll.value() < 28
+    rendered = view.document().toHtml()
+    assert "#8995a5" in rendered
+    assert "#172438" in rendered
+
+    scroll.setValue(0)
+    qt_app.processEvents()
+    buffer.accept(
+        TranscriptEvent(
+            1,
+            "session",
+            "later-top",
+            1,
+            "microphone",
+            "hu",
+            "final",
+            61000,
+            62000,
+            "Újabb mondat " * 8,
+            61,
+        )
+    )
+    view.render_buffer(buffer)
+    qt_app.processEvents()
+    assert scroll.value() == 0
+
+    scroll.setValue(scroll.maximum())
+    qt_app.processEvents()
+    buffer.accept(
+        TranscriptEvent(
+            1,
+            "session",
+            "later-bottom",
+            1,
+            "microphone",
+            "hu",
+            "final",
+            62000,
+            63000,
+            "A végén érkezett mondat " * 8,
+            62,
+        )
+    )
+    view.render_buffer(buffer)
+    qt_app.processEvents()
+    assert scroll.maximum() - scroll.value() < 28
+    view.close()
