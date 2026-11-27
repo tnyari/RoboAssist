@@ -220,6 +220,13 @@ követi. Ez a rész nem jogi minősítés.
   NumPy overlay importnév-módosítása és a csomagolt modell-CLI `--help`
   ellenőrzése sikeres. A Redistributable terjesztési jogosultsága és a tiszta
   gépes indítás továbbra sincs lezárva.
+- ✅ A végleges ZIP-ből olvasott modellmanifest a base/small modellek rögzített
+  revisionjét, fájlméretét és SHA-256 értékeit tartalmazza; mindkét rögzített
+  model card MIT licencet jelöl. A csomagolt `WHISPER_LICENSE.txt` SHA-256-a
+  (`b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d`) egyezik
+  mindkét manifestbejegyzéssel. A runtime manifest forrás-URL-je, minimumverziója
+  és hash-e egyezik a ZIP-ben lévő VC Redistributable telepítővel; modellsúly
+  nincs a kiadási ZIP-ben.
 - ✅ A `uv audit` 51 Python csomagra ismert sérülékenységet vagy kedvezőtlen
   projektstátuszt nem jelzett; a natív conda closure nem tartozott a vizsgálatba.
 - ⏳ A ZIP-ben található Qt, ONNX Runtime, PortAudio és minden tranzitív notice
