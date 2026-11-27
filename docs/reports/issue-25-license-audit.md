@@ -106,9 +106,13 @@ A fő közvetlen komponensek licenceit és nyitott terjesztési kérdéseit a
 ### PySide6/Qt 6.12 közösségi LGPLv3 út vizsgálata
 
 A tulajdonos a közösségi LGPLv3 út vizsgálatát kérte; ez nem végleges licencválasztás.
-A próbacsomag PySide6_Essentials és shiboken6 6.12.0 metadata LGPL/GPL
-alternatívákat jelez, a két licencmappában viszont csak
-LicenseRef-Qt-Commercial.txt található. A csomagolt fájllista 5 Qt6 DLL-t,
+PySide6_Essentials és shiboken6 6.12.0 metadata LGPL/GPL alternatívákat jelez;
+a Python disztribúciók saját `licenses/` könyvtárában továbbra is csak
+`LicenseRef-Qt-Commercial.txt` található. A külön, explicit Qt közleménycsomag
+viszont már 101 forrásból kinyert licenc-, notice- és attribution-fájlt tesz a ZIP-be, köztük
+az LGPL-3.0-only, GPL-2.0-only és GPL-3.0-only szövegeket. Forrásarchívum,
+belső útvonal, fájlméret és SHA-256 a csomag `_internal/licenses/qt/manifest.json`
+fájljában szerepel. A csomagolt fájllista 5 Qt6 DLL-t,
 20 plug-in DLL-t, 4 PySide .pyd modult és shiboken bindingfájlokat tartalmaz.
 A végleges ZIP alatti összes Qt/PySide/shiboken DLL/PYD fájl pontos listája,
 mérete, PE verziója és SHA-256 értéke a [Qt runtime lockban](qt-runtime-file-lock.json)
@@ -125,15 +129,19 @@ jól látható tájékoztatást ír le. A Qt Company nem ad jogi tanácsot a meg
 egyedi minősítéséről. Forrás: [Qt LGPLv3 kötelezettségek](https://www.qt.io/development/open-source-lgpl-obligations),
 [Qt licensing FAQ](https://www.qt.io/faq/qt-open-source-licensing).
 
-Az exact QtBase, QtSvg, Qt Image Formats és PySide 6.12.0 upstream
-source archive-ok letöltve és hash-ellenőrizve; az offline csomagbuild
-mind a négyet az `_internal/licenses/upstream-sources/` könyvtárba teszi.
-A PySide forrásarchívum tartalmazza a teljes `LICENSES/LGPL-3.0-only.txt`
-licencszöveget. A PyPI PySide6-Essentials 6.12.0 release-oldalán öt wheel
+A QtBase, QtSvg, Qt Image Formats és PySide 6.12.0 source archive hash-ellenőrzött;
+az offline csomagbuild mind a négyet az `_internal/licenses/upstream-sources/`
+könyvtárba, az archívumokból származó licenc-/notice-fájlokat pedig az
+`_internal/licenses/qt/` könyvtárba teszi. A build a teljes forráscsomagokra
+illeszkedő SHA-256 után, explicit útvonalakat és archívumgyökereket ellenőrizve
+nyer ki fájlokat; a path traversal és nem regular file tagokat elutasítja.
+A géppel olvasható manifest a forrás- és kimeneti útvonalat, méretet és hash-t
+rögzíti. A PyPI PySide6-Essentials 6.12.0 release-oldalán öt wheel
 szerepel, source distribution és provenance attesztáció nélkül. A Qt for Python
 buildútmutató a pyside-setup forrásrepót és azonos verziójú Qt telepítést
 használja; a jelenlegi wheel-hashből nem áll elő forrásból buildelt binary
-chain. Források: [QtBase 6.12.0 source archive](https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz),
+chain; a hozzáadott source archive nem bizonyítja, hogy a wheel ezekből épült.
+Források: [QtBase 6.12.0 source archive](https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz),
 [PyPI artifactlista](https://pypi.org/project/PySide6-Essentials/6.12.0/),
 [Qt for Python buildútmutató](https://doc.qt.io/qtforpython-6/building_from_source/index.html).
 
@@ -150,6 +158,18 @@ annotált, unsigned tagekhez rendeli; ez pontos source ref, de nem bizonyíték 
 hogy a csomagolt wheelek/binarisok ezekből a fájlokból készültek. A source tree-k
 archívumai a ZIP-be kerülnek; a vendor build konfiguráció, toolchain és binary
 provenance továbbra sincs a ZIP-ben.
+
+Az exact source archive-okban található `qt_attribution.json` rögzíti, hogy a
+QtBase `qjpeg` pluginnél libjpeg-turbo 3.2.0-at használ, ha nem a
+`-system-libjpeg` opciót választják; a Qt Image Formats `qtiff` és `qwebp`
+pluginje libtiff 4.7.2-t, illetve libwebp 1.6.0-t használ, ha nincs kiválasztott
+rendszerkönyvtár. Az ezekhez tartozó upstream license/copyright fájlok is külön
+bekerülnek a közleménycsomagba. Ez a Qt forrásverzióra vonatkozó feltételes
+attribution; a PyPI binary build opcióit és a ténylegesen linkelt kódot nem
+bizonyítja. A ZIP SHA-256 `0a75779765687cff222e8f17c307797ad85f565eb58ba3c82092f640e24bd3c8`,
+1345 bejegyzésű; a ZIP-ből mind a 101 manifestelt Qt licenc/notice/attribution fájl hash-e
+újraszámolva egyezett, és mind a négy Qt/PySide archívumot találtam benne.
+Részletes, csomagból származtatott leltár: [Qt licencbundle audit](qt-license-bundle.md).
 
 ### MSVC runtime – hivatalos Redistributable csomagút
 
@@ -174,7 +194,8 @@ verziója legalább olyan friss legyen, mint az alkalmazáshoz használt Build T
 és a Redistributable terjesztése licencelt Visual Studio felhasználókra, illetve
 a Visual Studio licencfeltételeire korlátozott.
 
-Az új offline ZIP (`1b9522deec6168d68f21068c22038bee0159f4f38f4df7d31ddb6f0151ddf43b`)
+Az offline ZIP aktuális hash-e
+(`0a75779765687cff222e8f17c307797ad85f565eb58ba3c82092f640e24bd3c8`)
 ezért a Microsoft hivatalos `https://aka.ms/vc14/vc_redist.x64.exe` útvonalán
 letöltött, 14.52.37029.0 x64 telepítőt tartalmazza
 (`_internal/runtime/vc_redist.x64.exe`; SHA-256
@@ -241,4 +262,3 @@ követi. Ez a rész nem jogi minősítés.
 
 A #25 és az M1 kapu (#10) maradjon nyitva, amíg a terjesztési/licencátvétel és a
 M1 többi elfogadási feltétele nem teljesül.
-
