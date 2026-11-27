@@ -404,5 +404,8 @@ Windows 10/11 környezet továbbra sem érhető el; nincs GUI-indítás, mikrofo
 hangfelvétel vagy benchmark. A binary provenance, GPL-only closure, third-party
 linkelés, MSVC terjesztési jogcím és a licencút végleges elfogadása nyitva marad
 a [#54](https://github.com/tnyari/RoboAssist/issues/54) és [#25](https://github.com/tnyari/RoboAssist/issues/25)
-jegyen. A GitHub Windows CI az új fájllock/README csomagolási módosításaira még
-nem futott.
+jegyen. A teljes [Windows CI #132](https://github.com/tnyari/RoboAssist/actions/runs/46013882644)
+sikeres a [3da2a5f](https://github.com/tnyari/RoboAssist/commit/3da2a5fe639fc22d907f5fd52fc6be38561c3f5e)
+headen: lint, format, strict typecheck, teljes tesztkészlet, config entrypoint és
+native offline smoke zöld. Ez a csomag és a statikus lock-ellenőrzés eredménye;
+módosított Qt/PySide DLL/PYD-val futtatás nem történt.
