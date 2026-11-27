@@ -128,4 +128,3 @@ def test_replay_window_records_text_after_actual_transcript_paint(qt_app, tmp_pa
         window.close()
         qt_app.processEvents()
     assert session.closed
-
