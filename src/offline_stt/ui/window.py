@@ -166,6 +166,9 @@ class MainWindow(QMainWindow):
             QLabel.metricValue { color: #172438; font-size: 14px; font-weight: 650; }
             """
         )
+        help_menu = self.menuBar().addMenu("Súgó")
+        about_action = help_menu.addAction("Névjegy")
+        about_action.triggered.connect(self._show_about)
         root = QWidget(self)
         layout = QVBoxLayout(root)
         layout.setContentsMargins(22, 20, 22, 18)
@@ -301,6 +304,16 @@ class MainWindow(QMainWindow):
         layout.addWidget(self._model_help)
         self.setCentralWidget(root)
         self._refresh_actions()
+
+    def _show_about(self) -> None:
+        QMessageBox.about(
+            self,
+            "Névjegy – RoboAssist",
+            "A RoboAssist az FFmpeg projekt LGPLv2.1 licencű könyvtárait használja.\n\n"
+            "A terjesztett Windows csomag FFmpeg forrásarchívuma az "
+            "_internal/licenses/upstream-sources mappában, buildreceptje és "
+            "licencszövegei az _internal/licenses/av-runtime mappában található.",
+        )
 
     @staticmethod
     def _metric(grid: QGridLayout, column: int, title: str) -> QLabel:
