@@ -308,4 +308,3 @@ class FasterWhisperEngine:
             self._count,
             self._session_samples,
         )
-
