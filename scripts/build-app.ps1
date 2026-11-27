@@ -24,6 +24,20 @@ try {
         }
     }
 
+    $sourceDir = Join-Path (Join-Path $RepoRoot '.tools/av-vendor') 'upstream-sources'
+    $sourceHashes = [ordered]@{
+        'av-17.1.0.tar.gz' = '7f1e71ff621b66253333926f948e00faae11d855b2442133c65128bca64cdeb3'
+        'ffmpeg-8.1.2.tar.gz' = '32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22'
+    }
+    foreach ($entry in $sourceHashes.GetEnumerator()) {
+        $sourcePath = Join-Path $sourceDir $entry.Key
+        if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+            throw "Missing upstream license source $($entry.Key). Run scripts/stage-license-sources.ps1 explicitly before building."
+        }
+        $sourceHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($sourceHash -ne $entry.Value) { throw "Upstream source hash mismatch: $($entry.Key)" }
+    }
+
     $setupAv = Join-Path $PSScriptRoot 'setup-av-runtime.ps1'
     $avArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $setupAv, '-Python', $Python)
     if ($Offline) { $avArgs += '-Offline' }
