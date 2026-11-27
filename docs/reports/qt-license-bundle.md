@@ -1,7 +1,7 @@
 # Qt/PySide licenc- és attribution bundle audit
 
 **Ellenőrzött artifact:** `RoboAssist-0.1.0-windows-x64.zip`  
-**SHA-256:** `10d2d892ff9a939a3ce2a01def55801e608a6701fc42c5aa53b6602fca5c4555`  
+**SHA-256:** `7c066f60e55163ab5f193dfc3e762f9e8ab1b493232376c9bb616761eec37301`  
 **GitHub követés:** [#54](https://github.com/tnyari/RoboAssist/issues/54), a #25 audit része.
 
 ## ✅ Mit tartalmaz a csomag
@@ -90,3 +90,12 @@ nem jogi minősítés.
 - **Értékelés:** az LGPLv3/GPLv3 Community licencút elérhető a Qt for Python termékhez, de a jelen csomagolt PySide/Qt binary closure, az esetleges GPL-only komponensek, a wheel–source build megfeleltetése, valamint a felhasználói relink/install eljárás nincs igazolva. A #54 checklist nyitva marad.
 
 Források: [Qt for Python – Commercial Use / Community Edition](https://doc.qt.io/qtforpython-6/commercial/index.html), [PySide6-Essentials 6.12.0 release és licensing metaadat](https://pypi.org/project/PySide6-Essentials/6.12.0/), [Qt – LGPL/GPL kötelezettségek](https://www.qt.io/development/open-source-lgpl-obligations), [Qt Open Source Licensing FAQ](https://www.qt.io/faq/qt-open-source-licensing).
+
+
+## 🟩 Friss artifact-ellenőrzés · 2026-11-27
+
+- A javított Start/Stop átmeneti állapotú UI-val az offline `scripts/build-app.ps1 -Offline` build sikeres; új ZIP SHA-256: `7c066f60e55163ab5f193dfc3e762f9e8ab1b493232376c9bb616761eec37301`.
+- Statikus ellenőrzés: 1 427 bejegyzés, 108 DLL, 3 EXE, modellsúly nélkül; 6 upstream source archive. A Qt licenc/notice fájlok 174/174, attribution dokumentumok 76/76, Qt runtime DLL/PYD lock 33/33 méret+SHA egyezés.
+- A csomagolt `RoboAssist.exe --help` és `RoboAssistModels.exe --help` kilépési kódja egyaránt 0. Ez parancssori smoke; a grafikus felületet és mikrofont nem indítottam el.
+- A Windows CI [#107](https://github.com/tnyari/RoboAssist/actions/runs/45994614436) sikeres a [92b07d05d4ef](https://github.com/tnyari/RoboAssist/commit/92b07d05d4ef41f9358c06cdee021a7d50ff6c03) kód+teszt headen. A helyi UI csomagtesztek **6 passed**, Ruff lint/format és mypy (35 source files) sikeres.
+- A tiszta Windows 10/11 install/start/stop/uninstall átvétel továbbra sem futott, mert külön tesztgép/VM nem áll rendelkezésre.
