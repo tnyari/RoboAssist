@@ -99,3 +99,40 @@ Források: [Qt for Python – Commercial Use / Community Edition](https://doc.qt
 - A csomagolt `RoboAssist.exe --help` és `RoboAssistModels.exe --help` kilépési kódja egyaránt 0. Ez parancssori smoke; a grafikus felületet és mikrofont nem indítottam el.
 - A Windows CI [#107](https://github.com/tnyari/RoboAssist/actions/runs/45994614436) sikeres a [92b07d05d4ef](https://github.com/tnyari/RoboAssist/commit/92b07d05d4ef41f9358c06cdee021a7d50ff6c03) kód+teszt headen. A helyi UI csomagtesztek **6 passed**, Ruff lint/format és mypy (35 source files) sikeres.
 - A tiszta Windows 10/11 install/start/stop/uninstall átvétel továbbra sem futott, mert külön tesztgép/VM nem áll rendelkezésre.
+
+
+## 🔬 Qt plugin-források SPDX-mintavétele · 2026-11-27
+
+A ZIP-be csomagolt Qt platform-, stílus-, TLS-, hálózati információs, SVG- és
+képkodek pluginekhez tartozó Qt source könyvtárakban a `.cpp`, `.h` és `.c`
+fájlok SPDX fejlécét ellenőriztem. A vizsgált source archive-ok SHA-256 értéke:
+
+- QtBase: `a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307`
+- Qt Image Formats: `0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762`
+- QtSvg: `e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331`
+
+| Forrásmodul és plugin könyvtár | Fájl | Egységes SPDX-kifejezés |
+|---|---:|---|
+| QtBase: Windows platform | 110 | `LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only` |
+| QtBase: offscreen, minimal, Direct2D platform | 36 | ugyanaz |
+| QtBase: modern Windows stílus | 10 | ugyanaz |
+| QtBase: Network List Manager | 3 | ugyanaz |
+| QtBase: Schannel, OpenSSL, cert-only TLS | 28 | ugyanaz |
+| QtBase: JPEG, GIF, ICO képkodek | 9 | ugyanaz |
+| Qt Image Formats: ICNS, TGA, TIFF, WBMP, WebP | 17 | ugyanaz |
+| QtSvg: SVG kép- és ikon pluginek | 6 | ugyanaz |
+| **Összesen** | **219** | **minden fájlban megtalálható** |
+
+Ez bizonyítja, hogy a forrásrelease e fájljaihoz az LGPLv3 választási lehetőség
+is közzé van téve; nem jelöl ki automatikusan egyetlen alkalmazandó licencet.
+Nem azonosítja, hogy a PyPI wheelben lévő DLL/PYD/plugin binárisok melyik
+licencválasztással és milyen buildbeállítással készültek, és önmagában nem zárja
+ki a GPL-only buildösszetevőt vagy harmadik fél kódját. Ezért a #54 első három
+licencátvételi feltétele továbbra is nyitott.
+
+**Ténylegesen futtatott ellenőrzés:** a hash-zárt QtBase, Qt Image Formats és
+QtSvg archive-okban a felsorolt 219 plugin-forrás `.cpp`/`.h`/`.c` SPDX
+fejléceinek automatizált összesítése; az összes fájlban ugyanaz az alternatív
+licenckifejezés található, fejléc nélküli fájl nem volt. Ez forrásfájl-minta és
+nem bináris provenance- vagy jogi megfelelőségi vizsgálat.
+
