@@ -30,6 +30,22 @@ forrása és telepített licencmetaadata a [#25 auditriportban](docs/reports/iss
 szerepel. A metaadat nem helyettesíti a wheelben vagy natív DLL-ben szállított
 kódok licencének ellenőrzését.
 
+## FFmpeg 8.1.2 forrás és buildbeállítás
+
+A Windows x64 csomag az `ffmpeg-8.1.2-lgpl_haba0ffa_812` conda-forge artifactot
+használja (SHA-256: `903a1428dddb6a7568d82e767f0c793b6abcc621bd740bdde325be1889008f08`).
+A hozzá rögzített [FFmpeg 8.1.2 upstream forrásarchívum](https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.gz)
+SHA-256 értéke `32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22`;
+a conda-forge recept commitja `f639462076b7d4d708c8b0b5a447be6776ecf9cf`.
+A recept nem-GPL ága `--disable-gpl` kapcsolót használ, a közös konfiguráció
+pedig `--enable-version3`-at; a csomagolt FFmpeg bináris `-buildconf` kimenete
+ezeket mutatta. A ZIP tartalmazza a receptet és az LGPLv2.1/LGPLv3 szövegeket.
+
+A forrásarchívum nincs a jelenlegi ZIP-ben, ezért ez a hivatkozás és hash nem
+bizonyítja a corresponding source kiadással együtt történő átadását vagy a teljes
+licencfeltételek teljesítését. A #47/#25 kiadási átvétel nyitott; a DLL-lista
+ellenőrzése nem jogi minősítés.
+
 ## Modellek
 
 A [manifest](models/manifest.json) a base és small modellt immutable revisionnel,
@@ -53,3 +69,4 @@ Az aktuális csomagpróba a `.tools/python-license-bundle` és
 `.tools/av-vendor/av-runtime` leltárából készül; ezekből a spec a `licenses/`
 mappát másolja a kiadási onedir könyvtárba. A végleges terjesztési ellenőrzés,
 a tiszta Windows próba és az M1 hangbenchmark még nem teljesült.
+
