@@ -311,8 +311,13 @@ class MainWindow(QMainWindow):
             "Névjegy – RoboAssist",
             "A RoboAssist az FFmpeg projekt LGPLv2.1 licencű könyvtárait használja.\n\n"
             "A terjesztett Windows csomag FFmpeg forrásarchívuma az "
-            "_internal/licenses/upstream-sources mappában, buildreceptje és "
-            "licencszövegei az _internal/licenses/av-runtime mappában található.",
+            "_internal/licenses/upstream-sources mappában, buildreceptjei és "
+            "licencszövegei az _internal/licenses/av-runtime mappában találhatók.\n\n"
+            "A Qt/PySide forrásarchívumai és licenc-/harmadikfél-közleményei az "
+            "_internal/licenses/upstream-sources és _internal/licenses/qt "
+            "mappában találhatók. A teljes közleményjegyzék a "
+            "THIRD_PARTY_NOTICES.md fájlban van. A bináris csomag licencútja "
+            "kiadási ellenőrzés alatt áll.",
         )
 
     @staticmethod
