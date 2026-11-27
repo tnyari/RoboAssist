@@ -183,3 +183,10 @@ Az offline build és statikus ellenőrzés nem helyettesíti módosított Qt/PyS
 DLL/PYD-vel végzett újraindítást. A vendor wheel provenance, GPL-only closure,
 third-party binary linkage és a VC Redistributable terjesztési jogcíme továbbra
 is nyitott; az LGPL út nincs véglegesen kiválasztva vagy jogilag jóváhagyva.
+
+
+A README, Qt runtime-lock és notice módosításainak teljes [Windows CI #132](https://github.com/tnyari/RoboAssist/actions/runs/46013882644)
+sikeres a [3da2a5f](https://github.com/tnyari/RoboAssist/commit/3da2a5fe639fc22d907f5fd52fc6be38561c3f5e)
+headen: lint, formázás, strict typecheck, unit/audio/pipeline replay tesztek,
+config entrypoint és native offline smoke zöld. Ez nem módosított Qt/PySide
+DLL/PYD-val végzett futtatási próba.
