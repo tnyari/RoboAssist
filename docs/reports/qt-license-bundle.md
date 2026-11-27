@@ -136,3 +136,50 @@ fejléceinek automatizált összesítése; az összes fájlban ugyanaz az altern
 licenckifejezés található, fejléc nélküli fájl nem volt. Ez forrásfájl-minta és
 nem bináris provenance- vagy jogi megfelelőségi vizsgálat.
 
+
+## 🧭 LGPLv3 csereút és hivatalos útmutató · 2026-11-27
+
+A kiadási README most útvonalat ad a Qt/PySide runtime DLL/PYD fájlokhoz és a
+33-fájlos `qt-runtime-file-lock.json` leltárhoz. A lock az `_internal/licenses/qt/`
+alatt kerül a ZIP-be; az eredeti QtBase, QtSvg, Qt Image Formats és PySide
+forrásarchívumok, továbbá a kinyert license/notice-fájlok is a csomagban vannak.
+A README leírja az azonos relatív útvonalon történő, ABI-kompatibilis csere
+műszaki lépéseit és a `Start-RoboAssist.cmd` indítását. A csomagindító nem
+ellenőrzi Qt/PySide runtime hash-eket; a lock a kiadott fájlok alapállapotát
+rögzíti.
+
+A [Qt hivatalos útmutató](https://www.qt.io/development/open-source-lgpl-obligations)
+a teljes corresponding source vagy a terjesztő által kontrollált írásos
+source-ajánlat mellett relinket és a módosított library-vel történő futtatást,
+telepítési információt, teljes licencszöveget és jól látható notice-t sorol.
+A [Qt FAQ](https://www.qt.io/faq/qt-open-source-licensing) külön jelzi, hogy a
+Qt projektjére mutató link önmagában nem megfelelő source-ajánlat. A jelenlegi
+ZIP-ben lévő forrásmásolatok és runtime lock előrelépést jelentenek a műszaki
+átadásban.
+
+**Nyitott ellenőrzések:** a PyPI wheel exact build provenance, a tényleges
+third-party link closure és GPL-only komponensek, módosított Qt/PySide
+binárissal indítás és Microsoft VC Redistributable terjesztési jogcím. Emiatt
+az LGPL út nincs véglegesen kiválasztva vagy jóváhagyva; ez a leltár nem jogi
+megfelelőségi minősítés. Követés: [#54](https://github.com/tnyari/RoboAssist/issues/54).
+
+
+## 🧾 Legfrissebb ZIP és csomagolt Qt fájllock · 2026-11-27
+
+A ZIP README-je most előzetes Qt/PySide fájlcsere-útmutatót tartalmaz; a 33
+DLL/PYD hash-zár az `_internal/licenses/qt/qt-runtime-file-lock.json` útvonalon
+is bekerül a csomagba. Ez a fájl a komponensútvonalakat, verziókat, méreteket és
+hash-eket rögzíti, ZIP-hash nélkül, így nincs önhivatkozó artefaktumhash.
+
+A friss offline ZIP SHA-256 értéke
+`bb94a58ea48d6919d65c674e423c2b1c36d52ac66bffdcd029cf619d2c4d3dc1`; statikus
+leltára 1 435 bejegyzés, 108 DLL és 3 EXE, modellsúly nélkül. A Qt fájllock
+33/33 méret/hash, a Qt notice/licenc bundle 174/174 méret/hash és a source
+attribution lista 76/76 hash egyezett. Mind a 10 rögzített upstream
+forrás-/buildarchívum mérete és hash-e egyezett. A csomagolt
+`RoboAssistModels.exe --help` exit 0.
+
+Az offline build és statikus ellenőrzés nem helyettesíti módosított Qt/PySide
+DLL/PYD-vel végzett újraindítást. A vendor wheel provenance, GPL-only closure,
+third-party binary linkage és a VC Redistributable terjesztési jogcíme továbbra
+is nyitott; az LGPL út nincs véglegesen kiválasztva vagy jogilag jóváhagyva.
