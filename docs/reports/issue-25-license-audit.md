@@ -166,7 +166,7 @@ pluginje libtiff 4.7.2-t, illetve libwebp 1.6.0-t használ, ha nincs kiválaszto
 rendszerkönyvtár. Az ezekhez tartozó upstream license/copyright fájlok is külön
 bekerülnek a közleménycsomagba. Ez a Qt forrásverzióra vonatkozó feltételes
 attribution; a PyPI binary build opcióit és a ténylegesen linkelt kódot nem
-bizonyítja. A ZIP SHA-256 `08172151946834876be0c98bb084ab2b2435bd799eb5613c237172b7ff2b332a`,
+bizonyítja. A ZIP SHA-256 `10d2d892ff9a939a3ce2a01def55801e608a6701fc42c5aa53b6602fca5c4555`,
 1 427 bejegyzésű; a ZIP-ből mind a 174 manifestelt Qt licenc/notice-fájl és 76
 source attribution dokumentum hash-e, továbbá mind a 33 rögzített Qt runtime
 DLL/PYD mérete és hash-e egyezett. Mind a négy Qt/PySide archívum megtalálható.
@@ -196,7 +196,7 @@ verziója legalább olyan friss legyen, mint az alkalmazáshoz használt Build T
 a Visual Studio licencfeltételeire korlátozott.
 
 Az offline ZIP aktuális hash-e
-(`08172151946834876be0c98bb084ab2b2435bd799eb5613c237172b7ff2b332a`)
+(`10d2d892ff9a939a3ce2a01def55801e608a6701fc42c5aa53b6602fca5c4555`)
 ezért a Microsoft hivatalos `https://aka.ms/vc14/vc_redist.x64.exe` útvonalán
 letöltött, 14.52.37029.0 x64 telepítőt tartalmazza
 (`_internal/runtime/vc_redist.x64.exe`; SHA-256
@@ -263,4 +263,3 @@ követi. Ez a rész nem jogi minősítés.
 
 A #25 és az M1 kapu (#10) maradjon nyitva, amíg a terjesztési/licencátvétel és a
 M1 többi elfogadási feltétele nem teljesül.
-
