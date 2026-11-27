@@ -53,8 +53,18 @@ ellenőrzés alatt.
 A Qt 6.12.0 qtbase forrásarchívum upstream elérhető (49 MB, SHA-256
 **a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307**), de
 jelenleg nem része a ZIP-nek. A QtSvg és a használt image-format pluginek
-forrásait, a PySide pyside-setup forrásrefet és a corresponding buildláncot
-még rögzíteni kell. A [PyPI PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/)
+forrásai külön modulok. A hivatalos `v6.12.0` source tagek feloldott commitjai:
+[pyside-setup](https://github.com/pyside/pyside-setup/tree/f50facb83fc3dc5f3240c854668c7a6dd93871b2)
+`f50facb83fc3dc5f3240c854668c7a6dd93871b2`,
+[qtbase](https://github.com/qt/qtbase/tree/025bdad181de241e81bf853c8a2d7bf3d19261a9)
+`025bdad181de241e81bf853c8a2d7bf3d19261a9`,
+[qtsvg](https://github.com/qt/qtsvg/tree/883a58532078d003cefef0a549bfe9f885ce41f5)
+`883a58532078d003cefef0a549bfe9f885ce41f5`, és
+[qtimageformats](https://github.com/qt/qtimageformats/tree/dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e)
+`dc13f2fbff1d579cfb2eb2d9092e3563b4d05b8e`. A tagek unsigned állapotúak;
+ezek traceability-referenciák, nem a csomagolt binárisok build-provenance
+bizonyítékai. A forrástree-k és buildlánc jelenleg nem részei a ZIP-nek.
+A [PyPI PySide6-Essentials 6.12.0](https://pypi.org/project/PySide6-Essentials/6.12.0/)
 release oldala csak wheel fájlokat és provenance nélküli artefaktumokat listáz.
 
 A PySide6 és shiboken6 mappák MSVCP140/VCRUNTIME140 DLL-jei
