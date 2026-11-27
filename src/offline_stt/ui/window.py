@@ -484,6 +484,7 @@ class MainWindow(QMainWindow):
         self._final_latency_ids.clear()
         self._accept_events = True
         self._render_transcript()
+        self._capture_state = "loading"
         self._set_status("loading", "Helyi modell betöltése…")
         self._refresh_actions()
         self.start_requested.emit(
@@ -496,6 +497,7 @@ class MainWindow(QMainWindow):
     def _stop(self) -> None:
         if self._capture_state != "running":
             return
+        self._capture_state = "stopping"
         self._set_status("stopping", "Leállítás és adatok ürítése…")
         self._refresh_actions()
         self.stop_requested.emit()
