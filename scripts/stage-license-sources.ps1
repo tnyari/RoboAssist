@@ -16,6 +16,26 @@ $Sources = @(
         Name = 'ffmpeg-8.1.2.tar.gz'
         Uri = 'https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.gz'
         SHA256 = '32faba5ef67340d54724941eae1425580791195312a4fd13bf6f820a2818bf22'
+    },
+    [pscustomobject]@{
+        Name = 'qtbase-everywhere-src-6.12.0.tar.xz'
+        Uri = 'https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtbase-everywhere-src-6.12.0.tar.xz'
+        SHA256 = 'a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307'
+    },
+    [pscustomobject]@{
+        Name = 'qtsvg-everywhere-src-6.12.0.tar.xz'
+        Uri = 'https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtsvg-everywhere-src-6.12.0.tar.xz'
+        SHA256 = 'e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331'
+    },
+    [pscustomobject]@{
+        Name = 'qtimageformats-everywhere-src-6.12.0.tar.xz'
+        Uri = 'https://download.qt.io/archive/qt/6.12/6.12.0/submodules/qtimageformats-everywhere-src-6.12.0.tar.xz'
+        SHA256 = '0943132b5db8de6b6a7f1d162682173e8763c7ed94e80fd39113292845f67762'
+    },
+    [pscustomobject]@{
+        Name = 'pyside-setup-v6.12.0.tar.gz'
+        Uri = 'https://github.com/pyside/pyside-setup/archive/refs/tags/v6.12.0.tar.gz'
+        SHA256 = 'dce2a944b34320e51a0ec8100cb983956399b97dec386f0fbe39e1b52571a336'
     }
 )
 
@@ -45,3 +65,4 @@ foreach ($Source in $Sources) {
         }
     }
 }
+
