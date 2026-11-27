@@ -44,6 +44,32 @@ forrásarchívumok mellettük vannak az `_internal/licenses/upstream-sources/`
 mappában. A Qt binary provenance, a pontos third-party linkelés és az LGPL
 relink/telepítési út kiadási átvétele továbbra is nyitott.
 
+## Qt/PySide fájlcsere · közösségi LGPL út vizsgálata
+
+A ZIP az `_internal/licenses/qt/qt-runtime-file-lock.json` fájlban rögzíti a
+csomagolt 33 Qt/PySide/shiboken DLL és PYD nevét, útvonalát, méretét és hashét.
+A runtime fájlok külön állományok a `_internal/PySide6/`,
+`_internal/PySide6/plugins/` és `_internal/shiboken6/` könyvtárakban. Az LGPL
+közösségi út műszaki vizsgálatához a ZIP az eredeti QtBase, QtSvg, Qt Image
+Formats és PySide forrásarchívumokat, valamint a belőlük kinyert licenceket és
+notice-okat is tartalmazza.
+
+A csomag dinamikus fájlelrendezése lehetővé teszi, hogy ugyanazon Qt 6.12-es
+ABI-val kompatibilis, Windows x64 builddel a megfelelő DLL/PYD fájlokat azonos
+relatív útvonalon cseréljék, majd a `Start-RoboAssist.cmd` fájllal indítsák az
+alkalmazást. A csomagindító nem ellenőrzi a Qt/PySide runtime fájlok hashét; a
+lock a kiadott változat alapállapotát rögzíti. A felhasználónak a cserebuildhez
+alkalmazandó forrás-, módosítás- és buildadatokat is meg kell őriznie.
+
+Ez előzetes technikai csereútmutató, nem végleges licencválasztás vagy jogi
+megfelelőségi állítás. Módosított Qt/PySide DLL-lel/PYD-vel az alkalmazás nem
+lett újraindítva; a vendor wheel binary provenance-a, a pontos third-party
+closure, a GPL-only komponensek és az MSVC terjesztési jogcíme továbbra is
+vizsgálat alatt áll a [#54 jegyen](https://github.com/tnyari/RoboAssist/issues/54).
+A Qt hivatalos [LGPL kötelezettségei](https://www.qt.io/development/open-source-lgpl-obligations)
+és [licenc FAQ-ja](https://www.qt.io/faq/qt-open-source-licensing) írják le a
+source, relink, telepítési információ és felhasználói notice feltételeit.
+
 A Microsoft VC Redistributable telepítőjének verzióját és hashét a csomag
 `_internal/runtime/vc-runtime.json` fájlja rögzíti. A terjesztésre a Microsoft
 Visual Studio licencfeltételei vonatkoznak; az audit a #54 jegyben követi ezt.
