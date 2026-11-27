@@ -52,7 +52,6 @@ datas = [
     (str(ROOT / "LICENSE"), "."),
     (str(ROOT / "LICENSE"), "licenses/RoboAssist"),
     (str(ROOT / "THIRD_PARTY_NOTICES.md"), "."),
-    (str(ROOT / "docs" / "package" / "README.md"), "."),
     (str(ROOT / "docs" / "user-guide.md"), "docs"),
     (str(ROOT / "docs" / "benchmark-metrics.md"), "docs"),
 ]
