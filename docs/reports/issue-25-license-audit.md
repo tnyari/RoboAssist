@@ -49,12 +49,13 @@ kapcsolókat tartalmazza. A próbacsomag licencmappájában ellenőriztem a
 `recipe/meta.yaml`, `recipe/build.sh`, `COPYING.LGPLv2.1` és `COPYING.LGPLv3`
 bejegyzéseket.
 
-A forrásarchívum maga nincs a ZIP-ben: a csomag jelenleg a forrás URL-jét,
-hash-ét, a buildreceptet és a licencszövegeket tartalmazza. Ez a forrásazonosítás
-és konfigurációs bizonyíték nem igazolja önmagában a corresponding source
-kiadással együtt történő átadását, a relinkelési feltételeket vagy a teljes
-terjesztési megfelelést. Ezek a #47/#25 kiadási átvételi feltételei nyitva
-maradnak.
+Az FFmpeg 8.1.2 és PyAV 17.1.0 upstream source archive-ok a Windows ZIP-be
+kerülnek (`_internal/licenses/upstream-sources/`); a source SHA-256 értékek és
+URL-ek ottani README-ben vannak. A conda-forge build recipe-k, patchfájlok,
+artifact metaadatok és licencszövegek `_internal/licenses/av-runtime/packages/`
+alatt találhatók. Ez a csomagolt source és konfigurációs bizonyíték önmagában
+nem igazolja a teljes licencfeltételek vagy a relinkelési út megfelelőségét.
+Ezek a #47/#25 kiadási átvételi feltételei maradnak.
 
 A korábbi PyPI `av` 18.1.0 kiadás yanked státuszt kapott memóriakorrupciós hiba
 miatt. A hiba javítását a [PyAV 18.1.1 kiadási jegyzete](https://github.com/PyAV-Org/PyAV/releases/tag/v18.1.1)
@@ -77,10 +78,9 @@ Ugyanennek a receptnek a külön tesztkörnyezet `ffmpeg * gpl*` függőséget k
 vonatkozó adat; önmagában nem bizonyítja, hogy az elkészült PyAV artifact GPL
 kodeket linkelt. A tényleges csomag 65 DLL-es zárában nincs x264/x265 DLL, és a
 csomagolt FFmpeg 8.1.2 `-buildconf` kimenete `--disable-gpl`-t mutat. A ZIP az
-av conda recept `meta.yaml` fájlját és a BSD-3-Clause `LICENSE.txt`-t tartalmazza,
-az upstream PyAV forrásarchívumot nem. E bizonyítékok mellett is nyitva marad a
-pontos PyAV/FFmpeg licencút és a corresponding-source átadása; ez nem jogi
-minősítés.
+upstream PyAV source archive-ot, conda recept `meta.yaml` fájlját, patchfájlokat
+és BSD-3-Clause `LICENSE.txt`-t tartalmazza. E bizonyítékok mellett is nyitva
+marad a pontos PyAV/FFmpeg licencút; ez nem jogi minősítés.
 
 ## 🐍 Python disztribúciók és ismert sérülékenységek
 
@@ -109,9 +109,9 @@ A fő közvetlen komponensek licenceit és nyitott terjesztési kérdéseit a
 - ✅ A `conda-av-win64.lock` 98 explicit artifact URL-t és SHA-256-ot rögzít.
 - ✅ A stage manifest az FFmpeg 8.1.2 buildjét LGPL-2.1-or-laterként jelöli, és
   rögzíti a DLL-zárat; x264/x265 DLL nincs benne.
-- ✅ A csomagolt FFmpeg 8.1.2 buildrecept, upstream forrás URL/SHA-256,
-  `--disable-gpl` buildág és tényleges bináris `-buildconf` egyezése ellenőrizve;
-  a forrásarchívum átadása és a licencút teljes átvétele nyitott.
+- ✅ A csomagolt FFmpeg 8.1.2 és PyAV 17.1.0 source archive, buildrecept,
+  patchfájlok, forrás URL/SHA-256, `--disable-gpl` buildág és tényleges bináris
+  `-buildconf` egyezése ellenőrizve; a licencút teljes átvétele nyitott.
 - ✅ A `uv audit` 51 Python csomagra ismert sérülékenységet vagy kedvezőtlen
   projektstátuszt nem jelzett; a natív conda closure nem tartozott a vizsgálatba.
 - ⏳ A ZIP-ben található Qt, ONNX Runtime, PortAudio és minden tranzitív notice
